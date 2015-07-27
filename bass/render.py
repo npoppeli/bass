@@ -9,7 +9,7 @@ Chameleon is the primary template toolkit.
 from .common import keep, read_file
 from glob import glob
 from chameleon import PageTemplate
-import logging
+import logging, os
 
 def read_templates():
     template = {}

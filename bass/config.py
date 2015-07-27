@@ -8,6 +8,8 @@ Objects and functions related to configuration.
 import argparse, logging, os
 from .common import keep, read_yaml_file
 
+# TODO: this module itself could serve as registry instead of 'keep'
+
 config_default = {
     'input':     'input',
     'output':    'output',
@@ -16,7 +18,7 @@ config_default = {
 }
 
 def read_config():
-    config_file = 'config'
+    config_file = 'config' # assumption: cwd == project directory
     config = config_default.copy()
     if os.path.exists(config_file) and os.path.isfile(config_file):
          config.update(read_yaml_file(config_file))

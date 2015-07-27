@@ -12,8 +12,10 @@ from .convert import converter
 
 # node classes
 class Node:
-    def __init__(self, parent=None):
+    def __init__(self, path, parent=None):
         self.key = ''
+        self.path = path
+        self.name = name # in theory can be derived from path
         self.parent = parent
         self.child = []
     def transform(self):
@@ -27,35 +29,65 @@ class Node:
         while this.parent is not None:
             this = this.parent
         return this
+    def path(self):
+        return ''
 
 class Folder(Node):
     def __init__(self, path, parent):
-        super().__init__(parent)
+        super().__init__(path, parent)
         self.key = 'Folder'
-        self.path = path
+    def render(self):
+        # create sub-directory 'name' in directory 'parent'
+        logging.debug('Folder.render() output_dir=%s name=%s',
+                      keep.output, self.name)
+        path = os.path.join(keep.output, self.parent.path, name)
+        for node in self.child:
+            node.render()
+    def path(self):
+        if self.parent is None:
+            result = ''
+        elif self.parent.parent is None:
+            result = self.name
+        else:
+            result = '{}/{}'.format(self.parent.path, self.name)
+        # logging.debug("Folder.path name='%s' path='%s'", self.name, result)
+        return result
 
 class Page(Node):
     def __init__(self, path, parent):
-        super().__init__(parent)
+        super().__init__(path, parent)
         self.key = 'Page'
-        self.path = path
-        logging.debug('create page from %s', path)
+        path = os.path.join(keep.input, parent.path, name)
         pagetype = os.path.splitext(path)[1]
-        logging.debug('convert as %s', pagetype)
         (meta, preview, content) = read_page(path)
         convert = keep.converter[pagetype]
         self.preview = convert(preview) if preview else ''
         self.content = convert(content)
         self.meta = complete_meta(meta)
+    def render(self):
+        logging.debug('Page.render() output_dir=%s parent=%s name=%s',
+                      keep.output, self.parent.name, self.name)
+        for node in self.child:
+            node.render()
+    def path(self):
+        if self.parent.key == 'Page': # self is a sub-page
+            return '{}/{}'.format(self.parent.parent.path, self.name)
+        else:
+            return '{}/{}'.format(self.parent.path, self.name)
 
 class Asset(Node):
     def __init__(self, path, parent):
-        super().__init__(parent)
+        super().__init__(path, parent)
         self.key = 'Asset'
-        self.path = path
+    def render(self):
+        logging.debug('Asset.render() output_dir=%s parent=%s name=%s',
+                      keep.output, self.parent.name, self.name)
+    def path(self):
+        return '{}/{}'.format(self.parent.path, self.name)
 
 # read page, return triple (meta, preview, content)
 def read_page(path):
+    logging.debug('read_page %s', path)
     text = read_file(path)
     parts = text.split('\n---\n')
     if len(parts) == 1: # no metadata, just content

@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -i
+#!/usr/bin/python3
 
 import logging, sys
 from bass import parse_cmdline, create_project, build_site

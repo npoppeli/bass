@@ -5,7 +5,7 @@ bass.common
 Objects and functions shared by other modules.
 """
 
-import yaml
+import logging, yaml
 from bunch import Bunch
 keep = Bunch()
 

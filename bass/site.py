@@ -27,6 +27,9 @@ def ignore_entry(name):
 def build_site():
     logging.info('building site')
     read_config()
+    keep.project = os.getcwd()
+    keep.input = os.path.join(keep.project, keep.config['input'])
+    keep.output = os.path.join(keep.project, keep.config['output'])
     read_templates()
     root = build_tree()
     root.transform()
@@ -35,16 +38,15 @@ def build_site():
 
 def build_tree():
     logging.info('ignoring files/directories: %s', ' '.join(keep.ignore))
-    if not keep.markdown: logging.warning('Markdown is not enabled')
-    if not keep.restructuredtext: logging.warning('RestructuredText is not enabled')
-    if not keep.textile: logging.warning('Textile is not enabled')
-    logging.debug('conversion is enabled for the following extensions: %s', ' '.join(converter.keys()))
-    keep.project = os.getcwd()
-    input_dir = os.path.join(keep.project, keep.config['input'])
-    return create_folder(input_dir, None)
+    logging.info('valid page extensions: %s', ' '.join(keep.pagetypes))
+    return create_folder('', None)
 
-def create_folder(folder_path, parent):
-    folder = Folder(folder_path, parent)
+def create_folder(path, parent):
+    folder = Folder(path, parent)
+    if parent is None:
+        folder_path = keep.input
+    else:
+        folder_path = os.path.join(keep.input, path)
     for name in os.listdir(folder_path):
         path = os.path.join(folder_path, name)
         if ignore_entry(path):
@@ -52,14 +54,14 @@ def create_folder(folder_path, parent):
         elif os.path.isfile(path):
             extension = os.path.splitext(name)[1]
             if extension in keep.pagetypes:
-                logging.debug('page %s', name)
+                logging.debug('create page %s path=%s', name, path)
                 this = Page(path, folder)
             else:
-                logging.debug('asset %s', name)
+                logging.debug('create asset %s path=%s', name, path)
                 this = Asset(path, folder)
             folder.add(this)
         elif os.path.isdir(path):
-            logging.debug('folder %s', name)
+            logging.debug('create folder %s path=%s', name, path)
             this = create_folder(path, folder)
             folder.add(this)
         else:
