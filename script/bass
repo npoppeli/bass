@@ -1,3 +1,20 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -i
 
-from bass import build_tree
+import logging, sys
+from bass import parse_cmdline, create_project, build_site
+
+# parse command line
+args = parse_cmdline()
+# configure logging
+logging.basicConfig(format='%(levelname)s: %(message)s', stream=sys.stdout,
+                    level=logging.DEBUG if args.debug else logging.INFO)
+
+if args.create: # create new project
+    create_project()
+elif args.build: # build site in existing project
+    build_site()
+    # run server if requested
+    # if args.server:
+    #     run_server()
+else:
+    logging.info('not building, not creating')
