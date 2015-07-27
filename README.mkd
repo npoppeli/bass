@@ -1,0 +1,31 @@
+bass options
+-c, --create
+-b, --build
+-s, --server
+
+config: yaml file
+
+input:
+preserve directory structure
+ignore symbolic links, dot files and everything on the ignore list
+build tree from all files in input directory
+.txt: convert \n\n -> </p><p>
+.rst: convert to HTML fragment, with docutils
+.mkd, .md: convert to HTML fragment, with markdown2 (tables and other extensions)
+.txi: convert to HTML fragment, with textile
+other: remember file location
+
+all text files have a yaml header with metadata, and are converted to a page
+assets (other files) are not converted
+
+transform: transformation to full HTML page with Chameleon,
+no-op for folders and assets
+
+rendering: writing folder tree to output directory
+folder.render(): create folder, render children
+page.render(): write HTML file to path
+asset.render(): copy file from input to output directory
+
+template: default.pt, *.pt, other files ignored
+
+output:
