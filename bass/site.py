@@ -37,14 +37,14 @@ def build_site():
 def build_tree():
     logging.info('ignoring files/directories: %s', ' '.join(setting.ignore))
     logging.info('valid page extensions: %s', ' '.join(setting.pagetypes))
-    return create_folder('#root', '', None)
+    return create_folder('', '', None)
 
 def create_folder(name, path, parent):
     folder = Folder(name, path, parent)
     if parent is None:
         folder_path = setting.input
     else:
-        folder_path = os.path.join(setting.input, path)
+        folder_path = path # os.path.join(setting.input, path)
     for name in os.listdir(folder_path):
         path = os.path.join(folder_path, name)
         if ignore_entry(path):

@@ -22,24 +22,21 @@ class Node:
         pass
     def render(self):
         pass
-    def add(self, node):
-        self.child.append(node)
     def root(self): # follow parent chain until you get None
         this = self
         while this.parent is not None:
             this = this.parent
         return this
-    def path(self):
-        return ''
 
 class Folder(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
         self.key = 'Folder'
+    def add(self, node):
+        self.child.append(node)
     def render(self):
         # create sub-directory 'name' in directory 'parent'
-        logging.debug('Folder.render() output_dir=%s name=%s',
-                      setting.output, self.name)
+        logging.debug('Folder.render() path=%s name=%s', self.path, self.name)
         # path = os.path.join(setting.output, self.parent.path, self.name)
         for node in self.child:
             node.render()
@@ -56,8 +53,7 @@ class Page(Node):
         self.content = convert(content)
         self.meta = complete_meta(meta)
     def render(self):
-        logging.debug('Page.render() output_dir=%s parent=%s name=%s',
-                      setting.output, self.parent.name, self.name)
+        logging.debug('Page.render() path=%s name=%s', self.path, self.name)
         for node in self.child:
             node.render()
 
@@ -66,12 +62,10 @@ class Asset(Node):
         super().__init__(name, path, parent)
         self.key = 'Asset'
     def render(self):
-        logging.debug('Asset.render() output_dir=%s parent=%s name=%s',
-                      setting.output, self.parent.name, self.name)
+        logging.debug('Asset.render() path=%s name=%s', self.path, self.name)
 
 # read page, return triple (meta, preview, content)
 def read_page(path):
-    logging.debug('read_page %s', path)
     text = read_file(path)
     parts = text.split('\n---\n')
     if len(parts) == 1: # no metadata, just content
