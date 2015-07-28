@@ -5,9 +5,7 @@ bass.common
 Objects and functions shared by other modules.
 """
 
-import logging, yaml
-from bunch import Bunch
-keep = Bunch()
+import yaml
 
 def read_file(filename):
     with open(filename, 'rU') as f:
