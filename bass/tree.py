@@ -35,8 +35,9 @@ class Folder(Node):
     def add(self, node):
         self.child.append(node)
     def render(self):
-        if self.name != '': # directory setting.output already exists
-            # create sub-directory 'name' in directory 'parent'
+        if self.name == '': # root directory should already exist
+            pass
+        else: # create sub-directory 'name' in directory 'parent'
             dir_path = os.path.join(setting.output, self.path)
             logging.debug('mkdir %s', dir_path)
             os.mkdir(dir_path)
@@ -54,10 +55,14 @@ class Page(Node):
         self.preview = convert(preview) if preview else ''
         self.content = convert(content)
         self.meta = complete_meta(meta)
+        # add metadata as node attributes
+        for key, value in self.meta.items():
+            setattr(self, key, value)
     def render(self):
         html_file = os.path.splitext(self.path)[0] + '.html'
         logging.debug('create %s in %s', html_file, setting.output)
-        write_file('', os.path.join(setting.output, html_file))
+        template = setting.template[self.type]
+        write_file(template.render(this=self), os.path.join(setting.output, html_file))
 
 class Asset(Node):
     def __init__(self, name, path, parent):
