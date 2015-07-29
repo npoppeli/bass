@@ -34,12 +34,25 @@ class Folder(Node):
         self.key = 'Folder'
     def add(self, node):
         self.child.append(node)
+    def folder(self, name):
+        matches = [child for child in self.child
+                   if child.name == name and child.key == 'Folder']
+        return matches[0] if matches else None
+    def folders(self):
+        return [child for child in self.child if child.key == 'Folder']
+    def pages(self):
+        return [child for child in self.child if child.key == 'Page']
+    def assets(self):
+        return [child.name for child in self.child if child.key == 'Asset']
+    def page(self, name):
+        matches = [child for child in self.child
+                   if child.name == name and child.key == 'Page']
+        return matches[0] if matches else None
     def render(self):
         if self.name == '': # root directory should already exist
             pass
         else: # create sub-directory 'name' in directory 'parent'
             dir_path = os.path.join(setting.output, self.path)
-            logging.debug('mkdir %s', dir_path)
             os.mkdir(dir_path)
         for node in self.child:
             node.render()
@@ -47,21 +60,26 @@ class Folder(Node):
 class Page(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
+        logging.debug('Page.init: name=%s path=%s', self.name, self.path)
         self.key = 'Page'
-        path = os.path.join(setting.input, parent.path, name)
         pagetype = os.path.splitext(path)[1]
-        (meta, preview, content) = read_page(path)
+        full_path = os.path.join(setting.input, parent.path, name)
+        (meta, preview, content) = read_page(full_path)
         convert = setting.converter[pagetype]
         self.preview = convert(preview) if preview else ''
         self.content = convert(content)
-        self.meta = complete_meta(meta)
+        self.meta = complete_meta(meta, full_path)
         # add metadata as node attributes
         for key, value in self.meta.items():
             setattr(self, key, value)
+        logging.debug('Page.init: meta=%s', str(self.meta))
+        logging.debug('Page.init: name=%s path=%s', self.name, self.path)
     def render(self):
+        logging.debug('Page.render: name=%s path=%s', self.name, self.path)
         html_file = os.path.splitext(self.path)[0] + '.html'
-        logging.debug('create %s in %s', html_file, setting.output)
+        logging.debug('html file before join %s', html_file)
         template = setting.template[self.type]
+        logging.debug('create %s', os.path.join(setting.output, html_file))
         write_file(template.render(this=self), os.path.join(setting.output, html_file))
 
 class Asset(Node):
@@ -69,7 +87,6 @@ class Asset(Node):
         super().__init__(name, path, parent)
         self.key = 'Asset'
     def render(self):
-        logging.debug('cp %s %s', os.path.join(setting.input, self.path), os.path.join(setting.output, self.path))
         shutil.copy(os.path.join(setting.input, self.path), os.path.join(setting.output, self.path))
 
 # read page, return triple (meta, preview, content)
@@ -77,17 +94,15 @@ def read_page(path):
     text = read_file(path)
     parts = text.split('\n---\n')
     if len(parts) == 1: # no metadata, just content
-        return {'path':path}, '', parts[0]
+        return {}, '', parts[0]
     elif len(parts) == 2: # metadata, content
         meta = read_yaml_string(parts[0])
-        meta['path'] = path
         return meta, '', parts[1]
     else: # len(parts) > 2 -> metadata, preview, content
         meta = read_yaml_string(parts[0])
-        meta['path'] = path
         return meta, parts[1], '\n'.join(parts[1:])
 
-def complete_meta(meta):
+def complete_meta(meta, path):
     # title: if missing, create one from path
     if 'title' not in meta:
         meta['title'] = os.path.splitext(os.path.basename(meta['path']))[0]
@@ -104,10 +119,10 @@ def complete_meta(meta):
     if 'type' not in meta:
         meta['type'] = 'default'
     # date, time, datetime
-    fix_date_time(meta)
+    fix_date_time(meta, path)
     return meta
 
-def fix_date_time(meta):
+def fix_date_time(meta, path):
     date_part = meta['date'] if 'date' in meta else None
     time_part = meta['time'] if 'time' in meta else None
     if 'datetime' in meta:
@@ -127,4 +142,4 @@ def fix_date_time(meta):
     elif date_part is not None:
         meta['datetime'] = datetime(date_part.year, date_part.month, date_part.day)
     else:
-        meta['datetime'] = datetime.fromtimestamp(os.path.getctime(meta['path']))
+        meta['datetime'] = datetime.fromtimestamp(os.path.getctime(path))

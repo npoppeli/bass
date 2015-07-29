@@ -55,8 +55,8 @@ try:
 except ImportError:
     setting.textile = False
 
-# HTML
-converter['.html'] = lambda text: text
+# HTML: treated as assets for now
+# converter['.html'] = lambda text: text
 
 # plain text
 def convert_txt(text):
