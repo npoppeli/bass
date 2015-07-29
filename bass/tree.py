@@ -5,10 +5,10 @@ bass.tree
 Objects and functions related to the site tree.
 """
 
-import logging, os
+import logging, os, shutil
 from datetime import datetime, date
 from . import setting
-from .common import read_file, read_yaml_string
+from .common import read_file, read_yaml_string, write_file
 
 # node classes
 class Node:
@@ -35,9 +35,11 @@ class Folder(Node):
     def add(self, node):
         self.child.append(node)
     def render(self):
-        # create sub-directory 'name' in directory 'parent'
-        logging.debug('Folder.render() path=%s name=%s', self.path, self.name)
-        # path = os.path.join(setting.output, self.parent.path, self.name)
+        if self.name != '': # directory setting.output already exists
+            # create sub-directory 'name' in directory 'parent'
+            dir_path = os.path.join(setting.output, self.path)
+            logging.debug('mkdir %s', dir_path)
+            os.mkdir(dir_path)
         for node in self.child:
             node.render()
 
@@ -53,16 +55,17 @@ class Page(Node):
         self.content = convert(content)
         self.meta = complete_meta(meta)
     def render(self):
-        logging.debug('Page.render() path=%s name=%s', self.path, self.name)
-        for node in self.child:
-            node.render()
+        html_file = os.path.splitext(self.path)[0] + '.html'
+        logging.debug('create %s in %s', html_file, setting.output)
+        write_file('', os.path.join(setting.output, html_file))
 
 class Asset(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
         self.key = 'Asset'
     def render(self):
-        logging.debug('Asset.render() path=%s name=%s', self.path, self.name)
+        logging.debug('cp %s %s', os.path.join(setting.input, self.path), os.path.join(setting.output, self.path))
+        shutil.copy(os.path.join(setting.input, self.path), os.path.join(setting.output, self.path))
 
 # read page, return triple (meta, preview, content)
 def read_page(path):

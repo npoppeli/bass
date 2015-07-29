@@ -65,4 +65,3 @@ converter['.txt'] = convert_txt
 
 setting.converter = converter
 setting.pagetypes = list(converter.keys())
-print('module convert: setting.pagetypes=', setting.pagetypes)
