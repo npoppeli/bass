@@ -10,12 +10,13 @@ from .common import read_file
 from . import setting
 from glob import glob
 from chameleon import PageTemplate
-import logging, os
+from os.path import basename
+import logging
 
 def read_templates():
     template = {}
     for filename in glob(setting.templates+'/*.xml'):
-        name = os.path.basename(filename).replace('.xml', '')
+        name = basename(filename).replace('.xml', '')
         try:
             template[name] = PageTemplate(read_file(filename))
         except Exception as e:

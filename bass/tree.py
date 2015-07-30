@@ -5,8 +5,10 @@ bass.tree
 Objects and functions related to the site tree.
 """
 
-import logging, os, shutil
+import logging, shutil
 from datetime import datetime, date
+from os import mkdir
+from os.path import join, splitext, getctime, basename
 from . import setting
 from .common import read_file, read_yaml_string, write_file
 
@@ -51,20 +53,18 @@ class Folder(Node):
     def render(self):
         if self.name == '': # root directory should already exist
             pass
-        else: # create sub-directory 'name' in directory 'parent'
-            dir_path = os.path.join(setting.output, self.path)
-            os.mkdir(dir_path)
+        else: # create sub-directory 'self.path' in output directory
+            mkdir(join(setting.output, self.path))
         for node in self.child:
             node.render()
 
 class Page(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
-        logging.debug('Page.init: name=%s path=%s', self.name, self.path)
         self.key = 'Page'
-        pagetype = os.path.splitext(path)[1]
-        full_path = os.path.join(setting.input, parent.path, name)
+        full_path = join(setting.input, parent.path, name)
         (meta, preview, content) = read_page(full_path)
+        pagetype = splitext(path)[1]
         convert = setting.converter[pagetype]
         self.preview = convert(preview) if preview else ''
         self.content = convert(content)
@@ -72,22 +72,21 @@ class Page(Node):
         # add metadata as node attributes
         for key, value in self.meta.items():
             setattr(self, key, value)
-        logging.debug('Page.init: meta=%s', str(self.meta))
         logging.debug('Page.init: name=%s path=%s', self.name, self.path)
     def render(self):
         logging.debug('Page.render: name=%s path=%s', self.name, self.path)
-        html_file = os.path.splitext(self.path)[0] + '.html'
-        logging.debug('html file before join %s', html_file)
+        html_file = splitext(self.path)[0] + '.html'
         template = setting.template[self.type]
-        logging.debug('create %s', os.path.join(setting.output, html_file))
-        write_file(template.render(this=self), os.path.join(setting.output, html_file))
+        write_file(template.render(this=self), join(setting.output, html_file))
+        for node in self.child: # sub-pages (dynamically created)
+            node.render()
 
 class Asset(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
         self.key = 'Asset'
     def render(self):
-        shutil.copy(os.path.join(setting.input, self.path), os.path.join(setting.output, self.path))
+        shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
 
 # read page, return triple (meta, preview, content)
 def read_page(path):
@@ -105,7 +104,7 @@ def read_page(path):
 def complete_meta(meta, path):
     # title: if missing, create one from path
     if 'title' not in meta:
-        meta['title'] = os.path.splitext(os.path.basename(meta['path']))[0]
+        meta['title'] = splitext(basename(meta['path']))[0]
     # author: cannot be derived from anything else
     # tags
     if 'tags' in meta:
@@ -119,10 +118,10 @@ def complete_meta(meta, path):
     if 'type' not in meta:
         meta['type'] = 'default'
     # date, time, datetime
-    fix_date_time(meta, path)
+    fix_date_time(meta, datetime.fromtimestamp(getctime(path)))
     return meta
 
-def fix_date_time(meta, path):
+def fix_date_time(meta, ctime):
     date_part = meta['date'] if 'date' in meta else None
     time_part = meta['time'] if 'time' in meta else None
     if 'datetime' in meta:
@@ -142,4 +141,4 @@ def fix_date_time(meta, path):
     elif date_part is not None:
         meta['datetime'] = datetime(date_part.year, date_part.month, date_part.day)
     else:
-        meta['datetime'] = datetime.fromtimestamp(os.path.getctime(path))
+        meta['datetime'] = ctime

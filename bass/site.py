@@ -12,14 +12,15 @@ from .config import config_default, read_config
 from .convert import converter
 from .render import read_templates
 from .tree import Folder, Page, Asset
-from os.path import isdir
+from os import listdir, mkdir, unlink
+from os.path import isdir, isfile, islink, join, relpath, splitext
 
 def create_project():
     """create_project: create new project directory, with default configuration"""
     logging.info('creating project')
-    if len(os.listdir()) == 0:
+    if len(listdir()) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
-        os.mkdir('input'); os.mkdir('output'); os.mkdir('template')
+        mkdir('input'); mkdir('output'); mkdir('template')
     else:
         logging.warn('current directory not empty')
         sys.exit()
@@ -43,12 +44,12 @@ def verify_project():
 
 def prepare_output():
     """prepare_output: clean output directory before rendering site tree"""
-    for name in os.listdir(setting.output):
+    for name in listdir(setting.output):
         if name[0] == ".":
             continue
-        path = os.path.join(setting.output, name)
-        if os.path.isfile(path):
-            os.unlink(path)
+        path = join(setting.output, name)
+        if isfile(path):
+            unlink(path)
         else:
             shutil.rmtree(path)
 
@@ -59,21 +60,21 @@ def build_tree():
 
 def ignore_entry(name):
     """ignore_entry: True if symbolic link or if filename matches one of the ignore patterns"""
-    return any([fnmatch.fnmatch(name, pattern) for pattern in setting.ignore]) or os.path.islink(name)
+    return any([fnmatch.fnmatch(name, pattern) for pattern in setting.ignore]) or islink(name)
 
 def create_folder(name, path, parent):
     folder = Folder(name, path, parent)
     if parent is None:
         folder_path = setting.input
     else:
-        folder_path = os.path.join(setting.input, path)
+        folder_path = join(setting.input, path)
     for name in os.listdir(folder_path):
-        path = os.path.join(folder_path, name)
-        rel_path = os.path.relpath(path, setting.input)
+        path = join(folder_path, name)
+        rel_path = relpath(path, setting.input)
         if ignore_entry(path):
             logging.debug('ignore %s', rel_path)
-        elif os.path.isfile(path):
-            extension = os.path.splitext(name)[1]
+        elif isfile(path):
+            extension = splitext(name)[1]
             if extension in setting.pagetypes:
                 # logging.debug('create page %s path=%s', name, rel_path)
                 this = Page(name, rel_path, folder)
@@ -81,7 +82,7 @@ def create_folder(name, path, parent):
                 # logging.debug('create asset %s path=%s', name, rel_path)
                 this = Asset(name, rel_path, folder)
             folder.add(this)
-        elif os.path.isdir(path):
+        elif isdir(path):
             # logging.debug('create folder %s path=%s', name, rel_path)
             this = create_folder(name, rel_path, folder)
             folder.add(this)
