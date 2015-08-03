@@ -64,4 +64,3 @@ def convert_txt(text):
 converter['.txt'] = convert_txt
 
 setting.converter = converter
-setting.pagetypes = list(converter.keys())

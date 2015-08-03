@@ -5,7 +5,7 @@ bass.site
 Objects and functions related to site structure.
 """
 
-import fnmatch, logging, os, shutil,sys, yaml
+import fnmatch, imp, logging, os, shutil,sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
@@ -29,17 +29,27 @@ def build_site():
     read_config()
     verify_project()
     read_templates()
-    logging.info('building site')
+    read_hooks()
+    logging.info('building site tree')
     root = build_tree()
-    # root.transform()
     prepare_output()
+    logging.info('rendering site tree')
     root.render()
-    setting.root = root
+
+def read_hooks():
+    if isdir(setting.hooks):
+        (fileobj, path, details) = imp.find_module('__init__', [setting.hooks])
+        module = imp.load_module('hooks', fileobj, path, details)
+        setting.pre_hook  = getattr(module, 'pre', {})
+        setting.post_hook = getattr(module, 'post', {})
+    else:
+        setting.pre_hook  = {}
+        setting.post_hook = {}
 
 def verify_project():
     """verify_project: # verify existence of directories specified in configuration"""
     if not ( isdir(setting.input) and isdir(setting.output) and isdir(setting.templates) ):
-        logging.critical("Directories missing in project. Exit, stage left.")
+        logging.critical("Directories missing in project.")
         sys.exit(1)
 
 def prepare_output():
@@ -54,9 +64,14 @@ def prepare_output():
             shutil.rmtree(path)
 
 def build_tree():
+    root = None
+    if '//' in setting.pre_hook: setting.pre_hook['//'](root)
     logging.info('ignoring files/directories: %s', ' '.join(setting.ignore))
-    logging.info('valid page extensions: %s', ' '.join(setting.pagetypes))
-    return create_folder('', '', None)
+    pagetypes = list(setting.converter.keys())
+    logging.info('valid page extensions: %s', ' '.join(pagetypes))
+    root = create_folder('', '', None)
+    if '//' in setting.post_hook: setting.post_hook['//'](root)
+    return root
 
 def ignore_entry(name):
     """ignore_entry: True if symbolic link or if filename matches one of the ignore patterns"""
@@ -64,6 +79,7 @@ def ignore_entry(name):
 
 def create_folder(name, path, parent):
     folder = Folder(name, path, parent)
+    pagetypes = list(setting.converter.keys())
     if parent is None:
         folder_path = setting.input
     else:
@@ -75,15 +91,12 @@ def create_folder(name, path, parent):
             logging.debug('ignore %s', rel_path)
         elif isfile(path):
             extension = splitext(name)[1]
-            if extension in setting.pagetypes:
-                # logging.debug('create page %s path=%s', name, rel_path)
+            if extension in pagetypes:
                 this = Page(name, rel_path, folder)
             else:
-                # logging.debug('create asset %s path=%s', name, rel_path)
                 this = Asset(name, rel_path, folder)
             folder.add(this)
         elif isdir(path):
-            # logging.debug('create folder %s path=%s', name, rel_path)
             this = create_folder(name, rel_path, folder)
             folder.add(this)
         else:

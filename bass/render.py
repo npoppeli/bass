@@ -13,6 +13,11 @@ from chameleon import PageTemplate
 from os.path import basename
 import logging
 
+# TODO: make it possible to add other template engines
+# map extensions to template factories
+# .xml -> chameleon.PageTemplate
+# .jpt -> jinja2.SomeClass
+
 def read_templates():
     template = {}
     for filename in glob(setting.templates+'/*.xml'):

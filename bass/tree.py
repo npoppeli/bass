@@ -51,6 +51,7 @@ class Folder(Node):
                    if child.name == name and child.key == 'Page']
         return matches[0] if matches else None
     def render(self):
+        logging.debug('Folder.render: name=%s path=%s', self.name, self.path)
         if self.name == '': # root directory should already exist
             pass
         else: # create sub-directory 'self.path' in output directory
@@ -72,12 +73,11 @@ class Page(Node):
         # add metadata as node attributes
         for key, value in self.meta.items():
             setattr(self, key, value)
-        logging.debug('Page.init: name=%s path=%s', self.name, self.path)
+        self.url = '/' + splitext(self.path)[0] + '.html'
     def render(self):
         logging.debug('Page.render: name=%s path=%s', self.name, self.path)
-        html_file = splitext(self.path)[0] + '.html'
-        template = setting.template[self.type]
-        write_file(template.render(this=self), join(setting.output, html_file))
+        template = setting.template[self.skin]
+        write_file(template.render(this=self), join(setting.output, self.url[1:]))
         for node in self.child: # sub-pages (dynamically created)
             node.render()
 
@@ -85,7 +85,9 @@ class Asset(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
         self.key = 'Asset'
+        self.url = '/' + self.path
     def render(self):
+        logging.debug('Asset.render: name=%s path=%s', self.name, self.path)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
 
 # read page, return triple (meta, preview, content)
@@ -114,9 +116,12 @@ def complete_meta(meta, path):
             meta['tags'] = [tag.strip() for tag in meta['tags'].split(',')]
     else:
         meta['tags'] = []
-    # type
-    if 'type' not in meta:
-        meta['type'] = 'default'
+    # skin
+    if 'skin' not in meta:
+        meta['skin'] = 'default'
+    # id
+    if 'id' not in meta:
+        meta['id'] = ''
     # date, time, datetime
     fix_date_time(meta, datetime.fromtimestamp(getctime(path)))
     return meta

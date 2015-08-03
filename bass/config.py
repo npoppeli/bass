@@ -14,6 +14,7 @@ from .common import read_yaml_file
 config_default = {
     'input':     'input',
     'output':    'output',
+    'hooks':     'hooks',
     'templates': 'templates',
     'ignore':    '.?*'
 }
@@ -22,13 +23,14 @@ def read_config():
     config_file = 'config' # assumption: cwd == project directory
     config = config_default.copy()
     if exists(config_file) and isfile(config_file):
-         config.update(read_yaml_file(config_file))
+        config.update(read_yaml_file(config_file))
     setting.ignore = config['ignore'].split()
     if config_default['ignore'] not in setting.ignore:
         setting.ignore.append(config_default['ignore'])
     setting.project   = getcwd()
     setting.input     = join(setting.project, config['input'])
     setting.output    = join(setting.project, config['output'])
+    setting.hooks     = join(setting.project, config['hooks'])
     setting.templates = join(setting.project, config['templates'])
 
 def parse_cmdline():
