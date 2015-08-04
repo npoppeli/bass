@@ -2,37 +2,39 @@ Bass
 ====
 
 Bass is a static website generator (Bass=Build A Static Site). It turns a
-collection of content pages, assets (PNG, CSS, JS etc.) and templates into a static
-website, i.e. a website consisting only of directories, HTML pages and the same
-assets. Bass is distributed under the MIT license (see the LICENSE file for
-more details).
+collection of content pages, assets (PNG, CSS, JS etc.) and templates into a
+static website, i.e. a website consisting only of directories, HTML pages and
+the same assets. Bass is distributed under the MIT license (see the LICENSE
+file for more details).
 
 The idea is that you don't need a content-management system on the server to
 generate page dynamically: you generate the content, upload it to the server,
 and repeat this process when something has changed. That way, there is no need
-to install complex software on the server, with the associated
-maintenance effort (software upgrad, backup) and security issues.
+to install complex software on the server, with the associated maintenance
+effort (software upgrad, backup) and security issues.
 
 The design of Bass borrows ideas from [Wok][wok] and other static site
-generators (see [overview][static]). Before I created Bass, I used Wok for about a year,
-created two websites with it, and also looked at alternatives.
+generators (see [overview][static]). Before I created Bass, I used Wok for
+about a year, created two websites with it, and also looked at alternatives.
 During that year I noticed two drawbacks.
 
-The first drawback of many static site generators is that they make assumptions about the
-structure of the input directory and the names of files and directories (being designed primarily for blog sites).
-Wok completely ignores the structure of the input directory, and uses the metadata of
-the pages(category) to create the structure of the site tree.
+The first drawback of many static site generators is that they make assumptions
+about the structure of the input directory and the names of files and
+directories (being designed primarily for blog sites).  Wok completely ignores
+the structure of the input directory, and uses the metadata of the
+pages(category) to create the structure of the site tree.
 
-The second drawback of Wok is that it lacks certain handy features.
-Some examples of missing features are: flexible pagination, use of template engines other than Jinja,
-ignoring certain files in the content directory (e.g. Emacs backup files).
+The second drawback of Wok is that it lacks certain handy features.  Some
+examples of missing features are: flexible pagination, use of template engines
+other than Jinja, ignoring certain files in the content directory (e.g. Emacs
+backup files).
 
 Bass includes the features I missed in Wok and other static site generators.
-More importantly: it considers the organization of the input directory as meaningful, and
-preserves it in the site tree.
-With organization of the input directory I mean: (1) the structure of the tree of files and
-sub-directories in the input directory, and (2) the names of files and sub-directories.
-This concept was borrowed from [Wintersmith][wintersmith].
+More importantly: it considers the organization of the input directory as
+meaningful, and preserves it in the site tree.  With organization of the input
+directory I mean: (1) the structure of the tree of files and sub-directories in
+the input directory, and (2) the names of files and sub-directories.  This
+concept was borrowed from [Wintersmith][wintersmith].
 
 [wok]: https://github.com/mythmon/wok
 [static]: https://www.staticgen.com/
@@ -40,11 +42,13 @@ This concept was borrowed from [Wintersmith][wintersmith].
 
 Documentation
 -------------
+
 Documentation is in the `doc` directory.
 An example site is in the `test` directory.
 
 Installation
 ------------
+
 The recommended way to install Bass is from the [Python Package Index][pypi]
 with this command: `sudo pip install bass`.
 
@@ -84,12 +88,13 @@ Put your content in the input directory (default: `input`). Build the site with
 `bass -b`. If you want to see debugging information, use `bass -b -d`.
 
 If you want to start a web server after generating the site, use `bass -b -s`.
-This will generate the site as usual, and then start an HTTP server (Python package 'waitress')
-on port 8080. This test server is intended solely for local testing of the
-site during development!
+This will generate the site as usual, and then start an HTTP server (Python
+package 'waitress') on port 8080. This test server is intended solely for local
+testing of the site during development!
 
 Configuration
 -------------
+
 Settings can be changed in the configuration file. This is the file `config` in
 the project directory.
 
@@ -106,7 +111,7 @@ Creating a site
 
 ### Process
 
-Bass is a tree transformation engine &#8211; no more, no less! The (site) tree is
+Bass is a tree transformation engine - no more, no less! The (site) tree is
 generated from a set of files and directories in the input directory. The tree
 can be transformed (optionally), and is then rendered as a set of files and
 directories in the output directory.
@@ -137,7 +142,8 @@ transformation.
 ###  Render site tree
 
 Rendering means writing the site tree to the output directory (default:
-`output`). Rendering is defined as a series of actions, depending on the type of the node.
+`output`). Rendering is defined as a series of actions, depending on the type
+of the node.
 
 * Folder: call pre-render hook, create directory, render children, call post-render hook
 * Page: call pre-render hook, write HTML file to path, render children, call post-render hook
@@ -161,13 +167,13 @@ are text files with some form of markup, assets are images, CSS files and other
 files.
 
 Bass defines converters for plain text (extension `.txt`) and HTML fragments
-(extension`.html`), and (provided the related Python packages are installed) for
-Markdown (extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`), and
-Textile (extension `.txi`).
+(extension`.html`), and (provided the related Python packages are installed)
+for Markdown (extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`),
+and Textile (extension `.txi`).
 
 In other words: a file is mapped to a page if the extension of the file is in
-the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`.
-All other files are mapped to an asset.
+the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
+'.html']`.  All other files are mapped to an asset.
 
 #### Pages
 
@@ -194,14 +200,14 @@ following contents.
     ---
     This is the home page. Add useful text here.
 
-This is a minimal Markdown page. The part above the divider `---` contains the metadata for
-the page. Below the `---` is the content of the page.
-The metadata section is not required. 
+This is a minimal Markdown page. The part above the divider `---` contains the
+metadata for the page. Below the `---` is the content of the page.  The
+metadata section is not required.
 
-The content itself can also contain a line with `---`. The part between the first and
-second divider is the preview, and the part below the second divider is the rest of
-the text. The preview part can be used on a front page, for example, with
-links to the complete page.
+The content itself can also contain a line with `---`. The part between the
+first and second divider is the preview, and the part below the second divider
+is the rest of the text. The preview part can be used on a front page, for
+example, with links to the complete page.
 
 The basic set of metadata is this.
 
@@ -216,13 +222,14 @@ Other metadata fields can be defined in the header, and used in templates or hoo
 
 #### Assets
 
-A file is mapped to an asset if the extension of the file is *not* in the list of
-page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. An asset
-is not changed during the tree generation phase.
+A file is mapped to an asset if the extension of the file is *not* in the list
+of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. An
+asset is not changed during the tree generation phase.
 
 #### Folders
 
-A directory is mapped to a folder. A folder is not changed during the tree generation phase.
+A directory is mapped to a folder. A folder is not changed during the tree
+generation phase.
 
 ### Templates
 
@@ -243,8 +250,8 @@ in the *root pre-build hook* (see next paragraph).
 
 ### Hooks
 
-Hooks are functions that are called before or after rendering a node.
-The first type is called a pre-render hook, the second type a post-render
+Hooks are functions that are called before or after rendering a node.  The
+first type is called a pre-render hook, the second type a post-render
 hook. Pre-render and post-render hooks can be defined for all nodes in the
 tree. The node to which the hook is attached, is specified by its path or its
 `id`.
@@ -297,6 +304,6 @@ Table of contents (paginated).
 #### Post-build hooks
 
 Defining templates engines can also be done in the post-build hook (as long as
-it is done *before* the rendering phase), but the main purpose of such a hook is
-to transform the whole site tree. Please use your imagination, but don't break
-the site tree (well: it's your tree anyway).
+it is done *before* the rendering phase), but the main purpose of such a hook
+is to transform the whole site tree. Please use your imagination, but don't
+break the site tree (well: it's your tree anyway).

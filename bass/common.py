@@ -5,7 +5,8 @@ bass.common
 Objects and functions shared by other modules.
 """
 
-import yaml
+import logging, yaml, sys
+from . import setting
 
 def read_file(filename):
     with open(filename, 'rU') as f:
@@ -37,7 +38,14 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
       - string: name of template to render one node in nodelist
       - callable: callable to render one node in nodelist."""
     # one HTML fragment per node, then partitioned in chunks of 'size'
-    parts = partition([skin.render(this=node) for node in nodelist], size)
+    if callable(skin):
+        func = skin
+    elif isinstance(skin, str):
+        func = setting.template['skin'].render
+    else:
+        logging.critical("Bad parameter 'skin' in function 'add_toc'")
+        sys.exit(1)
+    parts = partition([func(this=node) for node in nodelist], size)
     page.prev, page.next = None, None
     previous = page
     if len(parts) > 0:

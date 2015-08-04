@@ -22,7 +22,7 @@ def create_project():
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
         mkdir('input'); mkdir('output'); mkdir('template')
     else:
-        logging.warn('current directory not empty')
+        logging.warn('Current directory not empty.')
         sys.exit()
 
 def build_site():
@@ -37,9 +37,11 @@ def build_site():
     root.render()
 
 def check_hooks(hooks):
-    # TODO: remove entries with value not a callable; remove entry '#' (would match all nodes without explicit id attribute)
-    return hooks
-    
+    """hooks: dictionary
+    filter out entries k:v where v is not a callable, and a possible entry with k='#'.
+    The latter is removed because it would match all nodes without an explicit 'id' attribute."""
+    return {k:v for k, v in hooks.items() if callable(v) and k != '#'}
+
 def read_hooks():
     if isdir(setting.hooks):
         (fileobj, path, details) = imp.find_module('__init__', [setting.hooks])
@@ -69,12 +71,14 @@ def prepare_output():
 
 def build_tree():
     root = None
-    if '//' in setting.pre_hook: setting.pre_hook['//'](root)
+    if '//' in setting.pre_hook:
+        setting.pre_hook['//'](root)
     logging.info('ignoring files/directories: %s', ' '.join(setting.ignore))
     pagetypes = list(setting.converter.keys())
     logging.info('valid page extensions: %s', ' '.join(pagetypes))
     root = create_folder('', '', None)
-    if '//' in setting.post_hook: setting.post_hook['//'](root)
+    if '//' in setting.post_hook:
+        setting.post_hook['//'](root)
     return root
 
 def ignore_entry(name):

@@ -118,7 +118,8 @@ def read_page(path):
 def complete_meta(meta, path):
     # title: if missing, create one from path
     if 'title' not in meta:
-        meta['title'] = splitext(basename(meta['path']))[0]
+        title = splitext(basename(meta['path']))[0]
+        meta['title'] = title.replace('-', ' ').replace('_', ' ').capitalize()
     # author: cannot be derived from anything else
     # tags
     if 'tags' in meta:

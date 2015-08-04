@@ -1,0 +1,76 @@
+Version 0.5
+-----------
+In which the MIT license is applied.
+
+### Features
+-   The structure of the generated files is now user configurable.
+-   New configuration option: `author`. See docs for more info.
+-   Markdown, Pygments, and Docutils dependencies are now optional.
+-   Output from wok will now wrap to terminal windows.
+
+### Other
+-   The README now references some sample sites.
+-   Added a license. Wok is now officially open source!
+-   Tweaked output formats.
+-   Page metadata is now stored in a more consistent way.
+
+Version 0.4
+-----------
+In which things get more flexible.
+
+### Features
+-   Added a built in testing server, to easily test absolute links on the site.
+-   Add `--version` option.
+-   Added `site.pages`, a flat list of the pages of the site.
+-   Added `site.categories`, a dictionary:
+    `{top level categories : immediate children of that category}`.
+-   Added page.url field, settable in a page's header and accessible from
+    templates.
+-   Started adding unit tests.
+
+### Fixes
+-   Fix `Page.author` to actually parse author strings right.
+
+
+Version 0.3
+-----------
+In which things get brighter.
+
+-   Add optional syntax highlighting using [Pygments][pyg].
+-   Add tags for pages.
+-   Add `--verbose` (`-v`) and `--quiet` (`-q`) options to the script.
+
+[pyg]: http://pygments.org
+
+Version 0.2.2
+-------------
+In which I try to teach better.
+
+-   Improve the sample site.
+-   Enable syntax highlighting for Markdown.
+-   Fix requirements for PyPI/pip
+
+Version 0.2.1
+-------------
+In which I release what should have been v0.2.
+
+-   Add a sample site.
+-   Actually enable reStructuredText support.
+-   Don't try to parse hidden files.
+-   Fix datetime handling.
+-   Media directory is now optional.
+-   Make output files in a tree structure based on category.
+
+Version 0.2
+-----------
+In which MostAwesomeDude convinces me to add reStructured Text.
+
+-   Initial support for reStructuredText.
+-   Installable package.
+-   Bug fixes based on user feedback.
+
+Version 0.1
+-----------
+In which things start.
+
+-   First release.
