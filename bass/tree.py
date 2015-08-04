@@ -16,6 +16,7 @@ from .common import read_file, read_yaml_string, write_file
 class Node:
     def __init__(self, name, path, parent=None):
         self.key = ''
+        self.id = ''
         self.path = path
         self.name = name
         self.parent = parent
@@ -65,7 +66,7 @@ class Folder(Node):
         for node in self.child:
             node.render()
         self.apply(setting.post_hook)
-        
+
 class Page(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
@@ -100,7 +101,7 @@ class Asset(Node):
         self.apply(setting.pre_hook)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
         self.apply(setting.post_hook)
-        
+
 # read page, return triple (meta, preview, content)
 def read_page(path):
     text = read_file(path)
