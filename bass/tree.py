@@ -24,6 +24,11 @@ class Node:
         pass
     def render(self):
         pass
+    def apply(self, hooks):
+        if self.path in hooks:
+            hooks[self.path](self)
+        elif '#'+self.id in hooks:
+            hooks['#'+self.id](self)
     def root(self): # follow parent chain until you get None
         this = self
         while this.parent is not None:
@@ -52,13 +57,15 @@ class Folder(Node):
         return matches[0] if matches else None
     def render(self):
         logging.debug('Folder.render: name=%s path=%s', self.name, self.path)
+        self.apply(setting.pre_hook)
         if self.name == '': # root directory should already exist
             pass
         else: # create sub-directory 'self.path' in output directory
             mkdir(join(setting.output, self.path))
         for node in self.child:
             node.render()
-
+        self.apply(setting.post_hook)
+        
 class Page(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
@@ -76,10 +83,12 @@ class Page(Node):
         self.url = '/' + splitext(self.path)[0] + '.html'
     def render(self):
         logging.debug('Page.render: name=%s path=%s', self.name, self.path)
+        self.apply(setting.pre_hook)
         template = setting.template[self.skin]
         write_file(template.render(this=self), join(setting.output, self.url[1:]))
         for node in self.child: # sub-pages (dynamically created)
             node.render()
+        self.apply(setting.post_hook)
 
 class Asset(Node):
     def __init__(self, name, path, parent):
@@ -88,8 +97,10 @@ class Asset(Node):
         self.url = '/' + self.path
     def render(self):
         logging.debug('Asset.render: name=%s path=%s', self.name, self.path)
+        self.apply(setting.pre_hook)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
-
+        self.apply(setting.post_hook)
+        
 # read page, return triple (meta, preview, content)
 def read_page(path):
     text = read_file(path)
