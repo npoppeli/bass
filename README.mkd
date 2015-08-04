@@ -18,12 +18,13 @@ generators (see [overview][static]). I used Wok for about a year, but started
 missing certain features (e.g. using another template engine, ignoring Emacs
 backup files in the content directory, flexible pagination). This was one
 reason to write Bass: to develop a site generator that included those
-features. The other reason was that I needed a site generator that does not
-make assumptions about the structure of the input directory and the names of
-files and directories (an idea that can also be found in
-[Wintersmith][wintersmith] for example). Most static site generators have an
+features. The other reason was that I began to see the drawbacks of a site generator that
+makes assumptions about the structure of the input directory and the names of
+files and directories. Most static site generators, Wok included, have an
 orientation towards blog sites, or make assumptions about names of files and
-directories.
+directories. Bass makes no such assumptions. The idea of being completely free
+in structuring the input directory and naming files and sub-directories was
+borrowed from [Wintersmith][wintersmith]).
 
 [wok]: https://github.com/mythmon/wok
 [static]: https://www.staticgen.com/
