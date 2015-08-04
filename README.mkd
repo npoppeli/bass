@@ -14,17 +14,26 @@ to install and maintain complex software on the server, with the associated
 maintenance effort, security issues etcetera.
 
 The design of Bass borrows ideas from [Wok][wok] and other static site
-generators (see [overview][static]). I used Wok for about a year, but started
-missing certain features (e.g. using another template engine, ignoring Emacs
-backup files in the content directory, flexible pagination). This was one
-reason to write Bass: to develop a site generator that included those
-features. The other reason was that I began to see the drawbacks of a site generator that
-makes assumptions about the structure of the input directory and the names of
-files and directories. Most static site generators, Wok included, have an
-orientation towards blog sites, or make assumptions about names of files and
-directories. Bass makes no such assumptions. The idea of being completely free
-in structuring the input directory and naming files and sub-directories was
-borrowed from [Wintersmith][wintersmith]).
+generators (see [overview][static]). Before I created Bass, I used Wok for about a year,
+created two websites with it, and also looked at alternatives.
+During that year I noticed two drawbacks.
+
+The first drawback of many static site
+generators is that they have an orientation towards blog sites, and make assumptions about the
+structure of the input directory and the names of files and directories.
+Wok completely ignores the structure of the input directory, and uses the metadata of
+the pages(category) to create the structure of the site tree.
+
+The second drawback of Wok is that it lacks certain handy features.
+Some examples of missing features are: flexible pagination, using a template engine other than Jinja,
+ignoring certain files in the content directory (e.g. Emacs backup files).
+
+Bass includes the features I missed in Wok and other static site generators.
+More importantly: it considers the organization of the input directory as meaningful, and
+preserves it in the site tree.
+With organization of the input directory I mean: (1) the structure of the tree of files and
+sub-directories in the input directory, and (2) the names of files and sub-directories.
+This concept was borrowed from [Wintersmith][wintersmith]).
 
 [wok]: https://github.com/mythmon/wok
 [static]: https://www.staticgen.com/
