@@ -86,11 +86,11 @@ the project directory.
 
 Possible configuration options (and their defaults) are
 
-- `input` ('input'): collection of input files (files and assets).
+- `input` (`input`): collection of input files (files and assets).
 - `ignore` (`.?*`): patterns of files and directories to be ignored).
-- `output` ('output'): collection of output files (the generated web site).
-- `templates` ('templates'): collection of templates.
-- `hooks` ('hooks'): Python module with hooks.
+- `output` (`output`): collection of output files (the generated web site).
+- `templates` (`templates`): collection of templates.
+- `hooks` (`hooks`): Python module with hooks.
 
 Creating a site
 ---------------
@@ -117,8 +117,7 @@ Folder, Page, Asset. The details are explained below in the paragraph
 During the process of building the site tree, directories and files are ignored
 if their names match one of the *ignore patterns*. Symbolic links are also
 ignored.  By default there is one ignore pattern: `.?*`. Other ignore patterns
-can be defined in the configuration file. (`ignore` option in the configuration
-file).
+can be defined in the configuration file (option `ignore`).
 
 #### Transform site tree
 
@@ -129,7 +128,7 @@ transformation phase is equivalent to `pass`.
 ###  Render site tree
 
 Rendering means writing the site tree to the output directory (default:
-`output'). Depending on the type of the node, rendering is defined as a series
+`output`). Depending on the type of the node, rendering is defined as a series
 of actions.
 
 * Folder: call pre-render hook, create directory, render children, call post-render hook
@@ -159,7 +158,7 @@ Markdown (extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`), and
 Textile (extensions `.txi`).
 
 In other words: a file is mapped to a page if the extension of the file is in
-the list of page types, usually `[`.md`, `.mkd`, `.rst`, `.txi`, `.txt`, `.html`].
+the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`.
 All other files are mapped to an asset.
 
 #### Pages
@@ -183,8 +182,6 @@ Each page can start with meta-data section in YAML form, but this is
 optional. Suppose there is named `index.mkd` in the input directory, with the
 following contents.
 
-`index.mkd`
-
     title: Home
     ---
     This is the home page. Add useful text here.
@@ -204,8 +201,7 @@ The basic set of metadata is this.
 * tags: one or more words, separated by comma or space (default: empty list)
 * skin: the name of the template used to render this page as a complete HTML file (default: `default`)
 * id: an identifier of the node, which can be used in hooks (default: ``)
-* date, time, datetime: date, time and date-time in ISO notation (default:
-* `ctime` of the file)
+* date, time, datetime: date, time and date-time in ISO notation (default: `ctime` of the file)
 
 Other metadata fields can be defined in the header, and used in templates or
 hooks.
@@ -213,7 +209,7 @@ hooks.
 #### Assets
 
 A file is mapped to an asset if the extension of the file is *not* in the list of
-page types, usually `[`.md`, `.mkd`, `.rst`, `.txi`, `.txt`, `.html`]. An asset
+page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. An asset
 is not changed during the tree generation phase.
 
 #### Folders
@@ -262,7 +258,7 @@ hook is called after building/generating the site tree.
 
 Hooks are defined in the configuration file:
 
-    hooks: hookdir hookfile.py
+    hooks: hooks
 
 #### Pre-render hooks
 
