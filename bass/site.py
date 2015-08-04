@@ -36,12 +36,16 @@ def build_site():
     logging.info('rendering site tree')
     root.render()
 
+def check_hooks(hooks):
+    # TODO: remove entries with value not a callable; remove entry '#' (would match all nodes without explicit id attribute)
+    return hooks
+    
 def read_hooks():
     if isdir(setting.hooks):
         (fileobj, path, details) = imp.find_module('__init__', [setting.hooks])
         module = imp.load_module('hooks', fileobj, path, details)
-        setting.pre_hook  = getattr(module, 'pre', {})
-        setting.post_hook = getattr(module, 'post', {})
+        setting.pre_hook  = check_hooks(getattr(module, 'pre', {}))
+        setting.post_hook = check_hooks(getattr(module, 'post', {}))
     else:
         setting.pre_hook  = {}
         setting.post_hook = {}
