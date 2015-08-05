@@ -18,11 +18,11 @@ generators (see [overview][static]). Before I created Bass, I used Wok for
 about a year, created two websites with it, and also looked at alternatives.
 During that year I noticed two drawbacks.
 
-The first drawback of many static site generators is that they make assumptions
-about the structure of the input directory and the names of files and
-directories (being designed primarily for blog sites).  Wok completely ignores
-the structure of the input directory, and uses the metadata of the
-pages(category) to create the structure of the site tree.
+The first drawback of Wok is that it completely ignores the structure of the
+input directory, and uses the metadata of the pages (category) to create the
+structure of the site tree. Other static site generators were designed
+primarily for blog sites, and make assumptions about the structure of the input
+directory and the names of files and directories.
 
 The second drawback of Wok is that it lacks certain handy features.  Some
 examples of missing features are: flexible pagination, use of template engines
@@ -166,10 +166,11 @@ asset is a file for which no converter exists. In the most common case, pages
 are text files with some form of markup, assets are images, CSS files and other
 files.
 
-Bass defines converters for plain text (extension `.txt`) and HTML fragments
-(extension`.html`), and (provided the related Python packages are installed)
-for Markdown (extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`),
-and Textile (extension `.txi`).
+Bass defines converters for plain text (extension `.txt`), HTML fragments
+(extension`.html`), Markdown (extensions `.md`, `.mkd`), ReStructuredText
+(extension `.rst`), and Textile (extension `.txi`). For Markdown,
+ReStructuredText and Textile the related Python packages need to be installed of
+course.
 
 In other words: a file is mapped to a page if the extension of the file is in
 the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
@@ -218,7 +219,9 @@ The basic set of metadata is this.
 * date, time, datetime: date, time and date-time in ISO notation; datetime can be derived
   from date and time, or vice versa (default: `ctime` of the file)
 
-Other metadata fields can be defined in the header, and used in templates or hooks.
+Other metadata fields can be defined in the header, and used in templates or
+hooks. The metadata defined in the header of the file are added as attributes
+of the Page node.
 
 #### Assets
 

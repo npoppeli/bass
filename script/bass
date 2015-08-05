@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import logging, sys
-from bass import parse_cmdline, create_project, build_site
+from bass import parse_cmdline, create_project, build_site, http_server
 
 # parse command line
 args = parse_cmdline()
@@ -14,7 +14,7 @@ if args.create: # create new project
 elif args.build: # build site in existing project
     build_site()
     # run server if requested
-    # if args.server:
-    #     run_server()
+    if args.server:
+        http_server()
 else:
     logging.info('not building, not creating')

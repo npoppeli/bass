@@ -10,3 +10,4 @@ Chameleon is used for templating.
 from .config import parse_cmdline
 from .site import build_site, create_project
 from .convert import converter
+from .server import http_server
