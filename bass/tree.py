@@ -14,21 +14,34 @@ from .common import read_file, read_yaml_string, write_file
 
 # node classes
 class Node:
+    """Node is the base class for Folder, Page and Asset
+       Instance variables:
+           - key: type of node
+           - id: identifier of node (preferably unique within tree)
+           - name: name of node (last part of path)
+           - path: path of node
+           - parent: parent node
+           - child: list of child nodes
+
+       Instance methods:
+           - render: abstract method
+           - apply: apply hook to node
+           - root: find root of tree
+    """
     def __init__(self, name, path, parent=None):
+        """construct Node with given name, path and parent"""
         self.key = ''
         self.id = ''
-        self.path = path
         self.name = name
+        self.path = path
         self.parent = parent
         self.child = []
-    def transform(self):
-        pass
     def render(self):
         pass
     def apply(self, hooks):
         if self.path in hooks:
             hooks[self.path](self)
-        elif '#'+self.id in hooks:
+        elif self.id and '#'+self.id in hooks:
             hooks['#'+self.id](self)
     def root(self): # follow parent chain until you get None
         this = self
@@ -42,26 +55,29 @@ class Folder(Node):
         self.key = 'Folder'
     def add(self, node):
         self.child.append(node)
+    def asset(self, name):
+        matches = [child for child in self.child
+                   if child.name == name and child.key == 'Asset']
+        return matches[0] if matches else None
+    def assets(self):
+        return [child.name for child in self.child if child.key == 'Asset']
     def folder(self, name):
         matches = [child for child in self.child
                    if child.name == name and child.key == 'Folder']
         return matches[0] if matches else None
     def folders(self):
         return [child for child in self.child if child.key == 'Folder']
-    def pages(self):
-        return [child for child in self.child if child.key == 'Page']
-    def assets(self):
-        return [child.name for child in self.child if child.key == 'Asset']
     def page(self, name):
         matches = [child for child in self.child
                    if child.name == name and child.key == 'Page']
         return matches[0] if matches else None
+    def pages(self):
+        return [child for child in self.child if child.key == 'Page']
     def render(self):
         logging.debug('Folder.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
-        if self.name == '': # root directory should already exist
-            pass
-        else: # create sub-directory 'self.path' in output directory
+        if self.name != '': # root directory should already exist
+            # create sub-directory 'self.path' in output directory
             mkdir(join(setting.output, self.path))
         for node in self.child:
             node.render()
@@ -73,7 +89,7 @@ class Page(Node):
         self.key = 'Page'
         full_path = join(setting.input, parent.path, name)
         (meta, preview, content) = read_page(full_path)
-        pagetype = splitext(path)[1]
+        (pagename, pagetype) = splitext(path)
         convert = setting.converter[pagetype]
         self.preview = convert(preview) if preview else ''
         self.content = convert(content)
@@ -81,7 +97,7 @@ class Page(Node):
         # add metadata as node attributes
         for key, value in self.meta.items():
             setattr(self, key, value)
-        self.url = '/' + splitext(self.path)[0] + '.html'
+        self.url = '/' + pagename + '.html'
     def render(self):
         logging.debug('Page.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
@@ -100,6 +116,8 @@ class Asset(Node):
         logging.debug('Asset.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
+        # if an Asset node has children, what is the meaning?
+        # for node in self.child: node.render()
         self.apply(setting.post_hook)
 
 # read page, return triple (meta, preview, content)
@@ -118,7 +136,7 @@ def read_page(path):
 def complete_meta(meta, path):
     # title: if missing, create one from path
     if 'title' not in meta:
-        title = splitext(basename(meta['path']))[0]
+        title = splitext(basename(path))[0]
         meta['title'] = title.replace('-', ' ').replace('_', ' ').capitalize()
     # author: cannot be derived from anything else
     # tags
@@ -140,8 +158,8 @@ def complete_meta(meta, path):
     return meta
 
 def fix_date_time(meta, ctime):
-    date_part = meta['date'] if 'date' in meta else None
-    time_part = meta['time'] if 'time' in meta else None
+    date_part = meta.get('date')
+    time_part = meta.get('time')
     if 'datetime' in meta:
         if date_part is None:
             if isinstance(meta['datetime'], datetime):
@@ -152,6 +170,7 @@ def fix_date_time(meta, ctime):
             time_part = meta['datetime'].time()
     meta['date'] = date_part
     meta['time'] = time_part
+    # date & time from datetime override date & time from metadata
     if date_part is not None and time_part is not None:
         meta['datetime'] = datetime(date_part.year, date_part.month,
                 date_part.day, time_part.hour, time_part.minute,
@@ -160,3 +179,5 @@ def fix_date_time(meta, ctime):
         meta['datetime'] = datetime(date_part.year, date_part.month, date_part.day)
     else:
         meta['datetime'] = ctime
+        meta['date']     = ctime.date()
+        meta['time']     = ctime.time()

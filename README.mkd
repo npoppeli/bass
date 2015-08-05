@@ -103,7 +103,7 @@ Possible configuration options (and their defaults) are
 - `input` (`input`): collection of input files (pages and assets).
 - `ignore` (`.?*`): patterns of files and directories to be ignored.
 - `output` (`output`): collection of output files (the generated web site).
-- `templates` (`templates`): collection of templates.
+- `layout` (`layout`): layout defined as a collection of templates.
 - `hooks` (`hooks`): Python module with hooks (see paragraph [Hooks](#hooks) for more information).
 
 Creating a site
@@ -125,8 +125,11 @@ hooks).
 
 The site tree is generated from the files in the input directory (default:
 `input`). The site tree consists of nodes. There are three types of node:
-*Folder*, *Page*, *Asset*. The details are explained below in the paragraph
+*Folder*, *Page*, *Asset*. This tree model was inspired by:
+[StrangeCase][strangecase]. The details are explained below in the paragraph
 [Content](#content).
+
+[strangecase]: https://github.com/colinta/StrangeCase
 
 During the process of building the site tree, directories and files are ignored
 if their names match one of the *ignore patterns*. Symbolic links are also
@@ -234,15 +237,15 @@ asset is not changed during the tree generation phase.
 A directory is mapped to a folder. A folder is not changed during the tree
 generation phase.
 
-### Templates
+### Layout
 
 The layout of the site is created by templates, which are collected in the
-templates directory (default: `templates`). This is a flat directory,
+layout directory (default: `layout`). This is a flat directory,
 i.e. sub-directories are not scanned. Bass uses [Chameleon][chameleon]
 templates, with various variables exposed to build pages. This is a very
 flexible templating environment with control flow, filters, and other features.
 
-Chameleon Templates are XML files in the template directory. There should at
+Chameleon templates are XML files in the template directory. There should at
 least be a template `default.xml`. Other files are ignored, unless other
 template engines are defined.  It is possible to use other template languages,
 e.g. Jinja. The template factory for an extra template language can be defined
@@ -299,14 +302,14 @@ Table of contents (paginated).
     from bass import converter
     converter['.rest'] = converter['.rst'] # ReST file with another extension
 
-##### Define extra templates engine
+##### Define extra template engine
 
     from bass import template_factory
     template_factory['.jj2'] = jinja2.Template
 
 #### Post-build hooks
 
-Defining templates engines can also be done in the post-build hook (as long as
+Defining template engines can also be done in the post-build hook (as long as
 it is done *before* the rendering phase), but the main purpose of such a hook
 is to transform the whole site tree. Please use your imagination, but don't
 break the site tree (well: it's your tree anyway).

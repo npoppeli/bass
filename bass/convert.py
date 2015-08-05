@@ -15,10 +15,10 @@ converter = {}
 try:
     import markdown2
     markdown_found = True
-    def convert_mkd(text):
+    def convert_mkd2(text):
         return markdown2.markdown(text, extras=['def_list', 'footnotes', 'tables'])
-    converter['.md']  = convert_mkd
-    converter['.mkd'] = convert_mkd
+    converter['.md']  = convert_mkd2
+    converter['.mkd'] = convert_mkd2
     setting.markdown = True
 except ImportError:
     setting.markdown = False
@@ -55,8 +55,8 @@ try:
 except ImportError:
     setting.textile = False
 
-# HTML: treated as assets for now
-# converter['.html'] = lambda text: text
+# HTML
+converter['.html'] = lambda text: text
 
 # plain text
 def convert_txt(text):
