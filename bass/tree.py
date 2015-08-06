@@ -5,7 +5,7 @@ bass.tree
 Objects and functions related to the site tree.
 """
 
-import logging, shutil
+import logging, shutil, sys
 from datetime import datetime, date
 from os import mkdir
 from os.path import join, splitext, getctime, basename
@@ -98,6 +98,10 @@ class Page(Node):
         for key, value in self.meta.items():
             setattr(self, key, value)
         self.url = '/' + pagename + '.html'
+    def add(self, node):
+        self.child.append(node)
+    def copy(self):
+        return self # TODO: shallow copy, including all instance variables
     def render(self):
         logging.debug('Page.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
@@ -181,3 +185,45 @@ def fix_date_time(meta, ctime):
         meta['datetime'] = ctime
         meta['date']     = ctime.date()
         meta['time']     = ctime.time()
+
+def partition(lst, size):
+    """divide list in list of sub-lists of length <= size"""
+    return [lst[offset:offset+size] for offset in range(0, len(lst), size)]
+
+def add_toc(page, nodelist, skin, sep='_', size=10):
+    """add a table of contents to the specified node, apply pagination if necessary.
+
+    Parameters:
+        - page (Node): node to which table of contents is added
+        - nodelist ([Node]): nodes to include in table of contents
+        - skin (str|callable):
+            - string: name of template to render one node in nodelist
+            - callable: callable to render one node in nodelist
+    Return value: None
+    """
+    # determine method for converting node to HTML fragment
+    if callable(skin):
+        func = skin
+    elif isinstance(skin, str):
+        func = setting.template[skin].render
+    else:
+        logging.critical("Bad parameter 'skin' in function 'add_toc'")
+        sys.exit(1)
+    # one HTML fragment per node, then partitioned in chunks of 'size'
+    parts = partition([func(this=node) for node in nodelist], size)
+    page.prev, page.next = None, None
+    previous = page
+    if len(parts) > 0:
+        page.toc = '\n'.join(parts[0])
+    else:
+        page.toc = ''
+    if len(parts) > 1:
+        for p, part in enumerate(parts[1:]):
+            current = page.copy()
+            current.name += sep + str(p+1)
+            current.toc = '\n'.join(part)
+            page.add(current)
+            previous.next = current
+            current.prev = previous
+            previous = current
+        previous.next = None # last subpage

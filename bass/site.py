@@ -10,7 +10,7 @@ from . import setting
 from .common import write_file
 from .config import config_default, read_config
 from .convert import converter
-from .render import read_templates
+from .layout import read_templates
 from .tree import Folder, Page, Asset
 from os import listdir, mkdir, unlink
 from os.path import isdir, isfile, islink, join, relpath, splitext
@@ -37,6 +37,12 @@ def build_site():
     logging.info('Rendering site tree')
     root.render()
 
+def verify_project():
+    """verify existence of directories specified in configuration"""
+    if not ( isdir(setting.input) and isdir(setting.output) and isdir(setting.layout) ):
+        logging.critical("Directories missing in project.")
+        sys.exit(1)
+
 def check_hooks(hooks):
     """select all hooks that are callable"""
     return {key:value for key, value in hooks.items() if callable(value)}
@@ -52,12 +58,6 @@ def read_hooks():
         setting.pre_hook  = {}
         setting.post_hook = {}
 
-def verify_project():
-    """verify existence of directories specified in configuration"""
-    if not ( isdir(setting.input) and isdir(setting.output) and isdir(setting.layout) ):
-        logging.critical("Directories missing in project.")
-        sys.exit(1)
-
 def prepare_output():
     """clean output directory before rendering site tree"""
     for name in [n for n in listdir(setting.output) if n[0] != '.']:
@@ -70,13 +70,13 @@ def prepare_output():
 def build_tree():
     """generate site tree from files and directories in input directory"""
     root = None
-    if '//' in setting.pre_hook:
-        setting.pre_hook['//'](root)
+    if '@' in setting.pre_hook:
+        setting.pre_hook['@'](root)
     logging.info('Ignoring files/directories: %s', ' '.join(setting.ignore))
     logging.info('Valid page extensions: %s', ' '.join(setting.converter.keys()))
     root = create_folder('', '', None)
-    if '//' in setting.post_hook:
-        setting.post_hook['//'](root)
+    if '@' in setting.post_hook:
+        setting.post_hook['@'](root)
     return root
 
 def ignore_entry(name):
