@@ -8,10 +8,10 @@ the same assets. Bass is distributed under the MIT license (see the LICENSE
 file for more details).
 
 The idea is that you don't need a content-management system on the server to
-generate page dynamically: you generate the content, upload it to the server,
+generate pages dynamically: you generate the content, upload it to the server,
 and repeat this process when something has changed. That way, there is no need
 to install complex software on the server, with the associated maintenance
-effort (software upgrad, backup) and security issues.
+effort (software upgrade, backup) and security issues.
 
 The design of Bass borrows ideas from [Wok][wok] and other static site
 generators (see [overview][static]). Before I created Bass, I used Wok for
@@ -20,13 +20,13 @@ During that year I noticed two drawbacks.
 
 The first drawback of Wok is that it completely ignores the structure of the
 input directory, and uses the metadata of the pages (category) to create the
-structure of the site tree. Other static site generators were designed
+structure of the site tree. Other static site generators are designed
 primarily for blog sites, and make assumptions about the structure of the input
 directory and the names of files and directories.
 
-The second drawback of Wok is that it lacks certain handy features.  Some
+The second drawback of Wok is that it lacks certain useful features.  Some
 examples of missing features are: flexible pagination, use of template engines
-other than Jinja, ignoring certain files in the content directory (e.g. Emacs
+other than Jinja, ignoring specified files in the content directory (e.g. Emacs
 backup files).
 
 Bass includes the features I missed in Wok and other static site generators.
@@ -79,8 +79,8 @@ If you install from pip, they will be installed for you.
 Usage
 -----
 
-To use Bass, go to the directory where your site files will be located, and run
-the command `bass -c`. This will create a basic directory structure and
+To use Bass, go to the directory where your input and generated site will be located, and
+run the command `bass -c`. This will create a basic directory structure and
 corresponding configuration file. You can change the names of the directories,
 provided you apply the changes in the configuration file as well.
 
@@ -88,8 +88,8 @@ Put your content in the input directory (default: `input`). Build the site with
 `bass -b`. If you want to see debugging information, use `bass -b -d`.
 
 If you want to start a web server after generating the site, use `bass -b -s`.
-This will generate the site as usual, and then start an HTTP server (Python
-package 'waitress') on port 8080. This test server is intended solely for local
+This will generate the site as usual, and then start an HTTP server on port 8080.
+This test server is intended solely for local
 testing of the site during development!
 
 Configuration
@@ -125,7 +125,7 @@ hooks).
 
 The site tree is generated from the files in the input directory (default:
 `input`). The site tree consists of nodes. There are three types of node:
-*Folder*, *Page*, *Asset*. This tree model was inspired by:
+*Folder*, *Page*, *Asset*. The tree model was inspired by
 [StrangeCase][strangecase]. The details are explained below in the paragraph
 [Content](#content).
 
@@ -136,11 +136,13 @@ if their names match one of the *ignore patterns*. Symbolic links are also
 ignored.  By default there is one ignore pattern: `.?*`. Other ignore patterns
 can be defined in the configuration file (option `ignore`).
 
+    ignore: *.bak *~
+	
 #### Transform site tree
 
 Using *hooks* the site tree can be transformed. This step is optional: if the
-post-build hook for the root of the tree (path `//`) is empty, there is no tree
-transformation.
+post-build hook (path '@') and the pre-render hook for the root of the tree (path `//`)
+are empty, there is no tree transformation.
 
 ###  Render site tree
 
@@ -152,7 +154,7 @@ of the node.
 * Page: call pre-render hook, write HTML file to path, render children, call post-render hook
 * Asset: call pre-render hook, copy file from input to output directory, call post-render hook
 
-The root node is not rendered: the output directory is assumed to exist when
+For the root node no directory is created: the output directory is assumed to exist when
 you call `bass -b`.
 
 ### Content
@@ -248,11 +250,12 @@ flexible templating environment with control flow, filters, and other features.
 Chameleon templates are XML files in the template directory. There should at
 least be a template `default.xml`. Other files are ignored, unless other
 template engines are defined.  It is possible to use other template languages,
-e.g. Jinja. The template factory for an extra template language can be defined
+e.g. Mako or Jinja. The template factory for an extra template language can be defined
 in the *root pre-build hook* (see next paragraph).
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
+[mako]: http://www.makotemplates.org/
 
 ### Hooks
 
@@ -262,28 +265,37 @@ hook. Pre-render and post-render hooks can be defined for all nodes in the
 tree. The node to which the hook is attached, is specified by its path or its
 `id`.
 
-    pre_hook['article/intro.mkd']    pre-render hook for node with path 'article/intro.mkd'
-    post_hook['article/intro.mkd']   post-render hook for node with path 'article/intro.mkd'
-    pre_hook['#intro']               pre-render hook for node(s) with id 'intro'
-    post_hook['#intro']              post-render hook for node(s) with id 'intro'
+    pre['article/intro.mkd']    pre-render hook for node with path 'article/intro.mkd'
+    post['article/intro.mkd']   post-render hook for node with path 'article/intro.mkd'
+    pre['#intro']               pre-render hook for node(s) with id 'intro'
+    post['#intro']              post-render hook for node(s) with id 'intro'
 
-There is one exception to the above: hooks attached to the root of the site
-tree, identified by the path `//`, are not pre-render and post-render hooks,
-since the root node is not rendered.
+The root of the site tree, identified by the path `//`, can also have pre-render and post-render hooks.
+The post-render hook can be used for uploading the generated site to another server.
 
-    pre_hook['//']                   pre-build hook
-    post_hook['//']                  post-build hook
+There is one exception to the above: hooks attached to the special path '@' are pre-build and post-build hooks.
 
-The pre-build hook is called before generating the site tree. The post-build
-hook is called after building/generating the site tree.
+    pre['@']                   pre-build hook
+    post['@']                  post-build hook
+
+The pre-build hook is called before generating (building) the site tree.
+The post-build hook is called after generating (building) the site tree.
 
 Hooks are defined in the configuration file:
 
     hooks: hooks
 
+From the specified directory, Bass reads the module `__init.py`. This module should define
+dictionaries `pre` and `post`. The values in these dictionaries should be callable objects.
+
 #### Pre-render hooks
 
 Table of contents (paginated).
+
+    from bass import add_toc
+	def photo_toc(this):
+	    add_toc(this, this.parent.folder('photo').child, skin='photo_entry', size=20)
+	pre['photo'] = photo_toc
 
 #### Pre-build hooks
 
