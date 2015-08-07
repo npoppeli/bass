@@ -5,12 +5,12 @@ bass.server
 Simple web server for development and test purposes.
 """
 
-import logging, waitress
-# TODO: change to Python library: SimpleHTTPServer
-from webob.static import DirectoryApp
+import logging, os
+from http.server.static import HTTPServer, SimpleHTTPRequestHandler
 from . import setting
 
 def http_server(**kwarg):
     logging.debug('Starting HTTP server')
-    app = DirectoryApp(setting.output, index_page=None)
-    waitress.serve(app, **kwarg)
+    os.chdir(setting.output)
+    httpd = HTTPServer(('', 8080), SimpleHTTPRequestHandler)
+    httpd.serve_forever()
