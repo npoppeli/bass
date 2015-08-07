@@ -135,8 +135,10 @@ if their names match one of the *ignore patterns*. Symbolic links are also
 ignored.  By default there is one ignore pattern: `.?*`. Other ignore patterns
 can be defined in the configuration file (option `ignore`).
 
-    ignore: *.bak *~
+    ignore: "*.bak *~"
 	
+Note: the double quotes are required since '*' is a meta-character in YAML.
+
 #### Transform site tree
 
 Using *hooks* the site tree can be transformed. This step is optional: if the
