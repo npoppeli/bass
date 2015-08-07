@@ -21,8 +21,7 @@ During that year I noticed two drawbacks.
 The first drawback of Wok is that it completely ignores the structure of the
 input directory, and uses the metadata of the pages (category) to create the
 structure of the site tree. Other static site generators are designed
-primarily for blog sites, and make assumptions about the structure of the input
-directory and the names of files and directories.
+primarily for blog sites, and use an input directory with a fixed structure.
 
 The second drawback of Wok is that it lacks certain useful features.  Some
 examples of missing features are: flexible pagination, use of template engines
@@ -30,10 +29,10 @@ other than Jinja, ignoring specified files in the content directory (e.g. Emacs
 backup files).
 
 Bass includes the features I missed in Wok and other static site generators.
-More importantly: it considers the organization of the input directory as
-meaningful, and preserves it in the site tree.  With organization of the input
-directory I mean: (1) the structure of the tree of files and sub-directories in
-the input directory, and (2) the names of files and sub-directories.  This
+More importantly: it gives the user complete freedom in organizing the input
+directory, considers this organization as meaningful, and therefore preserves it in the site tree.
+With organization of the input directory I mean: (1) the structure of the tree of files and sub-directories in
+the input directory, and (2) the names of files and sub-directories. This
 concept was borrowed from [Wintersmith][wintersmith].
 
 [wok]: https://github.com/mythmon/wok
