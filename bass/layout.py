@@ -17,9 +17,7 @@ import logging, sys
 # they implement the following protocol:
 #   - extension -> template factory: template_factory[extension] -> class T
 #   - template string s -> template t: T(string) -> template object t
-#   - t.render(this=node) -> string: t.render(this) creates HTML content (preferably: complete page) for node 'this'
-
-# TODO: test this out with Mako
+#   - t.render(this=node) -> string: t.render(this) -> HTML content (complete page) for node 'this'
 
 template_factory = {}
 
@@ -38,11 +36,11 @@ def read_templates():
     template = {}
     template_types = list(template_factory.keys())
     logging.debug('Scanning for templates in {0}'.format(setting.layout))
+    logging.debug('Template types: {0}'.format(' '.join(template_types)))
     for filename in listdir(setting.layout):
         (name, extension) = splitext(filename)
         if extension in template_types: # other extensions are ignored
             try:
-                logging.debug('Template for {0} in file {1}'.format(name, filename))
                 template[name] = template_factory[extension](
                     read_file(join(setting.layout, filename)))
             except Exception as e:

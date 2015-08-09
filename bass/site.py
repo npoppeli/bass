@@ -5,13 +5,14 @@ bass.site
 Objects and functions related to site structure and site generation.
 """
 
-import fnmatch, imp, logging, os, shutil,sys, yaml
+import imp, logging, shutil,sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
 from .convert import converter
 from .layout import read_templates
 from .tree import Folder, Page, Asset
+from fnmatch import fnmatch
 from os import listdir, mkdir, unlink
 from os.path import isdir, isfile, islink, join, relpath, splitext
 
@@ -29,12 +30,21 @@ def build_site():
     """build site in current project directory"""
     read_config()
     verify_project()
-    read_templates()
     read_hooks()
     logging.info('Building site tree')
     root = build_tree()
     prepare_output()
+    read_templates()
     logging.info('Rendering site tree')
+    root.render()
+
+def rebuild_site():
+    """rebuild site in current project directory"""
+    logging.info('Building modified site tree')
+    root = build_tree()
+    prepare_output()
+    read_templates()
+    logging.info('Rendering modified site tree')
     root.render()
 
 def verify_project():
@@ -81,7 +91,7 @@ def build_tree():
 
 def ignore_entry(name):
     """True if 'name' is symbolic link or if 'name' matches one of the ignore patterns"""
-    return any([fnmatch.fnmatch(name, pattern) for pattern in setting.ignore]) or islink(name)
+    return any([fnmatch(name, pattern) for pattern in setting.ignore]) or islink(name)
 
 def create_folder(name, path, parent):
     folder = Folder(name, path, parent)
@@ -90,7 +100,7 @@ def create_folder(name, path, parent):
         folder_path = setting.input
     else:
         folder_path = join(setting.input, path)
-    for name in os.listdir(folder_path):
+    for name in listdir(folder_path):
         path = join(folder_path, name)
         rel_path = relpath(path, setting.input)
         if ignore_entry(path):

@@ -1,3 +1,13 @@
+Version 0.7
+-----------
+
+### Features
+-   New web server added; requires Waitress and Webob; if these are not	present, use a simpler web server
+-   The new Web server rebuilds the site when something changes in input or layout directory
+
+### Other
+-   Updated README.
+
 Version 0.6
 -----------
 

@@ -7,6 +7,7 @@ Objects and functions related to the site tree.
 
 import logging, shutil, sys
 from datetime import datetime, date
+from copy import copy
 from os import mkdir
 from os.path import join, splitext, getctime, basename
 from . import setting
@@ -38,6 +39,8 @@ class Node:
         self.child = []
     def render(self):
         pass
+    def add(self, node):
+        self.child.append(node)
     def apply(self, hooks):
         if self.path in hooks:
             hooks[self.path](self)
@@ -53,8 +56,6 @@ class Folder(Node):
     def __init__(self, name, path, parent):
         super().__init__(name, path, parent)
         self.key = 'Folder'
-    def add(self, node):
-        self.child.append(node)
     def asset(self, name):
         matches = [child for child in self.child
                    if child.name == name and child.key == 'Asset']
@@ -74,7 +75,7 @@ class Folder(Node):
     def pages(self):
         return [child for child in self.child if child.key == 'Page']
     def render(self):
-        logging.debug('Folder.render: name=%s path=%s', self.name, self.path)
+        # logging.debug('Folder.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
         if self.name != '': # root directory should already exist
             # create sub-directory 'self.path' in output directory
@@ -98,10 +99,16 @@ class Page(Node):
         for key, value in self.meta.items():
             setattr(self, key, value)
         self.url = '/' + pagename + '.html'
-    def add(self, node):
-        self.child.append(node)
-    def copy(self):
-        return self # TODO: shallow copy, including all instance variables
+    def copy(self, sep='_'):
+        """create of copy of page node, but with its own name, path and URL, and empty children list"""
+        newpage = copy(self)
+        newpage.child = []
+        (pagename, pagetype) = splitext(newpage.path)
+        newpage.name += sep
+        newpage.path = pagename + sep + pagetype
+        newpage.url = '/' + pagename + sep + '.html'
+        return newpage
+
     def render(self):
         logging.debug('Page.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
@@ -117,7 +124,7 @@ class Asset(Node):
         self.key = 'Asset'
         self.url = '/' + self.path
     def render(self):
-        logging.debug('Asset.render: name=%s path=%s', self.name, self.path)
+        # logging.debug('Asset.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
         # if an Asset node has children, what is the meaning?
@@ -148,7 +155,7 @@ def complete_meta(meta, path):
         if isinstance(meta['tags'], list):
             pass # OK
         elif isinstance(meta['tags'], str):
-            meta['tags'] = [tag.strip() for tag in meta['tags'].split(',')]
+            meta['tags'] = [tag.strip() for tag in meta['tags'].split()]
     else:
         meta['tags'] = []
     # skin
@@ -213,14 +220,16 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     parts = partition([func(this=node) for node in nodelist], size)
     page.prev, page.next = None, None
     previous = page
+    logging.debug('TOC main page name=%s path=%s', page.name, page.path)
+    logging.debug('TOC has %d parts', len(parts))
     if len(parts) > 0:
         page.toc = '\n'.join(parts[0])
     else:
         page.toc = ''
     if len(parts) > 1:
         for p, part in enumerate(parts[1:]):
-            current = page.copy()
-            current.name += sep + str(p+1)
+            current = page.copy(sep+str(p+1))
+            logging.debug('subpage name=%s path=%s', current.name, current.path)
             current.toc = '\n'.join(part)
             page.add(current)
             previous.next = current

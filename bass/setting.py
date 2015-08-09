@@ -5,4 +5,4 @@ bass.setting
 Global settings, shared by all modules.
 """
 
-version = '0.6'
+version = '0.7'
