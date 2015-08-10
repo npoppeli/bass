@@ -22,8 +22,8 @@ import logging, sys
 template_factory = {}
 
 try:
-    from chameleon import PageTemplate
-    template_factory['.xml'] = PageTemplate
+    from chameleon import PageTemplateFile
+    template_factory['.xml'] = PageTemplateFile
     template_factory['.pt'] = template_factory['.xml']
 except ImportError:
     logging.critical('Chameleon template engine not available.')
@@ -41,9 +41,11 @@ def read_templates():
         (name, extension) = splitext(filename)
         if extension in template_types: # other extensions are ignored
             try:
-                template[name] = template_factory[extension](
-                    read_file(join(setting.layout, filename)))
+                template[name] = template_factory[extension](join(setting.layout, filename))
             except Exception as e:
                 logging.debug('Error in template for {0} in file {1}'.format(name, filename))
                 logging.debug(str(e))
+    if 'default' not in template:
+        logging.critical('There is no default template.')
+        sys.exit()
     setting.template = template

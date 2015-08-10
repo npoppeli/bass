@@ -22,7 +22,7 @@ try:
             self.monitor = monitor
             self.callback = callback
 
-        def _changed(self):
+        def _changed(self, path):
             """return True if any file has changed since self.timestamp, otherwise False"""
             for mondir in self.monitor:
                 for (root, dirlist, filelist) in os.walk(mondir):
@@ -34,11 +34,12 @@ try:
             return False
 
         def __call__(self, environ, start_response):
-            if self._changed():
+            request = Request(environ)
+            # check for modifications every time a page (not an asset) is requested
+            if request.path.endswith('.html') and self._changed(request.path):
                 logging.debug('Rebuilding site')
                 self.timestamp = datetime.now()
                 self.callback()
-            request = Request(environ)
             response = request.get_response(self.wrapped)
             return response(environ, start_response)
 

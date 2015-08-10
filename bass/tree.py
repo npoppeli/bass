@@ -110,9 +110,13 @@ class Page(Node):
         return newpage
 
     def render(self):
-        logging.debug('Page.render: name=%s path=%s', self.name, self.path)
+        # logging.debug('Page.render: name=%s path=%s', self.name, self.path)
         self.apply(setting.pre_hook)
-        template = setting.template[self.skin]
+        if self.skin in setting.template:
+            template = setting.template[self.skin]
+        else:
+            logging.critical("Template '%s' for page %s not available.", self.skin, self.path)
+            sys.exit()
         write_file(template.render(this=self), join(setting.output, self.url[1:]))
         for node in self.child: # sub-pages (dynamically created)
             node.render()
