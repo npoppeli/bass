@@ -11,7 +11,7 @@ from .site import rebuild_site
 from . import setting
 
 try:
-    import waitress
+    from wsgiref.simple_server import make_server
     from webob import Request, Response
     from webob.static import DirectoryApp
 
@@ -47,7 +47,8 @@ try:
         static = DirectoryApp(setting.output, index_page=None)
         wrapped = Monitor(static, monitor=[setting.input, setting.layout], callback=rebuild_site)
         logging.debug('Starting HTTP server on port 8080')
-        waitress.serve(wrapped, port=8080)
+        server = make_server('127.0.0.1', 8080, wrapped)
+        server.serve_forever()
 
 except ImportError:
     from http.server import HTTPServer, SimpleHTTPRequestHandler

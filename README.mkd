@@ -16,17 +16,7 @@ effort (software upgrade, backup) and security issues.
 The design of Bass borrows ideas from [Wok][wok] and other static site
 generators (see [overview][static]). Before I created Bass, I used Wok for
 about a year, created two websites with it, and also looked at alternatives.
-During that year I noticed two drawbacks.
-
-The first drawback of Wok is that it completely ignores the structure of the
-input directory, and uses the metadata of the pages (category) to create the
-structure of the site tree. Other static site generators are designed
-primarily for blog sites, and use an input directory with a fixed structure.
-
-The second drawback of Wok is that it lacks certain useful features.  Some
-examples of missing features are: flexible pagination, use of template engines
-other than Jinja, ignoring specified files in the content directory (e.g. Emacs
-backup files).
+During that year I noticed several drawbacks, which led to the development of Bass.
 
 Bass includes the features I missed in Wok and other static site generators.
 More importantly: it gives the user complete freedom in organizing the input
@@ -35,6 +25,17 @@ it in the site tree.  With organization of the input directory I mean: (1) the
 structure of the tree of files and sub-directories in the input directory, and
 (2) the names of files and sub-directories. This concept was borrowed from
 [Wintersmith][wintersmith].
+
+Wok completely ignores the structure of the input directory, and uses the
+metadata of the pages (category) to create the structure of the site
+tree. Other static site generators are designed primarily for blog sites, and
+use an input directory with a fixed structure.
+
+Bass also add certain useful features that I found useful.  Some examples of
+these features are: flexible pagination, use of template engines other than
+Jinja, ignoring specified files in the content directory (e.g. Emacs backup
+files).
+
 
 [wok]: https://github.com/mythmon/wok
 [static]: https://www.staticgen.com/
@@ -75,280 +76,27 @@ If you install with pip, they will be installed for you.
 -   `Markdown` or `Markdown2`, for rendering Markdown documents.
 -   `docutils`, for rendering reStructuredText documents.
 -   `Textile`, for rendering Textile documents.
+-   `WebOb`, for a more advanced web server.
 
 Usage
 -----
 
 To use Bass, go to the project directory (the directory where the input files
-and generated site will be located), and run the command `bass -c`. This will
+and generated site will be located), and run the command `bass -c` or `bass --create`. This will
 create a basic directory structure and corresponding configuration file. You
 can change the names of the directories, provided you apply the changes in the
 configuration file as well.
 
 Put your content in the input directory (default: `input`). Build the site with
-`bass -b`. If you want to see debugging information, use `bass -b -d`.
-
-This will generate the site as usual, and then start an HTTP server on port
-8080. This test server is intended solely for local testing of the site during
-
-Configuration
--------------
-
-Settings can be changed in the configuration file. This is the file `config` in
-the project directory.
-
-Possible configuration options (and their defaults) are
-
-- `input` (`input`): collection of input files (pages and assets).
-- `ignore` (`.?*`): patterns of files and directories to be ignored.
-- `output` (`output`): collection of output files (the generated web site).
-- `layout` (`layout`): layout defined as a collection of templates.
-- `hooks` (`hooks`): Python module with hooks (see paragraph [Hooks](#hooks) for more information).
-
-Creating a site
----------------
-
-### Process
-
-Bass is a tree transformation engine - no more, no less! The (site) tree is
-generated from a set of files and directories in the input directory. The tree
-can be transformed (optionally), and is then rendered as a set of files and
-directories in the output directory.
-
-The structure of the input directory, and the names of directories and files
-are considered to express the semantics of the site. The structure and names
-are maintained in the output directory (unless the user makes changes by using
-hooks).
-
-#### Generate site tree
-
-The site tree is generated from the files in the input directory (default:
-`input`). The site tree consists of nodes. There are three types of node:
-*Folder*, *Page*, *Asset*.
-The tree model was inspired by [StrangeCase][strangecase]. The details are
-explained below in the paragraph [Content](#content).
-
-[strangecase]: https://github.com/colinta/StrangeCase
-
-During the process of building the site tree, directories and files are ignored
-if their names match one of the *ignore patterns*. Symbolic links are also
-ignored.  By default there is one ignore pattern: `.?*`. Other ignore patterns
-can be defined in the configuration file (option `ignore`).
-
-    ignore: "*.bak *~"
-
-Note: the double quotes are required since '*' is a meta-character in YAML.
-
-#### Transform site tree
-
-Using *hooks* the site tree can be transformed. This step is optional: if the
-post-build hook (path `@`) and the pre-render hook for the root of the tree
-(path `//`) are empty, there is no tree transformation.
-
-###  Render site tree
-
-Rendering means writing the site tree to the output directory (default:
-`output`). Rendering is defined as a series of actions, depending on the type
-of the node.
-
-* Folder: call pre-render hook, create directory, render children, call post-render hook
-* Page: call pre-render hook, write HTML file to path, render children, call post-render hook
-* Asset: call pre-render hook, copy file from input to output directory, call post-render hook
-
-For the root node no directory is created: the output directory is assumed to
-exist when you call `bass -b`.
-
-### Content
-
-All content of the site is in the input directory (default: `input`). Content
-consists of folders, pages and assets (the term *asset* was borrowed from
-[Jekyll][jekyll]).
-
-[jekyll]: http://jekyllrb.com/
-
-A directory is mapped to a folder in the site tree. A file is mapped to a page
-or an asset in the site tree. A page is a file for which a converter exists. An
-asset is a file for which no converter exists. In the most common case, pages
-are text files with some form of markup, assets are images, CSS files,
-Javascript modules and other files.
-
-Bass defines converters for plain text (extension `.txt`), HTML fragment
-(extension`.html`), Markdown (extensions `.md`, `.mkd`), ReStructuredText
-(extension `.rst`), and Textile (extension `.txi`). For Markdown,
-ReStructuredText and Textile the related Python packages need to be installed
-of course.
-
-In other words: a file is mapped to a page if the extension of the file is in
-the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
-'.html']`.  All other files are mapped to an asset.
-
-#### Pages
-
-The easiest way to write pages with formatting is to use lightweight markup
-languages such as [Markdown][mkd], [reStructuredText][rst] and
-[Textile][txi]. Markdown with extensions (e.g. tables) is possible if you
-install the Markdown2 package.
-
-It is also possible to write pages in HTML and in plain text. HTML pages are
-not changed during the tree generation phase. Pages of plain text are converted
-to very basic HTML by adding paragraph tags: each sequence of two or more line
-breaks is treated as end of paragraph.
-
-[mkd2]: https://github.com/trentm/python-markdown2
-[mkd]: http://daringfireball.net/projects/markdown/
-[rst]: http://docutils.sourceforge.net/rst.html
-[txi]: https://github.com/sebix/python-textile
-
-Each page can start with a metadata section in YAML form, but this is
-optional. Suppose there is named `index.mkd` in the input directory, with the
-following contents.
-
-    title: Home
-    ---
-    This is the home page. Add useful text here.
-
-This is a minimal Markdown page. The part above the divider `---` contains the
-metadata for the page. Below the `---` is the content of the page.  The
-metadata section is not required.
-
-The content itself can also contain a line with `---`. The part between the
-first and second divider is the preview, and the part below the second divider
-is the rest of the text. The preview part can be used on a front page, for
-example, with links to the complete page.
-
-The basic set of metadata is this.
-
-* `title`: title of the page (default: derived from the path of the file)
-* `tags`: one or more words, separated by comma or space (default: empty list)
-* `skin`: the name of the template used to render this page as a complete HTML file (default: `default`)
-* `id`: an identifier of the node, which can be used in hooks (default: `''`)
-* `date`, `time`, `datetime`: date, time and date-time in ISO notation; datetime can be derived
-  from date and time, or vice versa (default: `ctime` of the file)
-
-Other metadata fields can be defined in the header, and used in templates or
-hooks. The metadata defined in the header of the file are added as attributes
-of the Page node.
-
-#### Assets
-
-A file is mapped to an asset if the extension of the file is *not* in the list
-of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. An
-asset is not changed during the tree generation phase.
-
-#### Folders
-
-A directory is mapped to a folder. A folder is not changed during the tree
-generation phase.
-
-### Layout
-
-The layout of the site is created by templates, which are collected in the
-layout directory (default: `layout`). This is a flat directory,
-i.e. sub-directories are not scanned. Bass uses [Chameleon][chameleon]
-templates to create HTML pages. This is a very flexible templating environment
-with control flow, filters, and other features. When a template is called, one
-argument is passed, namely the current node.
-
-Chameleon templates are XML files in the template directory. Other files are
-ignored, unless other template engines are defined. There should at least be a
-template `default.xml`.  It is possible to use other template languages,
-e.g. [Mako][mako] or [Jinja][jinja]. The template factory for an extra template
-can be defined in the *pre-build hook* (see the paragraph about hooks).
-
-[chameleon]: https://github.com/malthe/chameleon
-[jinja]: http://jinja.pocoo.org/
-[mako]: http://www.makotemplates.org/
-
-### Global parameters
-
-Bass keeps global parameters in a separate module `setting`.
-
-* `converter`: dictionary of page converters (key: extension, value: converter function)
-* `hooks`: directory where hooks are defined
-* `ignore`: list of ignore patterns
-* `input`: content directory
-* `layout`: layout directory
-* `output`: output directory
-* `post_hook`: dictionary of post-render hooks (key: path, value: callable)
-* `pre_hook`: dictionary of pre-render hooks (key: path, value: callable)
-* `project`: project directory, parent of input, layout, hook and output directories
-* `template`: dictionary of templates (key: name, value: template)
-* `template_factory`: dictionary of template factories (key: extension, value: template factory)
-
-### Hooks
-
-A hook is a function (actually: a callable object) that is called before or
-after rendering a node. The first type is called a pre-render hook, the second
-type a post-render hook. Pre-render and post-render hooks can be defined for
-all nodes in the tree. The node to which the hook is attached, is specified by
-its (relative) path or its `id`.
-
-    pre['article/intro.mkd']    pre-render hook for node with path 'article/intro.mkd'
-    post['article/intro.mkd']   post-render hook for node with path 'article/intro.mkd'
-    pre['#intro']               pre-render hook for node(s) with id 'intro'
-    post['#intro']              post-render hook for node(s) with id 'intro'
-
-Hooks attached to the root of the site tree, identified by the path `//`, are
-pre-render and post-render hooks, just like the other hooks. The only
-difference is that for the root node no directory is created.  The post-render
-hook can be used for uploading the generated site to another server.
-
-Hooks attached to the special path `@` are not pre-render and post-render hooks,
-but pre-*build* and post-*build* hooks.
-
-    pre['@']                   pre-build hook
-    post['@']                  post-build hook
-
-The pre-build hook is called before generating (building) the site tree.
-The post-build hook is called after generating (building) the site tree.
-
-Hooks are defined in the configuration file:
-
-    hooks: hookdir
-
-From the specified directory (default: `hooks`) Bass attempts to read the
-module `__init.py`. This module should define dictionaries `pre` and
-`post`. The values in these dictionaries should be callable objects. The keys
-should be `@`, `//`, a valid (relative) path in the site tree, or an identifier
-of a node in the site tree prefixed with '#'.
-
-#### Pre-render hooks
-
-Table of contents (paginated).
-
-    from bass import add_toc
-    def photo_toc(this):
-        add_toc(this, this.parent.folder('photo').child, skin='photo_entry', size=20)
-    pre['photo'] = photo_toc
-
-#### Pre-build hook
-
-##### Define extra converter
-
-    from bass import converter
-    def add_tex2html(node):
-        converter['.tex'] = tex2html # self-defined function tex2html()
-    pre['@'] = add_tex2html
-
-###### Remove converter
-
-    del converter['.txt'] # .txt files are assets
-
-###### Other file extensions
-
-    converter['.rest'] = converter['.rst'] # ReST file with another extension
-
-##### Define extra template engine
-
-    from bass import template_factory
-    from mako.template import Template
-    def add_mako(node):
-        template_factory['.mko'] = Template
-    pre['@'] = add_mako
-
-#### Post-build hooks
-
-Defining template engines can also be done in the post-build hook (as long as
-it is done *before* the rendering phase), but the main purpose of such a hook
-is to transform the whole site tree. Please use your imagination, but don't
-break the site tree (well: it's your tree anyway).
+`bass -b` or `bass --build`. If you want to see debugging information, use
+`bass -b -d` or `bass --build --debug`.
+
+If you add the option `-s` or `--serve`, Bass will generate the site as usual,
+and then start a simple HTTP server on port 8080. This test server is intended solely
+for local testing of the site during the development phase.
+
+If the Python package `webob` is available, a slightly more advanced server
+(WSGI) is made available. This server checks for changes to the `content` and
+`layout` directories (see below) whenever a page is requested. If it detects a
+change in either of these directories, the site is regenerated before the page
+is returned.

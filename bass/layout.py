@@ -45,7 +45,8 @@ def read_templates():
             except Exception as e:
                 logging.debug('Error in template for {0} in file {1}'.format(name, filename))
                 logging.debug(str(e))
-    if 'default' not in template:
+    if 'default' in template:
+        setting.template = template
+    else:
         logging.critical('There is no default template.')
         sys.exit()
-    setting.template = template

@@ -4,7 +4,8 @@ Bass
 -----
 Bass is a tool for building static web sites.
 Wok, Wintersmith and StrangeCase served as sources of inspiration.
-Chameleon is used for templating.
+Markdown, RestructuredText and Textile are used for light-weight page markup.
+Chameleon is used for templating, but other template engines can be added.
 
 Functions:
     - parse_cmdline: parse command line, return parsed argument list
