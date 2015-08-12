@@ -377,10 +377,8 @@ Table of contents (paginated).
 
     from bass import template_factory
     from mako.template import Template
-    def mako_template_file(name):
-        return Template(filename=name)
     def add_mako(node):
-        template_factory['.mko'] = mako_template_file
+        template_factory['.mko'] = lambda name: Template(filename=name)
     pre = {'@': add_mako }
 
 #### Post-build hooks
