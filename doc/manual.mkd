@@ -257,9 +257,10 @@ templates to create HTML pages. This is a very flexible templating environment
 with control flow, filters, and other features. When a template is called, one
 argument is passed, namely the current node.
 
-Chameleon templates are XML files in the template directory. Other files are
+Chameleon templates are XML files in the template directory. The possible file
+extensions are `.xml` and `.pt`. Other files are
 ignored, unless other template engines are defined. There should at least be a
-template `default.xml`.  It is possible to use other template languages,
+template `default`. It is possible to use other template languages,
 e.g. [Mako][mako] or [Jinja][jinja]. The template factory for an extra template
 can be defined in the *pre-build hook* (see the paragraph about hooks).
 
@@ -267,9 +268,9 @@ By default, there is one template factory: chameleon.PageTemplateFile. This is
 connected to the file extensions `.xml` and `.pt`. Other template factories can
 be defined, provided they implement the following protocol:
 
-    extension -> template factory: template_factory[extension] -> class T
-    template string s -> template t: T(string) -> template object t
-    t.render(this=node) -> string: t.render(this) -> HTML content (complete page) for node 'this'
+    - extension -> template factory: T = template_factory[extension]
+    - filename -> template t: t = T(filename)
+    - t.render(this=node) -> string: t.render(this) is HTML page for node 'this'
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
@@ -279,10 +280,19 @@ be defined, provided they implement the following protocol:
 
 The tree model consists of the following classes.
 
-* Node: construct with name, path, parent; methods add, apply, root
-* Folder: sub-class of Node; methods asset, assets, folder, folders, page, pages, render
-* Page: sub-class of Node; methods render, copy
-* Asset: sub-class of Node; methods render
+* Node: construct with name, path, parent
+  - methods add, apply, root
+  - variables ...
+* Folder: sub-class of Node
+  - methods asset, assets, folder, folders, page, pages, render
+  - variables: ...
+* Page: sub-class of Node
+  - methods render, copy
+  - variables: ...
+  - metadata of a page are added as attributes of the node
+* Asset: sub-class of Node
+  - methods render
+  - variables: ...
 
 ### Global parameters
 
