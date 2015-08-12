@@ -18,17 +18,17 @@ generators (see [overview][static]). Before I created Bass, I used Wok for
 about a year, created two websites with it, and also looked at alternatives.
 During that year I noticed several drawbacks, which led to the development of Bass.
 
-The most important feature of Bass is that it gives the user complete freedom 
-in organizing the input directory, considers this organization as meaningful, 
+The most important feature of Bass is that it gives the user complete freedom
+in organizing the input directory, considers this organization as meaningful,
 and therefore preserves it in the site tree.
-With organization of the input directory I mean: (1) the structure 
-of the tree of files and sub-directories in the input directory, 
+With organization of the input directory I mean: (1) the structure
+of the tree of files and sub-directories in the input directory,
 and (2) the names of files and sub-directories. This concept was borrowed from
 [Wintersmith][wintersmith].
 
-Other static site generators are designed primarily for blog sites, and 
-use an input directory with a fixed structure, or completely ignore 
-the structure of the input directory, creating the structure of the site 
+Other static site generators are designed primarily for blog sites, and
+use an input directory with a fixed structure, or completely ignore
+the structure of the input directory, creating the structure of the site
 tree from metadata (Wok for example).
 
 Other features that were added are: flexible pagination, use of template
@@ -58,7 +58,7 @@ with this command: `sudo pip install bass`.
 All dependencies are available through pip. Although optional, you should at least
 install one of the following three tools:
 
-- Markdown (Markdown2 is even better)
+- Markdown (Markdown2 is an alternative)
 - docutils
 - Textile
 
@@ -75,6 +75,7 @@ If you install with pip, they will be installed for you.
 -   `docutils`, for rendering reStructuredText documents.
 -   `Textile`, for rendering Textile documents.
 -   `WebOb`, for a more advanced web server.
+-   `waitress`, for a faster web server.
 
 Usage
 -----

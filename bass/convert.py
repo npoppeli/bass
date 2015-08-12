@@ -27,7 +27,9 @@ if not setting.markdown:
     try:
         import markdown
         def convert_mkd(text):
-            return markdown.markdown(text, extras=['def_list', 'footnotes'])
+            return markdown.markdown(text, extras=['markdown.extensions.def_list',
+                                                   'markdown.extensions.footnotes',
+                                                   'markdown.extensionstables'])
         converter['.md']  = convert_mkd
         converter['.mkd'] = convert_mkd
         setting.markdown = True
