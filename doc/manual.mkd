@@ -280,19 +280,38 @@ be defined, provided they implement the following protocol:
 
 The tree model consists of the following classes.
 
-* Node: construct with name, path, parent
-  - methods add, apply, root
-  - variables ...
+* class Node(name, path, parent)
+  - methods:
+    - Node.add(child): add `child` node to list of children of this node
+    - Node.apply(hook): apply hook[path] or hook[id] (if present) to this node
+    - Node.root(): return root node of tree
+  - variables:
+    - Node.key: 'Node'
+    - Node.id: identifier of this node (default: empty)
+    - Node.name: name of node (last part of path)
+    - Node.path: relative path of node in tree
+    - Node.parent: parent node
+    - Node.child: list of child nodes
 * Folder: sub-class of Node
-  - methods asset, assets, folder, folders, page, pages, render
-  - variables: ...
+  - methods:
+    - Folder.asset(): ...
+    - Folder.assets(): ...
+    - Folder.folder(): ...
+    - Folder.folders(): ...
+    - Folder.page(): ...
+    - Folder.pages(): ...
+    - Folder.render(): ...
+  - variables: as in base class
 * Page: sub-class of Node
-  - methods render, copy
-  - variables: ...
+  - methods:
+    - Page.render(): ...
+    - Page.copy(): ...
+  - variables: as in base class, plus `preview`, `content`, `url`
   - metadata of a page are added as attributes of the node
 * Asset: sub-class of Node
-  - methods render
-  - variables: ...
+  - methods:
+    - Asset.render(): ...
+  - variables: as in base class, plus `url`
 
 ### Global parameters
 
