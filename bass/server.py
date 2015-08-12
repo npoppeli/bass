@@ -16,16 +16,16 @@ try:
     from webob.static import DirectoryApp
 
     class Monitor():
-        def __init__(self, app, monitor, callback):
+        def __init__(self, app, checklist, callback):
             self.wrapped = app
             self.timestamp = datetime.now()
-            self.monitor = monitor
+            self.checklist = checklist
             self.callback = callback
 
-        def _changed(self, path):
+        def changed(self, path):
             """return True if any file has changed since self.timestamp, otherwise False"""
-            for mondir in self.monitor:
-                for (root, dirlist, filelist) in os.walk(mondir):
+            for checkdir in self.checklist:
+                for (root, _, filelist) in os.walk(checkdir):
                     for f in filelist:
                         path = os.path.join(root, f)
                         if datetime.fromtimestamp(os.path.getmtime(path)) > self.timestamp:
@@ -36,7 +36,7 @@ try:
         def __call__(self, environ, start_response):
             request = Request(environ)
             # check for modifications every time a page (not an asset) is requested
-            if request.path.endswith('.html') and self._changed(request.path):
+            if request.path.endswith('.html') and self.changed(request.path):
                 logging.debug('Rebuilding site')
                 self.timestamp = datetime.now()
                 self.callback()
