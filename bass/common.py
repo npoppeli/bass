@@ -5,7 +5,11 @@ bass.common
 Objects and functions shared by other modules.
 """
 
-import yaml
+from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 
 def read_file(filename):
     """read entire file, return content as one string"""
@@ -21,10 +25,10 @@ def write_file(text, filename):
 def read_yaml_file(path):
     """read file, return YAML content as dictionary"""
     with open(path, 'r') as f:
-        result = yaml.load(f, Loader=yaml.CLoader)
+        result = load(f, Loader=Loader)
     return result
 
 def read_yaml_string(string):
     """read string, return YAML content as dictionary"""
-    result = yaml.load(string, Loader=yaml.CLoader)
+    result = load(string, Loader=Loader)
     return result

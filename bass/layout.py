@@ -16,8 +16,8 @@ import logging, sys
 # to the file extensions '.xml' and '.pt'. Other template factories can be defined, provided
 # they implement the following protocol:
 #   - extension -> template factory: T = template_factory[extension]
-#   - filename -> template t: t = T(filename)
-#   - t.render(this=node) -> string: t.render(this) is HTML page for node 'this'
+#   - filename -> template: t = T(filename)
+#   - node -> string: t.render(this=node) is HTML page for node 'this'
 
 template_factory = {}
 

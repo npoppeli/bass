@@ -20,16 +20,14 @@ During that year I noticed several drawbacks, which led to the development of Ba
 
 The most important feature of Bass is that it gives the user complete freedom
 in organizing the input directory, considers this organization as meaningful,
-and therefore preserves it in the site tree.
-With organization of the input directory I mean: (1) the structure
-of the tree of files and sub-directories in the input directory,
-and (2) the names of files and sub-directories. This concept was borrowed from
-[Wintersmith][wintersmith].
-
-Other static site generators are designed primarily for blog sites, and
-use an input directory with a fixed structure, or completely ignore
-the structure of the input directory, creating the structure of the site
-tree from metadata (Wok for example).
+and therefore preserves it in the site tree.  With organization of the input
+directory I mean: (1) the structure of the tree of files and sub-directories in
+the input directory, and (2) the names of files and sub-directories. This
+concept was borrowed from [Wintersmith][wintersmith]. Other static site
+generators are designed primarily for blog sites, and use an input directory
+with a fixed structure, or completely ignore the structure of the input
+directory, creating the structure of the site tree from metadata (Wok for
+example).
 
 Other features that were added are: flexible pagination, use of template
 engines other than Jinja, ignoring specified files in the content directory
@@ -160,9 +158,9 @@ Rendering means writing the site tree to the output directory (default:
 `output`). Rendering is defined as a series of actions, depending on the type
 of the node.
 
-* Folder: call pre-render hook, create directory, render children, call post-render hook
-* Page: call pre-render hook, write HTML file to path, render children, call post-render hook
-* Asset: call pre-render hook, copy file from input to output directory, call post-render hook
+* *Folder*: call pre-render hook, create directory, render children, call post-render hook
+* *Page*: call pre-render hook, write HTML file to path, render children, call post-render hook
+* *Asset*: call pre-render hook, copy file from input to output directory, call post-render hook
 
 For the root node no directory is created: the output directory is assumed to
 exist when you call `bass -b`.
@@ -178,7 +176,7 @@ consists of folders, pages and assets (the term *asset* was borrowed from
 A directory is mapped to a folder in the site tree. A file is mapped to a page
 or an asset in the site tree. A page is a file for which a converter exists. An
 asset is a file for which no converter exists. In the most common case, pages
-are text files with some form of markup, assets are images, CSS files,
+are text files with some form of markup, and assets are images, CSS files,
 Javascript modules and other files.
 
 Bass defines converters for plain text (extension `.txt`), HTML fragment
@@ -195,8 +193,8 @@ the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
 
 The easiest way to write pages with formatting is to use lightweight markup
 languages such as [Markdown][mkd], [reStructuredText][rst] and
-[Textile][txi]. Markdown with extensions (e.g. tables) is possible if you
-install the Markdown2 package.
+[Textile][txi]. Markdown is used with the extensions *definition list*,
+*footnotes* and *tables*.
 
 It is also possible to write pages in HTML and in plain text. HTML pages are
 not changed during the tree generation phase. Pages of plain text are converted
@@ -259,19 +257,20 @@ with control flow, filters, and other features. When a template is called, one
 argument is passed, namely the current node.
 
 Chameleon templates are XML files in the template directory. The possible file
-extensions are `.xml` and `.pt`. Other files are
-ignored, unless other template engines are defined. There should at least be a
-template `default`. It is possible to use other template languages,
-e.g. [Mako][mako] or [Jinja][jinja]. The template factory for an extra template
-can be defined in the *pre-build hook* (see the paragraph about hooks).
+extensions are `.xml` and `.pt`. Other files are ignored, unless additional
+template engines are defined. There should at least be a template `default`.
 
-By default, there is one template factory: chameleon.PageTemplateFile. This is
+It is possible to use other template languages, e.g. [Mako][mako] or
+[Jinja][jinja]. The template factory for an extra template can be defined in
+the *pre-build hook* (see the paragraph about hooks).
+
+By default, there is one template factory: `chameleon.PageTemplateFile`. This is
 connected to the file extensions `.xml` and `.pt`. Other template factories can
 be defined, provided they implement the following protocol:
 
     extension -> template factory: T = template_factory[extension]
-    filename -> template t: t = T(filename)
-    t.render(this=node) -> string: t.render(this) is HTML page for node 'this'
+    filename -> template: t = T(filename)
+    node -> string: t.render(this=node) is HTML page for node 'this'
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
@@ -281,38 +280,49 @@ be defined, provided they implement the following protocol:
 
 The tree model consists of the following classes.
 
-* class Node(name, path, parent)
-  - methods:
-    - Node.add(child): add `child` node to list of children of this node
-    - Node.apply(hook): apply hook[path] or hook[id] (if present) to this node
-    - Node.root(): return root node of tree
-  - variables:
-    - Node.key: 'Node'
-    - Node.id: identifier of this node (default: empty)
-    - Node.name: name of node (last part of path)
-    - Node.path: relative path of node in tree
-    - Node.parent: parent node
-    - Node.child: list of child nodes
-* Folder: sub-class of Node
-  - methods:
-    - Folder.asset(): ...
-    - Folder.assets(): ...
-    - Folder.folder(): ...
-    - Folder.folders(): ...
-    - Folder.page(): ...
-    - Folder.pages(): ...
-    - Folder.render(): ...
-  - variables: as in base class
-* Page: sub-class of Node
-  - methods:
-    - Page.render(): ...
-    - Page.copy(): ...
-  - variables: as in base class, plus `preview`, `content`, `url`
-  - metadata of a page are added as attributes of the node
-* Asset: sub-class of Node
-  - methods:
-    - Asset.render(): ...
-  - variables: as in base class, plus `url`
+#### Node
+* constructor Node(name, path, parent)
+* methods:
+  - Node.add(child): add `child` node to list of children of this node
+  - Node.apply(hook): apply hook[path] or hook[id] (if present) to this node
+  - Node.root(): return root node of tree
+* variables:
+  - Node.key: 'Node'
+  - Node.id: identifier of this node (default: empty)
+  - Node.name: name of node (last part of path)
+  - Node.path: relative path of node in tree
+  - Node.parent: parent node
+  - Node.child: list of child nodes
+
+#### Folder
+* sub-class of Node
+* methods:
+  - Folder.asset(): ...
+  - Folder.assets(): ...
+  - Folder.folder(): ...
+  - Folder.folders(): ...
+  - Folder.page(): ...
+  - Folder.pages(): ...
+  - Folder.render(): ...
+* variables: as in base class
+
+####  Page
+* sub-class of Node
+* methods:
+  - Page.render(): ...
+  - Page.copy(): ...
+* variables: as in base class, plus `preview`, `content`, `url`
+  - `url`: absolute URL of page
+  - `preview`: preview part of page (between first and second divider `---`)
+  - `content`: content of page
+* metadata of a page are added as attributes of the node
+
+#### Asset
+* sub-class of Node
+* methods:
+  - Asset.render(): ...
+* variables: as in base class, plus `url`
+  - `url`: absolute URL of asset
 
 ### Global parameters
 
@@ -342,6 +352,8 @@ its (relative) path or its `id`.
     post['article/intro.mkd']   post-render hook for node with path 'article/intro.mkd'
     pre['#intro']               pre-render hook for node(s) with id 'intro'
     post['#intro']              post-render hook for node(s) with id 'intro'
+    pre['$table']               pre-render hook for node(s) with tag 'table'
+    post['$table']              post-render hook for node(s) with tag 'table'
 
 Hooks attached to the root of the site tree, identified by the path `//`, are
 pre-render and post-render hooks, just like the other hooks. The only
@@ -364,8 +376,8 @@ Hooks are defined in the configuration file:
 From the specified directory (default: `hooks`) Bass attempts to read the
 module `__init.py`. This module should define dictionaries `pre` and
 `post`. The values in these dictionaries should be callable objects. The keys
-should be `@`, `//`, a valid (relative) path in the site tree, or an identifier
-of a node in the site tree prefixed with '#'.
+should be `@`, `//`, a valid (relative) path in the site tree, an identifier
+of a node in the site tree prefixed with '#', or a tag (usually on a page) prefixed with '$'.
 
 #### Pre-render hooks
 
@@ -387,7 +399,7 @@ Table of contents (paginated).
 
 ###### Remove converter
 
-    del converter['.txt'] # .txt files are assets
+    del converter['.txt'] # .txt files are seen as assets
 
 ###### Other file extensions
 

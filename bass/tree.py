@@ -37,6 +37,7 @@ class Node:
         self.path = path
         self.parent = parent
         self.child = []
+        self.tags = []
     def render(self):
         pass
     def add(self, node):
@@ -46,6 +47,9 @@ class Node:
             hooks[self.path](self)
         elif self.id and '#'+self.id in hooks:
             hooks['#'+self.id](self)
+        else:
+            for tag in [tag for tag in self.tags and '$'+tag in hooks]:
+                hooks['$'+tag](self)
     def root(self): # follow parent chain until you get None
         this = self
         while this.parent is not None:

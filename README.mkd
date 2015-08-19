@@ -20,16 +20,14 @@ During that year I noticed several drawbacks, which led to the development of Ba
 
 The most important feature of Bass is that it gives the user complete freedom
 in organizing the input directory, considers this organization as meaningful,
-and therefore preserves it in the site tree.
-With organization of the input directory I mean: (1) the structure
-of the tree of files and sub-directories in the input directory,
-and (2) the names of files and sub-directories. This concept was borrowed from
-[Wintersmith][wintersmith].
-
-Other static site generators are designed primarily for blog sites, and
-use an input directory with a fixed structure, or completely ignore
-the structure of the input directory, creating the structure of the site
-tree from metadata (Wok for example).
+and therefore preserves it in the site tree.  With organization of the input
+directory I mean: (1) the structure of the tree of files and sub-directories in
+the input directory, and (2) the names of files and sub-directories. This
+concept was borrowed from [Wintersmith][wintersmith]. Other static site
+generators are designed primarily for blog sites, and use an input directory
+with a fixed structure, or completely ignore the structure of the input
+directory, creating the structure of the site tree from metadata (Wok for
+example).
 
 Other features that were added are: flexible pagination, use of template
 engines other than Jinja, ignoring specified files in the content directory
@@ -99,3 +97,11 @@ If the Python package `webob` is available, a slightly more advanced server
 `layout` directories (see the manual) whenever a page is requested. If it detects a
 change in either of these directories, the site is regenerated before the page
 is returned.
+
+About
+-----
+
+Bass is written by Nico Poppelier using Python 3 and licensed under the MIT-license.
+
+The name is just another acronym. Several other site generators (e.g. Wok,
+Wintersmith, Jekyll, StrangeCase) inspired this project.
