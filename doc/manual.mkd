@@ -106,11 +106,12 @@ the project directory.
 
 Possible configuration options (and their defaults) are
 
-- `input` (`input`): collection of input files (pages and assets).
-- `ignore` (`.?*`): patterns of files and directories to be ignored.
-- `output` (`output`): collection of output files (the generated web site).
-- `layout` (`layout`): layout defined as a collection of templates.
-- `hooks` (`hooks`): Python module with hooks (see paragraph [Hooks](#hooks) for more information).
+- `input`   (`input`):   collection of input files (pages and assets).
+- `ignore`  (`.?*`):     patterns of files and directories to be ignored.
+- `output`  (`output`):  collection of output files (the generated web site).
+- `layout`  (`layout`):  layout defined as a collection of templates.
+- `handler` (`handler`): Python module with event handlers
+  (see paragraph [Events](#events) for more information).
 
 Creating a site
 ---------------
@@ -125,15 +126,15 @@ directories in the output directory.
 The structure of the input directory, and the names of directories and files
 are considered to express the semantics of the site. The structure and names
 are maintained in the output directory (unless the user makes changes by using
-hooks).
+event handlers).
 
 #### Generate site tree
 
 The site tree is generated from the files in the input directory (default:
 `input`). The site tree consists of nodes. There are three types of node:
 *Folder*, *Page*, *Asset*.
-The tree model was inspired by [StrangeCase][strangecase]. The details are
-explained below in the paragraph [Content](#content).
+The tree model was inspired by [StrangeCase][strangecase].
+The details are explained below in the paragraph [Content](#content).
 
 [strangecase]: https://github.com/colinta/StrangeCase
 
@@ -148,9 +149,9 @@ Note: the double quotes are required since `*` is a meta-character in YAML.
 
 #### Transform site tree
 
-Using *hooks* the site tree can be transformed. This step is optional: if the
-post-build hook (path `@`) and the pre-render hook for the root of the tree
-(path `//`) are empty, there is no tree transformation.
+Using *event handlers* the site tree can be transformed. This step is optional:
+if there is no even handler for the events `generate:post:root` and
+`render:pre:root`, there is no tree transformation.
 
 ###  Render site tree
 
@@ -158,9 +159,12 @@ Rendering means writing the site tree to the output directory (default:
 `output`). Rendering is defined as a series of actions, depending on the type
 of the node.
 
-* *Folder*: call pre-render hook, create directory, render children, call post-render hook
-* *Page*: call pre-render hook, write HTML file to path, render children, call post-render hook
-* *Asset*: call pre-render hook, copy file from input to output directory, call post-render hook
+* *Folder*: send pre-render event(s), create directory, render children,
+  send post-render event(s)
+* *Page*: send pre-render event(s), write HTML file to path, render children,
+  send post-render event(s)
+* *Asset*: send pre-render event(s), copy file from input to output directory,
+  send post-render event(s)
 
 For the root node no directory is created: the output directory is assumed to
 exist when you call `bass -b`.
@@ -174,12 +178,12 @@ consists of folders, pages and assets (the term *asset* was borrowed from
 [jekyll]: http://jekyllrb.com/
 
 A directory is mapped to a folder in the site tree. A file is mapped to a page
-or an asset in the site tree. A page is a file for which a converter exists. An
-asset is a file for which no converter exists. In the most common case, pages
+or an asset in the site tree. A page is a file for which a generator exists. An
+asset is a file for which no generator exists. In the most common case, pages
 are text files with some form of markup, and assets are images, CSS files,
 Javascript modules and other files.
 
-Bass defines converters for plain text (extension `.txt`), HTML fragment
+Bass defines generators for plain text (extension `.txt`), HTML fragment
 (extension`.html`), Markdown (extensions `.md`, `.mkd`), ReStructuredText
 (extension `.rst`), and Textile (extension `.txi`). For Markdown,
 ReStructuredText and Textile the related Python packages need to be installed
@@ -228,12 +232,12 @@ The basic set of metadata is this.
 * `title`: title of the page (default: derived from the path of the file)
 * `tags`: one or more words, separated by comma or space (default: empty list)
 * `skin`: the name of the template used to render this page as a complete HTML file (default: `default`)
-* `id`: an identifier of the node, which can be used in hooks (default: `''`)
+* `id`: an identifier of the node, which can be used in event(s)s (default: `''`)
 * `date`, `time`, `datetime`: date, time and date-time in ISO notation; datetime can be derived
   from date and time, or vice versa (default: `ctime` of the file)
 
 Other metadata fields can be defined in the header, and used in templates or
-hooks. The metadata defined in the header of the file are added as attributes
+event(s)s. The metadata defined in the header of the file are added as attributes
 of the Page node.
 
 #### Assets
@@ -262,7 +266,7 @@ template engines are defined. There should at least be a template `default`.
 
 It is possible to use other template languages, e.g. [Mako][mako] or
 [Jinja][jinja]. The template factory for an extra template can be defined in
-the *pre-build hook* (see the paragraph about hooks).
+the event handler for `render:pre:root` (see the paragraph about events).
 
 By default, there is one template factory: `chameleon.PageTemplateFile`. This is
 connected to the file extensions `.xml` and `.pt`. Other template factories can
@@ -284,7 +288,6 @@ The tree model consists of the following classes.
 * constructor Node(name, path, parent)
 * methods:
   - Node.add(child): add `child` node to list of children of this node
-  - Node.apply(hook): apply hook[path] or hook[id] (if present) to this node
   - Node.root(): return root node of tree
 * variables:
   - Node.key: 'Node'
@@ -328,94 +331,110 @@ The tree model consists of the following classes.
 
 Bass keeps global parameters in a separate module `setting`.
 
-* `converter`: dictionary of page converters (key: extension, value: converter function)
-* `hooks`: directory where hooks are defined
-* `ignore`: list of ignore patterns
-* `input`: content directory
-* `layout`: layout directory
-* `output`: output directory
-* `post_hook`: dictionary of post-render hooks (key: path, value: callable)
-* `pre_hook`: dictionary of pre-render hooks (key: path, value: callable)
-* `project`: project directory, parent of input, layout, hook and output directories
-* `template`: dictionary of templates (key: name, value: template)
+* `input`:            content directory
+* `ignore`:           list of ignore patterns
+* `layout`:           layout directory
+* `output`:           output directory
+* `handlers:          directory where event(s)s are defined
+* `project`:          project directory, parent of input, layout, event(s) and output directories
+* `event_handler`:    dictionary of event handler (key: extension, value: handler function)
+* `template`:         dictionary of templates (key: name, value: template)
 * `template_factory`: dictionary of template factories (key: extension, value: template factory)
 
-### Hooks
+### Events
 
-A hook is a function (actually: a callable object) that is called before or
-after rendering a node. The first type is called a pre-render hook, the second
-type a post-render hook. Pre-render and post-render hooks can be defined for
-all nodes in the tree. The node to which the hook is attached, is specified by
-its (relative) path or its `id`.
+An event is a signal that is emitted during the tree generation phase or the
+tree rendering phase. An event can be handled by an event handler: a function
+(actually: a callable object) that is called when the event signal is given.
+There are three types of events: post-generate, pre-render and post-render
+events. Events can be defined for all nodes in the tree. The node for which the
+event signal is emitted, is specified by a its type and one of the following:
+(1) (relative) path, (2) extension, (3) identifier (`id` attribute), (4) tag.
 
-    pre['article/intro.mkd']    pre-render hook for node with path 'article/intro.mkd'
-    post['article/intro.mkd']   post-render hook for node with path 'article/intro.mkd'
-    pre['#intro']               pre-render hook for node(s) with id 'intro'
-    post['#intro']              post-render hook for node(s) with id 'intro'
-    pre['$table']               pre-render hook for node(s) with tag 'table'
-    post['$table']              post-render hook for node(s) with tag 'table'
+    generate:post:folder:path:articles       post-generate event for folder with path `articles`
+    generate:post:page:extension:mkd         post-generate event for page with extension `.mkd`
+    render:pre:page:path:article/intro.mkd   pre-render event for node with path `article/intro.mkd`
+    render:post:page:path:article/intro.mkd  post-render event for node with path `article/intro.mkd`
+    render:pre:page:id:intro                 pre-render event for node(s) with id `intro`
+    render:post:page:id:intro                post-render event for node(s) with id `intro`
+    render:pre:page:tag:table                pre-render event for node(s) with tag `table`
+    render:post:page:tag:table               post-render event for node(s) with tag `table`
+    render:post:asset:extension:png          post-generate event for asset(s) with extension `.png`
 
-Hooks attached to the root of the site tree, identified by the path `//`, are
-pre-render and post-render hooks, just like the other hooks. The only
-difference is that for the root node no directory is created.  The post-render
-hook can be used for uploading the generated site to another server.
+Events for the root of the site tree are specified as:
 
-Hooks attached to the special path `@` are not pre-render and post-render hooks,
-but pre-*build* and post-*build* hooks.
+    generate:post:root                       post-generate event for root node
+    render:pre:root                          pre-render event for root node
+    render:post:root                         post-render event for root node
 
-    pre['@']                   pre-build hook
-    post['@']                  post-build hook
+The post-render for the root node can be used for uploading the generated site to another server.
+The post-build event for the root node is called after generating (building)
+the site tree, and can be used for global transformations of the tree.
 
-The pre-build hook is called before generating (building) the site tree.
-The post-build hook is called after generating (building) the site tree.
+Event handlers are defined in the configuration file:
 
-Hooks are defined in the configuration file:
+    handlers: handle_dir
 
-    hooks: hookdir
+From the specified directory (default: `handlers`) Bass attempts to read the
+module `__init.py`. This module should define one or more event handlers,
+usually in the form of functions, but actually any callable object is
+acceptable. An event handler is called with one parameter, namely the node that
+emitted the event.
 
-From the specified directory (default: `hooks`) Bass attempts to read the
-module `__init.py`. This module should define dictionaries `pre` and
-`post`. The values in these dictionaries should be callable objects. The keys
-should be `@`, `//`, a valid (relative) path in the site tree, an identifier
-of a node in the site tree prefixed with '#', or a tag (usually on a page) prefixed with '$'.
+Event handlers are are assigned to an event by calling the function `event_handler`:
 
-#### Pre-render hooks
+    def upload_site(root):
+        ....
+    event_handler('render:post:root', upload_site)
+
+For the following events Bass has built-in event handlers:
+
+* `generate:post:page:extension:md`, `generate:post:page:extension:mkd`
+  (provided Markdown or Markdown2 is installed)
+* `generate:post:page:extension:rst` (provided RestructuredText is installed)
+* `generate:post:page:extension:txi` (provided Textile is installed)
+* `generate:post:page:extension:html`
+* `generate:post:page:extension:txt`
+
+#### Pre-render events
 
 Table of contents (paginated).
 
-    from bass import add_toc
+    from bass import add_toc, event_handler
     def photo_toc(this):
         add_toc(this, this.parent.folder('photo').child, skin='photo_entry', size=20)
     pre = { 'photo.mkd': photo_toc }
 
-#### Pre-build hook
+#### Pre-build events
 
-##### Define extra converter
+##### Define extra generator
 
-    from bass import converter
+    from bass import add_toc, event_handler
+    from bass import generator
     def add_tex2html(node):
-        converter['.tex'] = tex2html # self-defined function tex2html()
+        generator:path:.tex'] = tex2html # self-defined function tex2html()
     pre = {'@': add_tex2html }
 
-###### Remove converter
+###### Remove generator
 
-    del converter['.txt'] # .txt files are seen as assets
+    del generator:path:.txt'] # .txt files are seen as assets
 
 ###### Other file extensions
 
-    converter['.rest'] = converter['.rst'] # ReST file with another extension
+    generator:path:.rest'] = generator['.rst'] # ReST file with another extension
 
 ##### Define extra template engine
 
-    from bass import template_factory
+    from bass import event_handler, template_factory
     from mako.template import Template
     def add_mako(node):
         template_factory['.mko'] = lambda name: Template(filename=name)
-    pre = {'@': add_mako }
+    event_handler('render:pre:root', add_mako)
 
-#### Post-build hooks
+#### Post-generate event
 
-Defining template engines can also be done in the post-build hook (as long as
-it is done *before* the rendering phase), but the main purpose of this hook
-is to transform the whole site tree. Please use your imagination, but don't
-break the site tree (well: it's your tree anyway).
+Defining template engines can be done in the post-generate event handler for
+the root node, or in the pre-render event handler for the root - as long as it
+is done *before* the rendering phase. Tthe main purpose of the event handler
+for `generate:post:root` is to transform the whole site tree. Please use your
+imagination, but don't break the site tree (well: it's your tree anyway).

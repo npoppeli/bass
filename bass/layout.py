@@ -6,7 +6,6 @@ Objects and functions related to the layout of the site tree.
 Chameleon is the primary template engine. Other engines can be added.
 """
 
-from .common import read_file
 from . import setting
 from os import listdir
 from os.path import join, splitext
@@ -26,7 +25,7 @@ try:
     template_factory['.xml'] = PageTemplateFile
     template_factory['.pt'] = template_factory['.xml']
 except ImportError:
-    logging.critical('Chameleon template engine not available.')
+    logging.critical('Chameleon template engine not available')
     sys.exit()
 
 setting.template_factory = template_factory
@@ -48,5 +47,5 @@ def read_templates():
     if 'default' in template:
         setting.template = template
     else:
-        logging.critical('There is no default template.')
+        logging.critical('There is no default template')
         sys.exit()

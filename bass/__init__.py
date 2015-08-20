@@ -3,7 +3,7 @@
 Bass
 -----
 Bass is a tool for building static web sites.
-Wok, Wintersmith and StrangeCase served as sources of inspiration.
+Wok, Wintersmith, Pelican and StrangeCase served as sources of inspiration.
 Markdown, RestructuredText and Textile are used for light-weight page markup.
 Chameleon is used for templating, but other template engines can be added.
 
@@ -16,8 +16,7 @@ Functions:
 """
 
 from .config import parse_cmdline
-from .convert import converter
+from .event  import add_toc
 from .layout import template_factory
 from .server import http_server
-from .site import build_site, create_project
-from .tree import add_toc
+from .site   import build_site, create_project

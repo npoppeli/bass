@@ -9,7 +9,7 @@ import imp, logging, shutil,sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
-from .convert import converter
+from .event import event, event_handler
 from .layout import read_templates
 from .tree import Folder, Page, Asset
 from fnmatch import fnmatch
@@ -23,14 +23,14 @@ def create_project():
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
         mkdir('input'); mkdir('output'); mkdir('template')
     else:
-        logging.warn('Current directory not empty.')
+        logging.warn('Current directory not empty')
         sys.exit()
 
 def build_site():
     """build site in current project directory"""
     read_config()
     verify_project()
-    read_hooks()
+    read_handlers()
     logging.info('Building site tree')
     root = build_tree()
     prepare_output()
@@ -50,26 +50,18 @@ def rebuild_site():
 def verify_project():
     """verify existence of directories specified in configuration"""
     if not ( isdir(setting.input) and isdir(setting.output) and isdir(setting.layout) ):
-        logging.critical("Directories missing in project.")
+        logging.critical("Directories missing in project")
         sys.exit(1)
 
-def check_hooks(hooks):
-    """select all hooks that are callable"""
-    return {key:value for key, value in hooks.items() if callable(value)}
-
-def read_hooks():
-    """read hooks from directory specified in configuration file"""
-    if isdir(setting.hooks):
-        (fileobj, path, details) = imp.find_module('__init__', [setting.hooks])
-        module = imp.load_module('hooks', fileobj, path, details)
-        setting.pre_hook  = check_hooks(getattr(module, 'pre', {}))
-        setting.post_hook = check_hooks(getattr(module, 'post', {}))
-    else:
-        setting.pre_hook  = {}
-        setting.post_hook = {}
+def read_handlers():
+    """read handlers from directory specified in configuration file"""
+    if isdir(setting.handlers):
+        (fileobj, path, details) = imp.find_module('__init__', [setting.handlers])
+        module = imp.load_module('handlers', fileobj, path, details)
 
 def prepare_output():
     """clean output directory before rendering site tree"""
+    logging.debug('Clean output directory %s', setting.output)
     for name in [n for n in listdir(setting.output) if n[0] != '.']:
         path = join(setting.output, name)
         if isfile(path):
@@ -79,14 +71,12 @@ def prepare_output():
 
 def build_tree():
     """generate site tree from files and directories in input directory"""
-    root = None
-    if '@' in setting.pre_hook:
-        setting.pre_hook['@'](root)
     logging.info('Ignoring files/directories: %s', ' '.join(setting.ignore))
-    logging.info('Valid page extensions: %s', ' '.join(setting.converter.keys()))
+    prefix = 'generate:post:page:extension:'
+    pagetypes =  [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
+    logging.info('Valid page extensions: %s', ' '.join(pagetypes))
     root = create_folder('', '', None)
-    if '@' in setting.post_hook:
-        setting.post_hook['@'](root)
+    event('generate:post:root', root)
     return root
 
 def ignore_entry(name):
@@ -95,7 +85,8 @@ def ignore_entry(name):
 
 def create_folder(name, path, parent):
     folder = Folder(name, path, parent)
-    pagetypes = list(setting.converter.keys())
+    prefix = 'generate:post:page:extension:'
+    pagetypes =  [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
     if parent is None:
         folder_path = setting.input
     else:
