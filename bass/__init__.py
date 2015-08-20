@@ -16,7 +16,7 @@ Functions:
 """
 
 from .config import parse_cmdline
-from .event  import add_toc
+from .event  import add_toc, handle_event
 from .layout import template_factory
 from .server import http_server
 from .site   import build_site, create_project
