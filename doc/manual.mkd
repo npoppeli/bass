@@ -92,11 +92,12 @@ If you add the option `-s` or `--serve`, Bass will generate the site as usual,
 and then start a simple HTTP server on port 8080. This test server is intended solely
 for local testing of the site during the development phase.
 
-If the Python package `webob` is available, a slightly more advanced server
-(WSGI) is made available. This server checks for changes to the `content` and
+If the Python package `webob` is installed, a slightly more advanced server
+(WSGI-based) is made available. This server checks for changes to the `content` and
 `layout` directories (see below) whenever a page is requested. If it detects a
 change in either of these directories, the site is regenerated before the page
-is returned.
+is returned. If the Python package `waitress` is also installed, this WSGI-based
+server is replaced with a faster one.
 
 Configuration
 -------------

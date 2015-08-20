@@ -104,4 +104,4 @@ About
 Bass is written by Nico Poppelier using Python 3 and licensed under the MIT-license.
 
 The name is just another acronym. Several other site generators (e.g. Wok,
-Wintersmith, Jekyll, StrangeCase) inspired this project.
+Wintersmith, Jekyll, Pelican, StrangeCase) inspired this project.
