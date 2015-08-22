@@ -9,11 +9,11 @@ import logging, sys
 from datetime import datetime, date
 from os.path import join, splitext, getctime, basename
 from . import setting
-from .convert import converter
+from .markup import converter
 
 event_handler = {}
 
-def handle_event(label, handler):
+def add_handler(label, handler):
     if callable(handler):
         if label in event_handler:
             logging.debug('Event handler for %s redefined', label)
@@ -22,6 +22,20 @@ def handle_event(label, handler):
         event_handler[label] = handler
     else:
         logging.debug('Event handler for %s is not a callable', label)
+
+def copy_handler(from_label, to_label):
+    if from_label in event_handler:
+        logging.debug('Event handler for %s copied from %s', to_label, from_label)
+        event_handler[to_label] = event_handler[from_label]
+    else:
+        logging.debug('No event handler for %s', from_label)
+
+def remove_handler(label):
+    if label in event_handler:
+        logging.debug('Event handler for %s removed', label)
+        del event_handler[label]
+    else:
+        logging.debug('No event handler for %s', label)
 
 def event(label, node):
     if label in event_handler:
@@ -142,19 +156,19 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
 
 if setting.markdown:
     markdown_processor = Processor(converter['.mkd'])
-    handle_event('generate:post:page:extension:md', markdown_processor)
-    handle_event('generate:post:page:extension:mkd', markdown_processor)
+    add_handler('generate:post:page:extension:mkd', markdown_processor)
+    copy_handler('generate:post:page:extension:mkd', 'generate:post:page:extension:md')
 
 if setting.rest:
     rest_processor = Processor(converter['.rst'])
-    handle_event('generate:post:page:extension:rst', rest_processor)
+    add_handler('generate:post:page:extension:rst', rest_processor)
 
 if setting.textile:
     textile_processor = Processor(converter['.txi'])
-    handle_event('generate:post:page:extension:txi', textile_processor)
+    add_handler('generate:post:page:extension:txi', textile_processor)
 
 html_processor = Processor(converter['.html'])
-handle_event('generate:post:page:extension:html', html_processor)
+add_handler('generate:post:page:extension:html', html_processor)
 
 text_processor = Processor(converter['.txt'])
-handle_event('generate:post:page:extension:txt', text_processor)
+add_handler('generate:post:page:extension:txt', text_processor)

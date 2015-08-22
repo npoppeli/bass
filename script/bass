@@ -3,15 +3,16 @@
 import logging, sys
 
 # configure logging
-# logging.basicConfig(format='%(levelname)s: %(message)s', stream=sys.stdout,
-#                    level=logging.DEBUG if args.debug else logging.INFO)
 logging.basicConfig(format='%(levelname)s: %(message)s', stream=sys.stdout,
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
 from bass import parse_cmdline, create_project, build_site, http_server
 
 # parse command line
 args = parse_cmdline()
+if args.debug:
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
 
 if args.create: # create new project
     create_project()

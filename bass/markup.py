@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-bass.convert
+bass.markup
 -----
-Objects and functions related to conversion of text pages.
+Objects and functions related to markup of text pages.
 """
 
 import re

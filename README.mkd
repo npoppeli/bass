@@ -64,16 +64,16 @@ If you install with pip, they will be installed for you.
 
 #### Required
 
--   `pyyaml`
--   `chameleon`
+- pyyaml
+- Chameleon
 
 #### Optional
 
--   `Markdown` or `Markdown2`, for rendering Markdown documents.
--   `docutils`, for rendering reStructuredText documents.
--   `Textile`, for rendering Textile documents.
--   `WebOb`, for a more advanced web server.
--   `waitress`, for a faster web server.
+- Markdown or Markdown2, for rendering Markdown documents.
+- Docutils, for rendering reStructuredText documents.
+- Textile, for rendering Textile documents.
+- WebOb, for a more advanced web server.
+- Waitress, for a faster web server.
 
 Usage
 -----

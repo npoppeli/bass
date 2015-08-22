@@ -20,15 +20,29 @@ import logging, sys
 
 template_factory = {}
 
+def add_template_type(suffix, factory):
+    if suffix in template_factory:
+        logging.debug('Cannot redefine template type %s', suffix)
+    else:
+        logging.debug('Define new template type %s', suffix)
+    template_factory[suffix] = factory
+
+def copy_template_type(from_suffix, to_suffix):
+    if to_suffix in template_factory:
+        logging.debug('Cannot redefine template type %s', to_suffix)
+    elif from_suffix in template_factory:
+        logging.debug('Template type %s copied from %s', to_suffix, from_suffix)
+        template_factory[to_suffix] = template_factory[from_suffix]
+    else:
+        logging.debug('No template type %s', from_suffix)
+
 try:
     from chameleon import PageTemplateFile
-    template_factory['.xml'] = PageTemplateFile
-    template_factory['.pt'] = template_factory['.xml']
+    add_template_type('.xml', PageTemplateFile)
+    copy_template_type('.xml', '.pt')
 except ImportError:
     logging.critical('Chameleon template engine not available')
     sys.exit()
-
-setting.template_factory = template_factory
 
 def read_templates():
     """read templates from layout directory"""

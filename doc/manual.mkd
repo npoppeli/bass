@@ -57,23 +57,23 @@ All dependencies are available through pip. Although optional, you should at lea
 install one of the following three tools:
 
 - Markdown (Markdown2 is an alternative)
-- docutils
+- Docutils
 - Textile
 
 If you install with pip, they will be installed for you.
 
 #### Required
 
--   `pyyaml`
--   `chameleon`
+- pyyaml
+- Chameleon
 
 #### Optional
 
--   `Markdown` or `Markdown2`, for rendering Markdown documents.
--   `docutils`, for rendering reStructuredText documents.
--   `Textile`, for rendering Textile documents.
--   `WebOb`, for a more advanced web server.
--   `waitress`, for a faster web server.
+- Markdown or Markdown2, for rendering Markdown documents.
+- docutils, for rendering reStructuredText documents.
+- Textile, for rendering Textile documents.
+- WebOb, for a more advanced web server.
+- Waitress, for a faster web server.
 
 Usage
 -----
@@ -107,11 +107,11 @@ the project directory.
 
 Possible configuration options (and their defaults) are
 
-- `input`   (`input`):   collection of input files (pages and assets).
-- `ignore`  (`.?*`):     patterns of files and directories to be ignored.
-- `output`  (`output`):  collection of output files (the generated web site).
-- `layout`  (`layout`):  layout defined as a collection of templates.
-- `handler` (`handler`): Python module with event handlers
+- `input`    (`input`):   collection of input files (pages and assets).
+- `ignore`   (`.?*`):     patterns of files and directories to be ignored.
+- `output`   (`output`):  collection of output files (the generated web site).
+- `layout`   (`layout`):  layout defined as a collection of templates.
+- `handlers` (`handlers`): Python module with event handlers
   (see paragraph [Events](#events) for more information).
 
 Creating a site
@@ -132,14 +132,7 @@ event handlers).
 #### Generate site tree
 
 The site tree is generated from the files in the input directory (default:
-`input`). The site tree consists of nodes. There are three types of node:
-*Folder*, *Page*, *Asset*.
-The tree model was inspired by [StrangeCase][strangecase].
-The details are explained below in the paragraph [Content](#content).
-
-[strangecase]: https://github.com/colinta/StrangeCase
-
-During the process of building the site tree, directories and files are ignored
+`input`). In the generation phase, directories and files are ignored
 if their names match one of the *ignore patterns*. Symbolic links are also
 ignored.  By default there is one ignore pattern: `.?*`. Other ignore patterns
 can be defined in the configuration file (option `ignore`).
@@ -147,6 +140,20 @@ can be defined in the configuration file (option `ignore`).
     ignore: "*.bak *~"
 
 Note: the double quotes are required since `*` is a meta-character in YAML.
+
+The resulting site tree consists of nodes. There are three types of node:
+*Folder*, *Page*, *Asset*. The tree model was inspired by
+[StrangeCase][strangecase]. The details are explained below in the paragraph
+[Content](#content).
+
+[strangecase]: https://github.com/colinta/StrangeCase
+
+After a node is created, one or two events is sent, depending on the node type:
+
+    generate:post:folder:path:<path>
+    generate:post:page:path:<path>
+    generate:post:page:extension:<extension>
+    generate:post:asset:path:<path>
 
 #### Transform site tree
 
@@ -179,20 +186,20 @@ consists of folders, pages and assets (the term *asset* was borrowed from
 [jekyll]: http://jekyllrb.com/
 
 A directory is mapped to a folder in the site tree. A file is mapped to a page
-or an asset in the site tree. A page is a file for which a generator exists. An
-asset is a file for which no generator exists. In the most common case, pages
-are text files with some form of markup, and assets are images, CSS files,
-Javascript modules and other files.
+or an asset in the site tree. Loosely speaking, pages are text files with some
+form of markup, and assets are images, CSS files, Javascript modules and other
+files.
 
-Bass defines generators for plain text (extension `.txt`), HTML fragment
-(extension`.html`), Markdown (extensions `.md`, `.mkd`), ReStructuredText
-(extension `.rst`), and Textile (extension `.txi`). For Markdown,
-ReStructuredText and Textile the related Python packages need to be installed
-of course.
+At a technical level, a page is a file for which an event handler
+`generate:post:page:extension:abc` is defined. Bass defines such event handlers
+for plain text (extension `.txt`), HTML fragment (extension`.html`), Markdown
+(extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`), and Textile
+(extension `.txi`). For Markdown, ReStructuredText and Textile the related
+Python packages need to be installed of course.
 
 In other words: a file is mapped to a page if the extension of the file is in
 the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
-'.html']`.  All other files are mapped to an asset.
+'.html']`. All other files are mapped to an asset.
 
 #### Pages
 
@@ -281,6 +288,8 @@ be defined, provided they implement the following protocol:
 [jinja]: http://jinja.pocoo.org/
 [mako]: http://www.makotemplates.org/
 
+See the paragraph [Events](#events) for an example.
+
 ### Tree model
 
 The tree model consists of the following classes.
@@ -336,11 +345,8 @@ Bass keeps global parameters in a separate module `setting`.
 * `ignore`:           list of ignore patterns
 * `layout`:           layout directory
 * `output`:           output directory
-* `handlers:          directory where event(s)s are defined
-* `project`:          project directory, parent of input, layout, event(s) and output directories
-* `event_handler`:    dictionary of event handler (key: extension, value: handler function)
-* `template`:         dictionary of templates (key: name, value: template)
-* `template_factory`: dictionary of template factories (key: extension, value: template factory)
+* `handlers`:         handler directory
+* `project`:          project directory, parent of input, layout, handler and output directories
 
 ### Events
 
@@ -352,15 +358,15 @@ events. Events can be defined for all nodes in the tree. The node for which the
 event signal is emitted, is specified by a its type and one of the following:
 (1) (relative) path, (2) extension, (3) identifier (`id` attribute), (4) tag.
 
-    generate:post:folder:path:articles       post-generate event for folder with path `articles`
-    generate:post:page:extension:mkd         post-generate event for page with extension `.mkd`
-    render:pre:page:path:article/intro.mkd   pre-render event for node with path `article/intro.mkd`
-    render:post:page:path:article/intro.mkd  post-render event for node with path `article/intro.mkd`
-    render:pre:page:id:intro                 pre-render event for node(s) with id `intro`
-    render:post:page:id:intro                post-render event for node(s) with id `intro`
-    render:pre:page:tag:table                pre-render event for node(s) with tag `table`
-    render:post:page:tag:table               post-render event for node(s) with tag `table`
-    render:post:asset:extension:png          post-generate event for asset(s) with extension `.png`
+    generate:post:folder:path:articles       post-generate event for folder with path 'articles'
+    generate:post:page:extension:mkd         post-generate event for page with extension '.mkd'
+    render:pre:page:path:article/intro.mkd   pre-render event for node with path 'article/intro.mkd'
+    render:post:page:path:article/intro.mkd  post-render event for node with path 'article/intro.mkd'
+    render:pre:page:id:intro                 pre-render event for node(s) with id 'intro'
+    render:post:page:id:intro                post-render event for node(s) with id 'intro'
+    render:pre:page:tag:table                pre-render event for node(s) with tag 'table'
+    render:post:page:tag:table               post-render event for node(s) with tag 'table'
+    render:post:asset:extension:png          post-generate event for asset(s) with extension '.png'
 
 Events for the root of the site tree are specified as:
 
@@ -368,16 +374,24 @@ Events for the root of the site tree are specified as:
     render:pre:root                          pre-render event for root node
     render:post:root                         post-render event for root node
 
-The post-render for the root node can be used for uploading the generated site to another server.
-The post-build event for the root node is called after generating (building)
-the site tree, and can be used for global transformations of the tree.
+The post-render event is called after the root node has been rendered. The
+rendering algorithm of Bass is such that this is the last node to be
+rendered. That means that the post-render event for the root node can be used
+for uploading the generated site to another server.
+
+The post-generate event for the root node, 'generate:post:root', is called
+after generating (building) the entire site tree, and can be used for global
+transformations of the tree. Please use your imagination, but don't break the
+site tree (well: it's your tree anyway).
+
+#### Event handlers
 
 Event handlers are defined in the configuration file:
 
-    handlers: handle_dir
+    handlers: handler_dir
 
 From the specified directory (default: `handlers`) Bass attempts to read the
-module `__init.py`. This module should define one or more event handlers,
+module `__init__.py`. This module should define one or more event handlers,
 usually in the form of functions, but actually any callable object is
 acceptable. An event handler is called with one parameter, namely the node that
 emitted the event.
@@ -388,54 +402,55 @@ Event handlers are are assigned to an event by calling the function `event_handl
         ....
     event_handler('render:post:root', upload_site)
 
+#### Built-in event handlers
+
 For the following events Bass has built-in event handlers:
 
-* `generate:post:page:extension:md`, `generate:post:page:extension:mkd`
+* 'generate:post:page:extension:md', 'generate:post:page:extension:mkd'
   (provided Markdown or Markdown2 is installed)
-* `generate:post:page:extension:rst` (provided RestructuredText is installed)
-* `generate:post:page:extension:txi` (provided Textile is installed)
-* `generate:post:page:extension:html`
-* `generate:post:page:extension:txt`
+* 'generate:post:page:extension:rst' (provided RestructuredText is installed)
+* 'generate:post:page:extension:txi' (provided Textile is installed)
+* 'generate:post:page:extension:html'
+* 'generate:post:page:extension:txt'
 
 #### Pre-render events
 
 Table of contents (paginated).
 
-    from bass import add_toc, event_handler
+    from bass import add_toc, add_handler
     def photo_toc(this):
         add_toc(this, this.parent.folder('photo').child, skin='photo_entry', size=20)
-    pre = { 'photo.mkd': photo_toc }
+    add_handler('render:pre:page:path:photo.mkd', photo_toc)
 
-#### Pre-build events
+#### Post-generate events
 
-##### Define extra generator
+##### Define extra markup type
 
-    from bass import add_toc, event_handler
-    from bass import generator
-    def add_tex2html(node):
-        generator:path:.tex'] = tex2html # self-defined function tex2html()
-    pre = {'@': add_tex2html }
+    from bass import add_handler
+    def page_with_tex_markup(node):
+        # convert node.content and node.preview to HTML
+        # use metadata to set node attributes
+        # set node.url
 
-###### Remove generator
+    add_handler('generate:post:page:extension:tex', page_with_tex_markup)
 
-    del generator:path:.txt'] # .txt files are seen as assets
+###### Remove markup type
+
+    from bass import remove_handler
+    remove_handler('generate:post:page:extension:txt')
+
+If you do this `.txt` files are treated as assets.
 
 ###### Other file extensions
 
-    generator:path:.rest'] = generator['.rst'] # ReST file with another extension
+    from bass import copy_handler
+    copy_handler('generate:post:page:extension:rst', 'generate:post:page:extension:rest')
 
-##### Define extra template engine
+If you do this, files with extension `.rest` are treated the same as files
+(pages) with extension `.rst`.
 
-    from bass import event_handler, template_factory
+##### Define extra template type
+
+    from bass import add_template_type
     from mako.template import Template
-    def add_mako(node):
-        template_factory['.mko'] = lambda name: Template(filename=name)
-    event_handler('render:pre:root', add_mako)
-
-#### Post-generate event
-
-Defining template engines can be done in the post-generate event handler for
-the root node, or in the pre-render event handler for the root - as long as it
-is done *before* the rendering phase. Tthe main purpose of the event handler
-for `generate:post:root` is to transform the whole site tree. Please use your
-imagination, but don't break the site tree (well: it's your tree anyway).
+    add_template_type('.mko', lambda name: Template(filename=name))
