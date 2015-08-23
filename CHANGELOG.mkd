@@ -1,3 +1,14 @@
+Version 0.9
+-----------
+
+### Features
+-   Event handlers work
+-   Internals hidden by introducing 5 convenience functions
+
+### Other
+-   Production ready
+-   Updated README and manual.
+
 Version 0.8
 -----------
 

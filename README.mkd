@@ -57,7 +57,7 @@ All dependencies are available through pip. Although optional, you should at lea
 install one of the following three tools:
 
 - Markdown (Markdown2 is an alternative)
-- docutils
+- Docutils
 - Textile
 
 If you install with pip, they will be installed for you.

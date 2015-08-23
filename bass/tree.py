@@ -79,8 +79,12 @@ class Folder(Node):
                    if child.name == name and child.key == 'Page']
         return matches[0] if matches else None
 
-    def pages(self):
-        return [child for child in self.child if child.key == 'Page']
+    def pages(self, tag=None):
+        if tag:
+            result = [child for child in self.child if child.key == 'Page' and tag in child.tags]
+        else:
+            result = [child for child in self.child if child.key == 'Page']
+        return sorted(result, key=lambda page: page.name)
 
     def render(self):
         event('render:pre:root' if self.name == '' else 'render:pre:folder:path:'+self.path, self)
@@ -121,7 +125,7 @@ class Page(Node):
         else:
             logging.critical("Template '%s' for page %s not available.", self.skin, self.path)
             sys.exit()
-        write_file(template.render(this=self), join(setting.output, self.url[1:]))
+        write_file(template.render(this=self, root=self.root()), join(setting.output, self.url[1:]))
         for node in self.child: # (dynamically created) sub-pages
             node.render()
         event('render:post:page:path:'+self.path, self)
