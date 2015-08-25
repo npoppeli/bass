@@ -462,4 +462,6 @@ Define extra template type:
     from mako.template import Template
     add_template_type('.mko', lambda name: Template(filename=name))
 
-This defines an event handler for the event `generate:post:page:extension:mko`.
+This defines a new template factory for the extension `.mko`. Strictly
+speaking, this has nothing to do with event handling, but it is the best way
+to define new template types.
