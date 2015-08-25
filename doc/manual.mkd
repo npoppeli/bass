@@ -365,21 +365,25 @@ for all nodes in the tree. The node for which the event signal is emitted, is
 specified by a its type and one of the following: (1) (relative) path, (2)
 extension, (3) identifier (*id* attribute), (4) tag.
 
-    generate:post:folder:path:articles       post-generate event for folder with path *articles*
-    generate:post:page:extension:mkd         post-generate event for page with extension *.mkd*
-    render:pre:page:path:article/intro.mkd   pre-render event for node with path *article/intro.mkd*
-    render:post:page:path:article/intro.mkd  post-render event for node with path *article/intro.mkd*
-    render:pre:page:id:intro                 pre-render event for node(s) with id *intro*
-    render:post:page:id:intro                post-render event for node(s) with id *intro*
-    render:pre:page:tag:table                pre-render event for node(s) with tag *table*
-    render:post:page:tag:table               post-render event for node(s) with tag *table*
-    render:post:asset:extension:png          post-generate event for asset(s) with extension *.png*
+event                                     | description
+------------------------------------------|---------------------------------------------------------
+`generate:post:folder:path:articles`      | post-generate event for folder with path *articles*
+`generate:post:page:extension:mkd`        | post-generate event for page with extension *.mkd*
+`render:pre:page:path:article/intro.mkd`  | pre-render event for node with path *article/intro.mkd*
+`render:post:page:path:article/intro.mkd` | post-render event for node with path *article/intro.mkd*
+`render:pre:page:id:intro`                | pre-render event for node(s) with id *intro*
+`render:post:page:id:intro`               | post-render event for node(s) with id *intro*
+`render:pre:page:tag:table`               | pre-render event for node(s) with tag *table*
+`render:post:page:tag:table`              | post-render event for node(s) with tag *table*
+`render:post:asset:extension:png`         | post-generate event for asset(s) with extension *.png*
 
 Events for the root of the site tree are specified as:
 
-    generate:post:root                       post-generate event for root node
-    render:pre:root                          pre-render event for root node
-    render:post:root                         post-render event for root node
+event                                     | description
+------------------------------------------|---------------------------------------------------------
+`generate:post:root`                      | post-generate event for root node
+`render:pre:root`                         | pre-render event for root node
+`render:post:root`                        | post-render event for root node
 
 The post-render event is called after the root node has been rendered. The
 rendering algorithm of Bass is such that this is the last node to be
