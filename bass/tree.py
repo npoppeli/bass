@@ -39,12 +39,15 @@ class Node:
         self.tags = []
 
     def render(self):
+        """abstract render method"""
         pass
 
     def add(self, node):
+        """add child node"""
         self.child.append(node)
 
     def root(self): # follow parent chain until you get None
+        """find root of tree in which this node lives"""
         this = self
         while this.parent is not None:
             this = this.parent
@@ -53,40 +56,48 @@ class Node:
 
 class Folder(Node):
     def __init__(self, name, path, parent):
+        """create new Folder node"""
         super().__init__(name, path, parent)
         self.key = 'Folder'
         if name != '':
             event('generate:post:folder:path:'+path, self)
 
     def asset(self, name):
+        """return asset node with given name in this folder"""
         matches = [child for child in self.child
                    if child.name == name and child.key == 'Asset']
         return matches[0] if matches else None
 
     def assets(self):
+        """return all asset nodes in this folder"""
         return [child.name for child in self.child if child.key == 'Asset']
 
     def folder(self, name):
+        """return folder node with given name in this folder"""
         matches = [child for child in self.child
                    if child.name == name and child.key == 'Folder']
         return matches[0] if matches else None
 
     def folders(self):
+        """return all folder nodes in this folder"""
         return [child for child in self.child if child.key == 'Folder']
 
     def page(self, name):
+        """return page node with given name in this folder"""
         matches = [child for child in self.child
                    if child.name == name and child.key == 'Page']
         return matches[0] if matches else None
 
-    def pages(self, tag=None):
+    def pages(self, tag=None, key='name'):
+        """return page nodes with given tag in this folder"""
         if tag:
             result = [child for child in self.child if child.key == 'Page' and tag in child.tags]
         else:
             result = [child for child in self.child if child.key == 'Page']
-        return sorted(result, key=lambda page: page.name)
+        return sorted(result, key=lambda page: getattr(page, key))
 
     def render(self):
+        """render folder"""
         event('render:pre:root' if self.name == '' else 'render:pre:folder:path:'+self.path, self)
         if self.name != '': # root -> output directory, which already exists
             # render = create sub-directory 'self.path' in output directory
@@ -98,6 +109,7 @@ class Folder(Node):
 
 class Page(Node):
     def __init__(self, name, path, parent):
+        """create new Page node"""
         super().__init__(name, path, parent)
         self.key = 'Page'
         full_path = join(setting.input, parent.path, name)
@@ -117,6 +129,7 @@ class Page(Node):
         return newpage
 
     def render(self):
+        """render Page node"""
         event('render:pre:page:path:'+self.path, self)
         if self.id: event('render:pre:page:id:'+self.id, self)
         for tag in self.tags: event('render:pre:page:tag:'+tag, self)
@@ -124,7 +137,7 @@ class Page(Node):
             template = setting.template[self.skin]
         else:
             logging.critical("Template '%s' for page %s not available.", self.skin, self.path)
-            sys.exit()
+            sys.exit(1)
         write_file(template.render(this=self, root=self.root()), join(setting.output, self.url[1:]))
         for node in self.child: # (dynamically created) sub-pages
             node.render()
@@ -135,11 +148,13 @@ class Page(Node):
 
 class Asset(Node):
     def __init__(self, name, path, parent):
+        """create new Asset node"""
         super().__init__(name, path, parent)
         self.key = 'Asset'
         self.url = '/' + self.path
         event('generate:post:asset:path:'+path, self)
     def render(self):
+        """render Asset node"""
         event('render:pre:asset:path:'+self.path, self)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
         event('render:post:asset:path:'+self.path, self)

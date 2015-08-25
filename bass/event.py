@@ -14,6 +14,7 @@ from .markup import converter
 event_handler = {}
 
 def add_handler(label, handler):
+    """add handler for event 'label'"""
     if callable(handler):
         if label in event_handler:
             logging.debug('Event handler for %s redefined', label)
@@ -24,6 +25,7 @@ def add_handler(label, handler):
         logging.debug('Event handler for %s is not a callable', label)
 
 def copy_handler(from_label, to_label):
+    """copy handler for event 'from_label' to event 'to_label'"""
     if from_label in event_handler:
         logging.debug('Event handler for %s copied from %s', to_label, from_label)
         event_handler[to_label] = event_handler[from_label]
@@ -31,6 +33,7 @@ def copy_handler(from_label, to_label):
         logging.debug('No event handler for %s', from_label)
 
 def remove_handler(label):
+    """remove handler for event 'label'"""
     if label in event_handler:
         logging.debug('Event handler for %s removed', label)
         del event_handler[label]
@@ -38,6 +41,7 @@ def remove_handler(label):
         logging.debug('No event handler for %s', label)
 
 def event(label, node):
+    """call handler for event 'label'"""
     if label in event_handler:
         event_handler[label](node)
 
@@ -62,6 +66,7 @@ class Processor:
         node.url = '/' + pagename + '.html'
 
 def complete_meta(meta, path):
+    """complete metadata for node with given path"""
     # title: if missing, create one from path
     if 'title' not in meta:
         title = splitext(basename(path))[0]
@@ -86,6 +91,7 @@ def complete_meta(meta, path):
     return meta
 
 def fix_date_time(meta, ctime):
+    """fix metadata date, time, datetime based on existing metadata and ctime of node"""
     date_part = meta.get('date')
     time_part = meta.get('time')
     if 'datetime' in meta:
@@ -110,6 +116,7 @@ def fix_date_time(meta, ctime):
         meta['date']     = ctime.date()
         meta['time']     = ctime.time()
 
+# partition and add_toc can be used in event handlers to produce index pages (with optional pagination).
 def partition(lst, size):
     """divide list in list of sub-lists of length <= size"""
     return [lst[offset:offset+size] for offset in range(0, len(lst), size)]
@@ -120,7 +127,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     Parameters:
         - page (Node): node to which table of contents is added
         - nodelist ([Node]): nodes to include in table of contents
-        - skin (str|callable):
+        - skin (string|callable):
             - string: name of template to render one node in nodelist
             - callable: callable to render one node in nodelist
     Return value: None
@@ -154,6 +161,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
             previous = current
         previous.next = None # last subpage
 
+    # define event handlers for the standard page types, depending on which Python packages are installed
 if setting.markdown:
     markdown_processor = Processor(converter['.mkd'])
     add_handler('generate:post:page:extension:mkd', markdown_processor)

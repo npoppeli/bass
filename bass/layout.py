@@ -2,8 +2,8 @@
 """
 bass.layout
 -----
-Objects and functions related to the layout of the site tree.
-Chameleon is the primary template engine. Other engines can be added.
+Objects and functions related to the layout of the rendered pages.
+Chameleon is the primary template engine. Other template engines can be added.
 """
 
 from . import setting
@@ -21,6 +21,7 @@ import logging, sys
 template_factory = {}
 
 def add_template_type(suffix, factory):
+    """add template factory for given suffix"""
     if suffix in template_factory:
         logging.debug('Cannot redefine template type %s', suffix)
     else:
@@ -28,6 +29,7 @@ def add_template_type(suffix, factory):
     template_factory[suffix] = factory
 
 def copy_template_type(from_suffix, to_suffix):
+    """copy existing template factory to another suffix"""
     if to_suffix in template_factory:
         logging.debug('Cannot redefine template type %s', to_suffix)
     elif from_suffix in template_factory:
@@ -42,7 +44,7 @@ try:
     copy_template_type('.xml', '.pt')
 except ImportError:
     logging.critical('Chameleon template engine not available')
-    sys.exit()
+    sys.exit(1)
 
 def read_templates():
     """read templates from layout directory"""
@@ -62,4 +64,4 @@ def read_templates():
         setting.template = template
     else:
         logging.critical('There is no default template')
-        sys.exit()
+        sys.exit(1)

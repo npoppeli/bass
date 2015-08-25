@@ -21,7 +21,8 @@ def create_project():
     logging.info('Creating project')
     if len(listdir()) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
-        mkdir('input'); mkdir('output'); mkdir('template')
+        for k, v in config_default.items():
+            if k != 'ignore': mkdir(v)
     else:
         logging.warn('Current directory not empty')
         sys.exit()
@@ -73,8 +74,8 @@ def build_tree():
     """generate site tree from files and directories in input directory"""
     logging.info('Ignoring files/directories: %s', ' '.join(setting.ignore))
     prefix = 'generate:post:page:extension:'
-    pagetypes =  [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
-    logging.info('Valid page extensions: %s', ' '.join(pagetypes))
+    setting.pagetypes =  [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
+    logging.info('Valid page extensions: %s', ' '.join(setting.pagetypes))
     root = create_folder('', '', None)
     event('generate:post:root', root)
     return root
@@ -84,9 +85,8 @@ def ignore_entry(name):
     return any([fnmatch(name, pattern) for pattern in setting.ignore]) or islink(name)
 
 def create_folder(name, path, parent):
+    """create folder node in site tree"""
     folder = Folder(name, path, parent)
-    prefix = 'generate:post:page:extension:'
-    pagetypes =  [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
     if parent is None:
         folder_path = setting.input
     else:
@@ -98,7 +98,7 @@ def create_folder(name, path, parent):
             logging.debug('Ignore %s', rel_path)
         elif isfile(path):
             extension = splitext(name)[1]
-            this = (Page if extension in pagetypes else Asset)(name, rel_path, folder)
+            this = (Page if extension in setting.pagetypes else Asset)(name, rel_path, folder)
             folder.add(this)
         elif isdir(path):
             this = create_folder(name, rel_path, folder)

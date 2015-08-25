@@ -2,7 +2,7 @@
 """
 bass.common
 -----
-Objects and functions shared by other modules.
+Basic functions shared by other modules.
 """
 
 from yaml import load
