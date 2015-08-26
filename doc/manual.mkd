@@ -29,7 +29,7 @@ with a fixed structure, or completely ignore the structure of the input
 directory, creating the structure of the site tree from metadata (Wok for
 example).
 
-Other features that were added are: extension through generic plugin mechanism
+Other features that were added are: extension through generic event mechanism
 (inspired by [Pelican][pelican] and Wok); use of template engines other than
 Jinja; ignoring specified files in the content directory (e.g. Emacs backup
 files); flexible pagination.
@@ -94,11 +94,11 @@ If you add the option `-s` or `--serve`, Bass will generate the site as usual,
 and then start a simple HTTP server on port 8080. This test server is intended solely
 for local testing of the site during the development phase.
 
-If the Python package `webob` is installed, a slightly more advanced server
-(WSGI-based) is made available. This server checks for changes to the `content` and
+If the Python package *WebOb* is installed, a slightly more advanced server
+(WSGI-based) is made available. This server checks for changes in the `content` and
 `layout` directories (see below) whenever a page is requested. If it detects a
 change in either of these directories, the site is regenerated before the page
-is returned. If the Python package `waitress` is also installed, this WSGI-based
+is returned. If the Python package *Waitress* is also installed, this WSGI-based
 server is replaced with a faster one.
 
 Configuration
@@ -150,7 +150,7 @@ The resulting site tree consists of nodes. There are three types of node:
 
 [strangecase]: https://github.com/colinta/StrangeCase
 
-After a node is created, one or two events is sent, depending on the node type:
+After a node is created, one or more events are sent, depending on the node type:
 
     generate:post:folder:path:<path>
     generate:post:page:path:<path>
@@ -160,8 +160,10 @@ After a node is created, one or two events is sent, depending on the node type:
 #### Transform site tree
 
 Using *event handlers* the site tree can be transformed. This step is optional:
-if there is no even handler for the events `generate:post:root` and
-`render:pre:root`, there is no tree transformation.
+if there is no event handler for the events `generate:post:root` and
+`render:pre:root`, there is no tree transformation of the whole tree. 
+Local tree transformations can be achieved by event handlers for `render:pre` events 
+of other nodes. See the paragraph [Events](#events) for an explanation of these events.
 
 ###  Render site tree
 
@@ -204,7 +206,7 @@ the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
 #### Pages
 
 The easiest way to write pages with formatting is to use lightweight markup
-languages such as [Markdown][mkd], [reStructuredText][rst] and
+languages such as [Markdown][mkd], [ReStructuredText][rst] and
 [Textile][txi]. Markdown is used with the extensions *definition list*,
 *footnotes* and *tables*.
 
@@ -248,9 +250,8 @@ The basic set of metadata is this.
 * `date`, `time`, `datetime`: date, time and date-time in ISO notation; datetime can be derived
   from date and time, or vice versa (default: `ctime` of the file)
 
-Other metadata fields can be defined in the header, and used in templates or
-event(s)s. The metadata defined in the header of the file are added as attributes
-of the Page node.
+Other metadata fields can be defined in the header of the page, and used in templates or
+events. The metadata defined in the header of the file are added as attributes of the *Page* node.
 
 #### Assets
 
@@ -279,8 +280,7 @@ template engines are defined. There should at least be a template `default`.
 It is possible to use other template languages, e.g. [Mako][mako] or
 [Jinja][jinja]. The template factory for an extra template can be defined in
 the handler definitions by calling `add_template_type`. This is a convenience
-function that defines a template factory for a new file extension (see the paragraph
-[Events](#events) for an example).
+function that defines a template factory for a new file extension.
 By default, there is one template factory: `chameleon.PageTemplateFile`. This is
 connected to the file extensions `.xml` and `.pt`. Other template factories can
 be defined, provided they implement the following protocol:
@@ -315,20 +315,20 @@ The tree model consists of the following classes.
 #### Folder
 * sub-class of Node
 * methods:
-    - `Folder.asset()`: ...
-    - `Folder.assets()`: ...
-    - `Folder.folder()`: ...
-    - `Folder.folders()`: ...
-    - `Folder.page()`: ...
-    - `Folder.pages()`: ...
-    - `Folder.render()`: ...
+    - `Folder.asset(name)`: return asset with given name, otherwise None
+    - `Folder.assets()`: return all assets in this folder
+    - `Folder.folder(name)`: return folder with given name, otherwise None
+    - `Folder.folders()`: return all sub-folders of this folder
+    - `Folder.page(name)`: return page with given name, otherwise None
+    - `Folder.pages(tag, key)`: return all pages (with tag, if given), sorted on attribute *key* (default: name) 
+    - `Folder.render()`: render folder
 * variables: as in base class
 
 ####  Page
 * sub-class of Node
 * methods:
-    - `Page.render()`: ...
-    - `Page.copy()`: ...
+    - `Page.render()`: render page
+    - `Page.copy()`: return shallow copy of page, with its own name, path and url, and empty child list
 * variables: as in base class, plus `preview`, `content`, `url`
     - `url`: absolute URL of page
     - `preview`: preview part of page (between first and second divider `---`)
@@ -338,7 +338,7 @@ The tree model consists of the following classes.
 #### Asset
 * sub-class of Node
 * methods:
-    - `Asset.render()`: ...
+    - `Asset.render()`: render asset
 * variables: as in base class, plus `url`
     - `url`: absolute URL of asset
 
@@ -356,25 +356,32 @@ Bass keeps global parameters in a separate module `setting`.
 ### Events
 
 An event is a signal that is emitted during the tree generation phase or the
-tree rendering phase. The event model was inspired by Pelican and Wok. An event
-can be handled by an event handler: a function (actually: a callable object)
-that is called when the event signal is given.  There are three types of
-events: post-generate, pre-render and post-render events. Events can be defined
-for all nodes in the tree. The node for which the event signal is emitted, is
-specified by a its type and one of the following: (1) (relative) path, (2)
+tree rendering phase. The event model was inspired by [Pelican][pelican] and [Wok][wok].
+An event can be handled by an event handler: a function (actually: a callable object)
+that is called when the event signal is given. If there is no handler for an event, 
+the event signal is ignored.
+
+There are three types of events: post-generate, pre-render and post-render events.
+Events can be defined for all nodes in the tree. The node for which the event signal is emitted, is
+specified by its type and one of the following: (1) relative path, (2)
 extension, (3) identifier (*id* attribute), (4) tag.
 
 event                                     | description
 ------------------------------------------|---------------------------------------------------------
 `generate:post:folder:path:articles`      | post-generate event for folder with path *articles*
+`render:pre:folder:path:articles`         | pre-render event for folder with path *articles*
+`render:post:folder:path:articles`        | post-render event for folder with path *articles*
 `generate:post:page:extension:mkd`        | post-generate event for page with extension *.mkd*
-`render:pre:page:path:article/intro.mkd`  | pre-render event for node with path *article/intro.mkd*
-`render:post:page:path:article/intro.mkd` | post-render event for node with path *article/intro.mkd*
-`render:pre:page:id:intro`                | pre-render event for node(s) with id *intro*
-`render:post:page:id:intro`               | post-render event for node(s) with id *intro*
-`render:pre:page:tag:table`               | pre-render event for node(s) with tag *table*
-`render:post:page:tag:table`              | post-render event for node(s) with tag *table*
-`render:post:asset:extension:png`         | post-generate event for asset(s) with extension *.png*
+`generate:post:page:path:index.mkd`       | pre-render event for page with path *index.mkd*
+`render:pre:page:path:index.mkd`          | pre-render event for page with path *index.mkd*
+`render:post:page:path:index.mkd`         | post-render event for page with path *index.mkd*
+`render:pre:page:id:intro`                | pre-render event for page(s) with id *intro*
+`render:post:page:id:intro`               | post-render event for page(s) with id *intro*
+`render:pre:page:tag:table`               | pre-render event for page(s) with tag *table*
+`render:post:page:tag:table`              | post-render event for page(s) with tag *table*
+`generate:post:asset:path:favicon.ico`    | post-generate event for asset with path *favicon.ico*
+`render:pre:asset:path:favicon.ico`       | pre-render event for asset with path *favicon.ico*
+`render:post:asset:path:favicon.ico`      | post-render event for asset with path *favicon.ico*
 
 Events for the root of the site tree are specified as:
 
@@ -384,15 +391,15 @@ event                                     | description
 `render:pre:root`                         | pre-render event for root node
 `render:post:root`                        | post-render event for root node
 
-The post-render event is called after the root node has been rendered. The
-rendering algorithm of Bass is such that this is the last node to be
-rendered. That means that the post-render event for the root node can be used
-for uploading the generated site to another server.
-
 The post-generate event for the root node, `generate:post:root`, is called
 after generating (building) the entire site tree, and can be used for global
 transformations of the tree. Please use your imagination, but don't break the
 site tree (well: it's your tree anyway).
+
+The post-render event is called after the root node has been rendered. The
+rendering algorithm of Bass is such that this is the last node to be
+rendered. That means that the post-render event for the root node can be used
+for uploading the generated site to another server.
 
 #### Event handlers
 
@@ -401,16 +408,18 @@ Event handlers are defined in the configuration file:
     handlers: handler_dir
 
 From the specified directory (default: `handlers`) Bass attempts to read the
-module `__init__.py`. This module should define one or more event handlers,
-usually in the form of functions, but actually any callable object is
+module `__init__.py`. If it exists, this module defines zero or more event handlers,
+usually in the form of functions, but naturally any callable object is
 acceptable. An event handler is called with one parameter, namely the node that
 emitted the event.
 
-Event handlers are are assigned to an event by calling the function `event_handler`:
+Event handlers are assigned to an event by calling the function `add_handler`:
 
     def upload_site(root):
         ....
-    event_handler('render:post:root', upload_site)
+    add_handler('render:post:root', upload_site)
+
+There also convenience functions `copy_handler` and `remove_handler` (see examples below).
 
 #### Built-in event handlers
 
@@ -466,5 +475,5 @@ Define extra template type:
     add_template_type('.mko', lambda name: Template(filename=name))
 
 This defines a new template factory for the extension `.mko`. Strictly
-speaking, this has nothing to do with event handling, but it is the best way
+speaking, this has nothing to do with event handling, but it is the easiest way
 to define new template types.
