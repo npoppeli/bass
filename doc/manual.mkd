@@ -219,7 +219,7 @@ breaks is treated as end of paragraph.
 [txi]: https://github.com/sebix/python-textile
 
 Each page can start with a metadata section in YAML form, but this is
-optional. Suppose there is named `index.mkd` in the input directory, with the
+optional. Suppose there is a file named `index.mkd` in the input directory, with the
 following contents.
 
     title: Home
