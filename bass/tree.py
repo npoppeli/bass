@@ -152,7 +152,10 @@ class Asset(Node):
         super().__init__(name, path, parent)
         self.key = 'Asset'
         self.url = '/' + self.path
+        pagetype = splitext(path)[1][1:]
         event('generate:post:asset:path:'+path, self)
+        event('generate:post:asset:extension:'+pagetype, self)
+        
     def render(self):
         """render Asset node"""
         event('render:pre:asset:path:'+self.path, self)
