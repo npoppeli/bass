@@ -13,37 +13,37 @@ from .markup import converter
 
 event_handler = {}
 
-def add_handler(label, handler):
-    """add handler for event 'label'"""
+def add_handler(event, handler):
+    """add handler for event 'event'"""
     if callable(handler):
-        if label in event_handler:
-            logging.debug('Event handler for %s redefined', label)
+        if event in event_handler:
+            logging.debug('Event handler for %s redefined', event)
         else:
-            logging.debug('New event handler for %s', label)
-        event_handler[label] = handler
+            logging.debug('New event handler for %s', event)
+        event_handler[event] = handler
     else:
-        logging.debug('Event handler for %s is not a callable', label)
+        logging.debug('Event handler for %s is not a callable', event)
 
-def copy_handler(from_label, to_label):
-    """copy handler for event 'from_label' to event 'to_label'"""
-    if from_label in event_handler:
-        logging.debug('Event handler for %s copied from %s', to_label, from_label)
-        event_handler[to_label] = event_handler[from_label]
+def copy_handler(from_event, to_event):
+    """copy handler for event 'from_event' to event 'to_event'"""
+    if from_event in event_handler:
+        logging.debug('Event handler for %s copied from %s', to_event, from_event)
+        event_handler[to_event] = event_handler[from_event]
     else:
-        logging.debug('No event handler for %s', from_label)
+        logging.debug('No event handler for %s', from_event)
 
-def remove_handler(label):
-    """remove handler for event 'label'"""
-    if label in event_handler:
-        logging.debug('Event handler for %s removed', label)
-        del event_handler[label]
+def remove_handler(event):
+    """remove handler for event 'event'"""
+    if event in event_handler:
+        logging.debug('Event handler for %s removed', event)
+        del event_handler[event]
     else:
-        logging.debug('No event handler for %s', label)
+        logging.debug('No event handler for %s', event)
 
-def event(label, node):
-    """call handler for event 'label'"""
-    if label in event_handler:
-        event_handler[label](node)
+def event(event, node):
+    """call handler for event 'event'"""
+    if event in event_handler:
+        event_handler[event](node)
 
 class Processor:
     def __init__(self, converter=None):
