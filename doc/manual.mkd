@@ -279,9 +279,8 @@ template engines are defined. There should at least be a template `default`.
 It is possible to use other template languages, e.g. [Mako][mako] or
 [Jinja][jinja]. The template factory for an extra template can be defined in
 the handler definitions by calling `add_template_type`. This is a convenience
-function that defines an event handler for `generate:post:page:extension:abc`,
-where `abc` is the extension of the template files (see the paragraph
-[Events](#events) for more information).
+function that defines a template factory for a new file extension (see the paragraph
+[Events](#events) for an example).
 By default, there is one template factory: `chameleon.PageTemplateFile`. This is
 connected to the file extensions `.xml` and `.pt`. Other template factories can
 be defined, provided they implement the following protocol:
