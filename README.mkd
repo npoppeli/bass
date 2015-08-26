@@ -29,7 +29,7 @@ with a fixed structure, or completely ignore the structure of the input
 directory, creating the structure of the site tree from metadata (Wok for
 example).
 
-Other features that were added are: extension through generic plugin mechanism
+Other features that were added are: extension through generic event mechanism
 (inspired by [Pelican][pelican] and Wok); use of template engines other than
 Jinja; ignoring specified files in the content directory (e.g. Emacs backup
 files); flexible pagination.
@@ -95,7 +95,7 @@ and then start a simple HTTP server on port 8080. This test server is intended s
 for local testing of the site during the development phase.
 
 If the Python package `webob` is available, a slightly more advanced server
-(WSGI) is made available. This server checks for changes to the `content` and
+(WSGI) is made available. This server checks for changes in the `content` and
 `layout` directories (see the manual) whenever a page is requested. If it detects a
 change in either of these directories, the site is regenerated before the page
 is returned.
