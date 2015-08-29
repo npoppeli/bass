@@ -74,7 +74,7 @@ def build_tree():
     """generate site tree from files and directories in input directory"""
     logging.info('Ignoring files/directories: %s', ' '.join(setting.ignore))
     prefix = 'generate:post:page:extension:'
-    setting.pagetypes =  [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
+    setting.pagetypes =  [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
     logging.info('Valid page extensions: %s', ' '.join(setting.pagetypes))
     root = create_folder('', '', None)
     event('generate:post:root', root)
@@ -97,8 +97,8 @@ def create_folder(name, path, parent):
         if ignore_entry(path):
             logging.debug('Ignore %s', rel_path)
         elif isfile(path):
-            extension = splitext(name)[1]
-            this = (Page if extension in setting.pagetypes else Asset)(name, rel_path, folder)
+            suffix = splitext(name)[1][1:]
+            this = (Page if suffix in setting.pagetypes else Asset)(name, rel_path, folder)
             folder.add(this)
         elif isdir(path):
             this = create_folder(name, rel_path, folder)

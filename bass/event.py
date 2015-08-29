@@ -163,20 +163,20 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
 
     # define event handlers for the standard page types, depending on which Python packages are installed
 if setting.markdown:
-    markdown_processor = Processor(converter['.mkd'])
+    markdown_processor = Processor(converter['mkd'])
     add_handler('generate:post:page:extension:mkd', markdown_processor)
     copy_handler('generate:post:page:extension:mkd', 'generate:post:page:extension:md')
 
 if setting.rest:
-    rest_processor = Processor(converter['.rst'])
+    rest_processor = Processor(converter['rst'])
     add_handler('generate:post:page:extension:rst', rest_processor)
 
 if setting.textile:
-    textile_processor = Processor(converter['.txi'])
+    textile_processor = Processor(converter['txi'])
     add_handler('generate:post:page:extension:txi', textile_processor)
 
-html_processor = Processor(converter['.html'])
+html_processor = Processor(converter['html'])
 add_handler('generate:post:page:extension:html', html_processor)
 
-text_processor = Processor(converter['.txt'])
+text_processor = Processor(converter['txt'])
 add_handler('generate:post:page:extension:txt', text_processor)

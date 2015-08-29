@@ -114,22 +114,23 @@ class Page(Node):
         self.key = 'Page'
         full_path = join(setting.input, parent.path, name)
         self.meta, self.preview, self.content = read_page(full_path)
-        pagetype = splitext(path)[1][1:]
+        suffix = splitext(path)[1][1:]
         event('generate:post:page:path:'+path, self)
-        event('generate:post:page:extension:'+pagetype, self)
+        event('generate:post:page:extension:'+suffix, self)
 
     def copy(self, sep='_'):
         """create copy of page node, with its own name, path and URL, and empty children list"""
         newpage = copy(self)
         newpage.child = []
-        (pagename, pagetype) = splitext(newpage.path)
+        (pagename, suffix) = splitext(newpage.path)
         newpage.name += sep
-        newpage.path = pagename + sep + pagetype
+        newpage.path = pagename + sep + suffix
         newpage.url = '/' + pagename + sep + '.html'
         return newpage
 
     def render(self):
         """render Page node"""
+        event('render:pre:page:any', self)
         event('render:pre:page:path:'+self.path, self)
         if self.id: event('render:pre:page:id:'+self.id, self)
         for tag in self.tags: event('render:pre:page:tag:'+tag, self)
@@ -141,6 +142,7 @@ class Page(Node):
         write_file(template.render(this=self, root=self.root()), join(setting.output, self.url[1:]))
         for node in self.child: # (dynamically created) sub-pages
             node.render()
+        event('render:post:page:any', self)
         event('render:post:page:path:'+self.path, self)
         if self.id: event('render:post:page:id:'+self.id, self)
         for tag in self.tags: event('render:post:page:tag:'+tag, self)
@@ -152,15 +154,18 @@ class Asset(Node):
         super().__init__(name, path, parent)
         self.key = 'Asset'
         self.url = '/' + self.path
-        pagetype = splitext(path)[1][1:]
+        suffix = splitext(path)[1][1:]
         event('generate:post:asset:path:'+path, self)
-        event('generate:post:asset:extension:'+pagetype, self)
-        
+        event('generate:post:asset:extension:'+suffix, self)
+
     def render(self):
         """render Asset node"""
+        suffix = splitext(self.path)[1][1:]
         event('render:pre:asset:path:'+self.path, self)
+        event('render:pre:asset:extension:'+suffix, self)
         shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
         event('render:post:asset:path:'+self.path, self)
+        event('render:post:asset:extension:'+suffix, self)
 
 def read_page(path):
     """read page from file and return triple (meta, preview, content)"""
