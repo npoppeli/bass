@@ -161,8 +161,8 @@ After a node is created, one or more events are sent, depending on the node type
 
 Using *event handlers* the site tree can be transformed. This step is optional:
 if there is no event handler for the events `generate:post:root` and
-`render:pre:root`, there is no tree transformation of the whole tree. 
-Local tree transformations can be achieved by event handlers for `render:pre` events 
+`render:pre:root`, there is no tree transformation of the whole tree.
+Local tree transformations can be achieved by event handlers for `render:pre` events
 of other nodes. See the paragraph [Events](#events) for an explanation of these events.
 
 ###  Render site tree
@@ -200,8 +200,8 @@ for plain text (extension `.txt`), HTML fragment (extension`.html`), Markdown
 Python packages need to be installed of course.
 
 In other words: a file is mapped to a page if the extension of the file is in
-the list of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt',
-'.html']`. All other files are mapped to an asset.
+the list of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt',
+'html']`. All other files are mapped to an asset.
 
 #### Pages
 
@@ -256,7 +256,7 @@ events. The metadata defined in the header of the file are added as attributes o
 #### Assets
 
 A file is mapped to an asset if the extension of the file is *not* in the list
-of page types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. An
+of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An
 asset is not changed during the tree generation phase.
 
 #### Folders
@@ -320,7 +320,7 @@ The tree model consists of the following classes.
     - `Folder.folder(name)`: return folder with given name, otherwise None
     - `Folder.folders()`: return all sub-folders of this folder
     - `Folder.page(name)`: return page with given name, otherwise None
-    - `Folder.pages(tag, key)`: return all pages (with tag, if given), sorted on attribute *key* (default: name) 
+    - `Folder.pages(tag, key)`: return all pages (with tag, if given), sorted on attribute *key* (default: name)
     - `Folder.render()`: render folder
 * variables: as in base class
 
@@ -358,7 +358,7 @@ Bass keeps global parameters in a separate module `setting`.
 An event is a signal that is emitted during the tree generation phase or the
 tree rendering phase. The event model was inspired by [Pelican][pelican] and [Wok][wok].
 An event can be handled by an event handler: a function (actually: a callable object)
-that is called when the event signal is given. If there is no handler for an event, 
+that is called when the event signal is given. If there is no handler for an event,
 the event signal is ignored.
 
 There are three types of events: post-generate, pre-render and post-render events.
@@ -472,8 +472,8 @@ Define extra template type:
 
     from bass import add_template_type
     from mako.template import Template
-    add_template_type('.mko', lambda name: Template(filename=name))
+    add_template_type('mko', lambda name: Template(filename=name))
 
-This defines a new template factory for the extension `.mko`. Strictly
-speaking, this has nothing to do with event handling, but it is the easiest way
-to define new template types.
+This defines a new template factory for the extension `mko`. Strictly speaking,
+this has nothing to do with event handling, but it is the easiest way to define
+new template types.

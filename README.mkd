@@ -5,7 +5,7 @@ Bass is a static website generator (Bass=Build A Static Site), written in
 Python 3. It turns a collection of content pages, assets (PNG, CSS, JS etc.)
 and templates into a static website, i.e. a website consisting only of
 directories, HTML pages and the same assets. Bass is distributed under the MIT
-license (see the LICENSE file for more details).
+license (see the LICENSE file for more details). &#10003;
 
 The idea is that you don't need a content-management system on the server to
 generate pages dynamically: you generate the content, upload it to the server,
