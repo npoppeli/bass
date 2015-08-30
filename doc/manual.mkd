@@ -125,15 +125,15 @@ Creating a site
 
 Bass is a tree transformation engine - no more, no less! The creation of a
 static website from a set of input files takes place in three phases: (1)
-generation, (2) transformation, (3) rendering.
+generation of the site tree, (2) transformation of the site tree, (3) rendering.
 
 #### Generation phase
 
-The site tree is generated from the files in the input directory (default:
-`input`). In the generation phase, directories and files are ignored
-if their names match one of the *ignore patterns*. Symbolic links are also
-ignored.  By default there is one ignore pattern: `.?*`. Other ignore patterns
-can be defined in the configuration file (option `ignore`). For example:
+The site tree is generated from the directories and files in the input
+directory (default: `input`). Directories and files are ignored if their names
+match one of the *ignore patterns*. Symbolic links are also ignored.  By
+default there is one ignore pattern: `.?*`. Other ignore patterns can be
+defined in the configuration file (option `ignore`). For example:
 
     ignore: "*.bak *~"
 
@@ -146,8 +146,8 @@ event handlers).
 
 The resulting site tree consists of nodes. There are three types of node:
 *Folder*, *Page*, *Asset*. The tree model was inspired by
-[StrangeCase][strangecase]. The details are explained below in the paragraph
-[Content](#content).
+[StrangeCase][strangecase]. The details are explained below in the paragraphs
+[Content](#content) and [Tree model](#treemodel).
 
 [strangecase]: https://github.com/colinta/StrangeCase
 
@@ -196,7 +196,7 @@ Javascript modules and other files.
 [jekyll]: http://jekyllrb.com/
 
 At a technical level, a page is a file for which an event handler
-`generate:post:page:extension:abc` is defined. Bass defines such event handlers
+*generate:post:page:extension:abc* is defined. Bass defines such event handlers
 for plain text (extension `.txt`), HTML fragment (extension`.html`), Markdown
 (extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`), and Textile
 (extension `.txi`). For Markdown, ReStructuredText and Textile the related
@@ -244,17 +244,17 @@ The basic set of metadata is this.
 
 * `title`: title of the page
   (default: derived from the path of the file)
-* `tags`: one or more words, separated by comma or space
+* `tags`: one or more words, separated by whitespace
   (default: empty list)
 * `skin`: the name of the template used to render this page as a complete HTML file
   (default: `default`)
-* `id`: an identifier of the node, which can be used in event(s)s
-  (default: `''`)
+* `id`: an identifier of the node (default: `''`)
 * `date`, `time`, `datetime`: date, time and date-time in ISO notation; datetime can be derived
   from date and time, or vice versa (default: `ctime` of the file)
 
-Other metadata fields can be defined in the header of the page, and used in templates or
-events. The metadata defined in the header of the file are added as attributes of the *Page* node.
+Other metadata fields can be defined in the header of the page. All metadata
+fields are added as attributes of the *Page* node, and can be used in templates
+or events.
 
 #### Assets
 
@@ -269,12 +269,12 @@ generation phase.
 
 ### Layout
 
-The layout of the site is created by templates, which are collected in the
-layout directory (default: `layout`). This is a flat directory,
-i.e. sub-directories are not scanned. Bass uses [Chameleon][chameleon]
-templates to create HTML pages. This is a very flexible templating environment
-with control flow, filters, and other features. When a template is called, two
-arguments are passed, namely the current node (`this`) and the root node (`root`).
+The layout of the site is created by templates, which are put in the layout
+directory (default: `layout`). This is a flat directory, i.e. sub-directories
+are not scanned. Bass uses [Chameleon][chameleon] templates to create HTML
+pages. This is a very flexible templating environment with control flow,
+filters, and other features. When a template is called, two arguments are
+passed, namely the current node (`this`) and the root node (`root`).
 
 Chameleon templates are XML files in the template directory. The possible file
 extensions are `.xml` and `.pt`. Other files are ignored, unless additional
@@ -282,11 +282,11 @@ template engines are defined. There should at least be a template `default`.
 
 It is possible to use other template languages, e.g. [Mako][mako] or
 [Jinja][jinja]. The template factory for an extra template can be defined in
-the handler definitions by calling `add_template_type`. This is a convenience
-function that defines a template factory for a new file extension.
-By default, there is one template factory: `chameleon.PageTemplateFile`. This is
-connected to the file extensions `.xml` and `.pt`. Other template factories can
-be defined, provided they implement the following protocol:
+the extension module by calling `add_template_type`. This is a convenience
+function that defines a template factory for a new file extension.  By default,
+there is one template factory: `chameleon.PageTemplateFile`. This is connected
+to the file extensions `.xml` and `.pt`. Other template factories can be
+defined, provided they implement the following protocol:
 
     extension -> template factory: T = template_factory[extension]
     filename -> template: t = T(filename)
@@ -358,8 +358,8 @@ Bass keeps global parameters in a separate module `setting`.
 
 ### Events
 
-An event is a signal that is emitted during the tree generation phase or the
-tree rendering phase. The event model was inspired by [Pelican][pelican] and
+An event is a signal that is emitted during the generation phase or the
+rendering phase. The event model was inspired by [Pelican][pelican] and
 [Wok][wok]. An event can be handled by an event handler: a function (actually:
 a callable object) that is called when the event signal is given. If there is
 no handler for an event, the event signal is ignored.
@@ -377,7 +377,7 @@ any. Below we give examples of each.
 5. any:        *render:pre:page:any*
 
 The table below specifies the combinations of event type, node type and details
-that are currently in use.
+that are currently in use (*none* means that no details of the node are specified).
 
 | event type    | node type | none | any | path | extension | id | tag  |
 |---------------|-----------|:----:|:---:|:----:|:---------:|:--:|:----:|
@@ -398,16 +398,16 @@ Events for the root of the site tree are specified as *generate:post:root*,
 *render:pre:root*, and *render:post:root*.
 
 The post-generate event for the root node, *generate:post:root*, is called
-after generating (building) the entire site tree, and can be used for global
-transformations of the tree. Please use your imagination, but don't break the
-site tree (well: it's your tree anyway).
+after generating the site tree, and can be used for global transformations of
+the tree. Please use your imagination, but don't break the site tree (well:
+it's your tree anyway).
 
 The post-render event, *render:post:root*, is called after the root node has
 been rendered. The rendering algorithm of Bass is such that this is the last
 node to be rendered. That means that the post-render event for the root node
-can be used for uploading the generated site to another server.
+can be used for uploading the generated site to another server, for example.
 
-#### Event handlers
+#### Extensions
 
 Extensions, mostly in the form of event handlers, are put in a directory that
 is defined in the configuration file:
@@ -486,6 +486,6 @@ Define extra template type:
     from mako.template import Template
     add_template_type('mko', lambda name: Template(filename=name))
 
-This defines a new template factory for the extension `mko`. Strictly speaking,
-this has nothing to do with event handling, but it is the easiest way to define
-new template types.
+This defines a new template factory for the extension `.mko`. Strictly speaking,
+this has nothing to do with event handling, but defining new template types is
+another form of extending the core ffunctionality.
