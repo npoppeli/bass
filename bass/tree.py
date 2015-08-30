@@ -59,7 +59,9 @@ class Folder(Node):
         """create new Folder node"""
         super().__init__(name, path, parent)
         self.key = 'Folder'
-        if name != '':
+        if name == '':
+            event('generate:post:root', self)
+        else:
             event('generate:post:folder:path:'+path, self)
 
     def asset(self, name):

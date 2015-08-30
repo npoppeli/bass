@@ -13,14 +13,21 @@ from .markup import converter
 
 event_handler = {}
 
+def combine(h1, h2):
+    def _h12(node):
+        h1(node)
+        h2(node)
+    return _h12
+
 def add_handler(event, handler):
     """add handler for event 'event'"""
     if callable(handler):
         if event in event_handler:
-            logging.debug('Event handler for %s redefined', event)
+            logging.debug('Event handler for %s extended', event)
+            event_handler[event] = combine(event_handler[event], handler)
         else:
             logging.debug('New event handler for %s', event)
-        event_handler[event] = handler
+            event_handler[event] = handler
     else:
         logging.debug('Event handler for %s is not a callable', event)
 

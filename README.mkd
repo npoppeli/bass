@@ -5,18 +5,20 @@ Bass is a static website generator (Bass=Build A Static Site), written in
 Python 3. It turns a collection of content pages, assets (PNG, CSS, JS etc.)
 and templates into a static website, i.e. a website consisting only of
 directories, HTML pages and the same assets. Bass is distributed under the MIT
-license (see the LICENSE file for more details). ✓ ✔
+license (see the LICENSE file for more details).
 
-The idea is that you don't need a content-management system on the server to
-generate pages dynamically: you generate the content, upload it to the server,
-and repeat this process when something has changed. That way, there is no need
-to install complex software on the server, with the associated maintenance
-effort (software upgrade, backup) and security issues.
+The idea behind a static site generator is that you don't need a
+content-management system on the server to generate pages dynamically: you
+generate the content, upload it to the server, and repeat this process when
+something has changed. That way, there is no need to install complex software
+on the server, with the associated maintenance effort (software upgrade,
+backup) and security issues.
 
 The design of Bass borrows ideas from [Wok][wok] and other static site
 generators (see [overview][static]). Before I created Bass, I used Wok for
 about a year, created two websites with it, and also looked at alternatives.
-During that year I noticed several drawbacks, which led to the development of Bass.
+During that year I noticed several drawbacks, which led to the development of
+Bass.
 
 The most important feature of Bass is that it gives the user complete freedom
 in organizing the input directory, considers this organization as meaningful,
@@ -29,7 +31,7 @@ with a fixed structure, or completely ignore the structure of the input
 directory, creating the structure of the site tree from metadata (Wok for
 example).
 
-Other features that were added are: extension through generic event mechanism
+Other features that were added: extension through generic event mechanism
 (inspired by [Pelican][pelican] and Wok); use of template engines other than
 Jinja; ignoring specified files in the content directory (e.g. Emacs backup
 files); flexible pagination.
@@ -55,8 +57,8 @@ with this command: `sudo pip install bass`.
 
 ### Dependencies
 
-All dependencies are available through pip. Although optional, you should at least
-install one of the following three tools:
+All dependencies are available through pip. Although optional, you should at
+least install one of the following three tools:
 
 - *Markdown* (*Markdown2* is an alternative)
 - *Docutils*
@@ -72,7 +74,7 @@ If you install with pip, they will be installed for you.
 #### Optional
 
 - *Markdown* or *Markdown2*, for rendering Markdown documents.
-- *Docutils*, for rendering reStructuredText documents.
+- *Docutils*, for rendering ReStructuredText documents.
 - *Textile*, for rendering Textile documents.
 - *WebOb*, for a more advanced web server.
 - *Waitress*, for a faster web server.
@@ -81,24 +83,25 @@ Usage
 -----
 
 To use Bass, go to the project directory (the directory where the input files
-and generated site will be located), and run the command `bass -c` or `bass --create`. This will
-create a basic directory structure and corresponding configuration file. You
-can change the names of the directories, provided you apply the changes in the
-configuration file as well.
+and generated site will be located), and run the command `bass -c` or `bass
+--create`. This will create a basic directory structure and corresponding
+configuration file. You can change the names of the directories, provided you
+apply the changes in the configuration file as well.
 
 Put your content in the input directory (default: `input`). Build the site with
 `bass -b` or `bass --build`. If you want to see debugging information, use
 `bass -b -d` or `bass --build --debug`.
 
 If you add the option `-s` or `--serve`, Bass will generate the site as usual,
-and then start a simple HTTP server on port 8080. This test server is intended solely
-for local testing of the site during the development phase.
+and then start a simple web server on port 8080. This web server is intended
+solely for local testing of the site during the development phase.
 
 If the Python package *WebOb* is available, a slightly more advanced server
 (WSGI) is made available. This server checks for changes in the `content` and
-`layout` directories (see the manual) whenever a page is requested. If it detects a
-change in either of these directories, the site is regenerated before the page
-is returned. If the Python package *Waitress* is also installed, this WSGI-based server is replaced with a faster one.
+`layout` directories (see the manual) whenever a page is requested. If it
+detects a change in either of these directories, the site is regenerated before
+the page is returned. If the Python package *Waitress* is also installed, this
+WSGI-based server is replaced with a faster one.
 
 About
 -----

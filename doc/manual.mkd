@@ -7,16 +7,18 @@ and templates into a static website, i.e. a website consisting only of
 directories, HTML pages and the same assets. Bass is distributed under the MIT
 license (see the LICENSE file for more details).
 
-The idea is that you don't need a content-management system on the server to
-generate pages dynamically: you generate the content, upload it to the server,
-and repeat this process when something has changed. That way, there is no need
-to install complex software on the server, with the associated maintenance
-effort (software upgrade, backup) and security issues.
+The idea behind a static site generator is that you don't need a
+content-management system on the server to generate pages dynamically: you
+generate the content, upload it to the server, and repeat this process when
+something has changed. That way, there is no need to install complex software
+on the server, with the associated maintenance effort (software upgrade,
+backup) and security issues.
 
 The design of Bass borrows ideas from [Wok][wok] and other static site
 generators (see [overview][static]). Before I created Bass, I used Wok for
 about a year, created two websites with it, and also looked at alternatives.
-During that year I noticed several drawbacks, which led to the development of Bass.
+During that year I noticed several drawbacks, which led to the development of
+Bass.
 
 The most important feature of Bass is that it gives the user complete freedom
 in organizing the input directory, considers this organization as meaningful,
@@ -29,7 +31,7 @@ with a fixed structure, or completely ignore the structure of the input
 directory, creating the structure of the site tree from metadata (Wok for
 example).
 
-Other features that were added are: extension through generic event mechanism
+Other features that were added: extension through generic event mechanism
 (inspired by [Pelican][pelican] and Wok); use of template engines other than
 Jinja; ignoring specified files in the content directory (e.g. Emacs backup
 files); flexible pagination.
@@ -55,8 +57,8 @@ with this command: `sudo pip install bass`.
 
 ### Dependencies
 
-All dependencies are available through pip. Although optional, you should at least
-install one of the following three tools:
+All dependencies are available through pip. Although optional, you should at
+least install one of the following three tools:
 
 - *Markdown* (*Markdown2* is an alternative)
 - *Docutils*
@@ -72,7 +74,7 @@ If you install with pip, they will be installed for you.
 #### Optional
 
 - *Markdown* or *Markdown2*, for rendering Markdown documents.
-- *Docutils*, for rendering reStructuredText documents.
+- *Docutils*, for rendering ReStructuredText documents.
 - *Textile*, for rendering Textile documents.
 - *WebOb*, for a more advanced web server.
 - *Waitress*, for a faster web server.
@@ -91,15 +93,15 @@ Put your content in the input directory (default: `input`). Build the site with
 `bass -b -d` or `bass --build --debug`.
 
 If you add the option `-s` or `--serve`, Bass will generate the site as usual,
-and then start a simple HTTP server on port 8080. This test server is intended solely
-for local testing of the site during the development phase.
+and then start a simple web server on port 8080. This web server is intended
+solely for local testing of the site during the development phase.
 
 If the Python package *WebOb* is installed, a slightly more advanced server
-(WSGI-based) is made available. This server checks for changes in the `content` and
-`layout` directories (see below) whenever a page is requested. If it detects a
-change in either of these directories, the site is regenerated before the page
-is returned. If the Python package *Waitress* is also installed, this WSGI-based
-server is replaced with a faster one.
+(WSGI-based) is made available. This server checks for changes in the `content`
+and `layout` directories (see below) whenever a page is requested. If it
+detects a change in either of these directories, the site is regenerated before
+the page is returned. If the Python package *Waitress* is also installed, this
+WSGI-based server is replaced with a faster one.
 
 Configuration
 -------------
@@ -109,11 +111,11 @@ format. This is the file `config` in the project directory.
 
 Possible configuration options (and their defaults) are
 
-- `input`    (`input`):   collection of input files (pages and assets).
-- `ignore`   (`.?*`):     patterns of files and directories to be ignored.
-- `output`   (`output`):  collection of output files (the generated web site).
-- `layout`   (`layout`):  layout defined as a collection of templates.
-- `handlers` (`handlers`): Python module with event handlers
+- `input`     (`input`):     directory of input files (pages and assets).
+- `ignore`    (`.?*`):       patterns of files and directories to be ignored.
+- `output`    (`output`):    directory of output files (the generated web site).
+- `layout`    (`layout`):    layout defined as a set of templates.
+- `extension` (`extension`): Python module(s) with extensions, mostly event handlers
   (see paragraph [Events](#events) for more information).
 
 Creating a site
@@ -121,17 +123,11 @@ Creating a site
 
 ### Process
 
-Bass is a tree transformation engine - no more, no less! The (site) tree is
-generated from a set of files and directories in the input directory. The tree
-can be transformed (optionally), and is then rendered as a set of files and
-directories in the output directory.
+Bass is a tree transformation engine - no more, no less! The creation of a
+static website from a set of input files takes place in three phases: (1)
+generation, (2) transformation, (3) rendering.
 
-The structure of the input directory, and the names of directories and files
-are considered to express the semantics of the site. The structure and names
-are maintained in the output directory (unless the user makes changes by using
-event handlers).
-
-#### Generate site tree
+#### Generation phase
 
 The site tree is generated from the files in the input directory (default:
 `input`). In the generation phase, directories and files are ignored
@@ -142,6 +138,11 @@ can be defined in the configuration file (option `ignore`). For example:
     ignore: "*.bak *~"
 
 Note: the double quotes are required since `*` is a meta-character in YAML.
+
+The structure of the input directory, and the names of directories and files
+are considered to express the semantics of the site. The structure and names
+are maintained in the output directory (unless the user makes changes by using
+event handlers).
 
 The resulting site tree consists of nodes. There are three types of node:
 *Folder*, *Page*, *Asset*. The tree model was inspired by
@@ -157,7 +158,9 @@ After a node is created, one or more events are sent, depending on the node type
     generate:post:page:extension:<extension>
     generate:post:asset:path:<path>
 
-#### Transform site tree
+See the paragraph [Events](#events) for an explanation of these events.
+
+#### Transformation phase
 
 Using *event handlers* the site tree can be transformed. This step is optional:
 if there is no event handler for the events `generate:post:root` and
@@ -165,7 +168,7 @@ if there is no event handler for the events `generate:post:root` and
 Local tree transformations can be achieved by event handlers for `render:pre` events
 of other nodes. See the paragraph [Events](#events) for an explanation of these events.
 
-###  Render site tree
+###  Rendering phase
 
 Rendering means writing the site tree to the output directory (default:
 `output`). Rendering is defined as a series of actions, depending on the type
@@ -256,8 +259,8 @@ events. The metadata defined in the header of the file are added as attributes o
 #### Assets
 
 A file is mapped to an asset if the extension of the file is *not* in the list
-of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An
-asset is not changed during the tree generation phase.
+of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An asset
+is not changed during the tree generation phase.
 
 #### Folders
 
@@ -287,7 +290,7 @@ be defined, provided they implement the following protocol:
 
     extension -> template factory: T = template_factory[extension]
     filename -> template: t = T(filename)
-    node -> string: t.render(this=node) is HTML page for node 'this'
+    node -> string: t.render(this=node, root=node.root()) returns HTML page for node 'this'
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
@@ -331,7 +334,7 @@ The tree model consists of the following classes.
     - `Page.copy()`: return shallow copy of page, with its own name, path and url, and empty child list
 * variables: as in base class, plus `preview`, `content`, `url`
     - `url`: absolute URL of page
-    - `preview`: preview part of page (between first and second divider `---`)
+    - `preview`: preview part of page (text between first and second divider `---`)
     - `content`: content of page
 * metadata of a page are added as attributes of the node
 
@@ -346,68 +349,72 @@ The tree model consists of the following classes.
 
 Bass keeps global parameters in a separate module `setting`.
 
-* `input`:            content directory
-* `ignore`:           list of ignore patterns
-* `layout`:           layout directory
-* `output`:           output directory
-* `handlers`:         handler directory
-* `project`:          project directory, parent of input, layout, handler and output directories
+* `input`:     content directory
+* `ignore`:    list of ignore patterns
+* `layout`:    layout directory
+* `output`:    output directory
+* `extension`: extension directory
+* `project`:   project directory, parent of input, layout, handler and output directories
 
 ### Events
 
 An event is a signal that is emitted during the tree generation phase or the
-tree rendering phase. The event model was inspired by [Pelican][pelican] and [Wok][wok].
-An event can be handled by an event handler: a function (actually: a callable object)
-that is called when the event signal is given. If there is no handler for an event,
-the event signal is ignored.
+tree rendering phase. The event model was inspired by [Pelican][pelican] and
+[Wok][wok]. An event can be handled by an event handler: a function (actually:
+a callable object) that is called when the event signal is given. If there is
+no handler for an event, the event signal is ignored.
 
-There are three types of events: post-generate, pre-render and post-render events.
-Events can be defined for all nodes in the tree. The node for which the event signal is emitted, is
-specified by its type and one of the following: (1) relative path, (2)
-extension, (3) identifier (*id* attribute), (4) tag.
+There are three types of events: post-generate, pre-render and post-render
+events.  Events can be defined for all nodes in the tree. The node for which
+the event signal is emitted, is specified by its type and one of the following:
+(1) path, (2) extension, (3) identifier (*id*) attribute, (4) tag, (5)
+any. Below we give examples of each.
 
-event                                     | description
-------------------------------------------|---------------------------------------------------------
-`generate:post:folder:path:articles`      | post-generate event for folder with path *articles*
-`render:pre:folder:path:articles`         | pre-render event for folder with path *articles*
-`render:post:folder:path:articles`        | post-render event for folder with path *articles*
-`generate:post:page:extension:mkd`        | post-generate event for page with extension *.mkd*
-`generate:post:page:path:index.mkd`       | pre-render event for page with path *index.mkd*
-`render:pre:page:path:index.mkd`          | pre-render event for page with path *index.mkd*
-`render:post:page:path:index.mkd`         | post-render event for page with path *index.mkd*
-`render:pre:page:id:intro`                | pre-render event for page(s) with id *intro*
-`render:post:page:id:intro`               | post-render event for page(s) with id *intro*
-`render:pre:page:tag:table`               | pre-render event for page(s) with tag *table*
-`render:post:page:tag:table`              | post-render event for page(s) with tag *table*
-`generate:post:asset:path:favicon.ico`    | post-generate event for asset with path *favicon.ico*
-`render:pre:asset:path:favicon.ico`       | pre-render event for asset with path *favicon.ico*
-`render:post:asset:path:favicon.ico`      | post-render event for asset with path *favicon.ico*
+1. path:       *generate:post:folder:path:articles*
+2. extension:  *generate:post:page:extension:mkd*, *render:post:asset:extension:js*
+3. identifier: *render:pre:page:id:intro*
+4. tag:        *render:pre:page:tag:table*
+5. any:        *render:pre:page:any*
 
-Events for the root of the site tree are specified as:
+The table below specifies the combinations of event type, node type and details
+that are currently in use.
 
-event                                     | description
-------------------------------------------|---------------------------------------------------------
-`generate:post:root`                      | post-generate event for root node
-`render:pre:root`                         | pre-render event for root node
-`render:post:root`                        | post-render event for root node
+| event type    | node type | none | any | path | extension | id | tag  |
+|---------------|-----------|:----:|:---:|:----:|:---------:|:--:|:----:|
+| generate:post | root      |  ✓   |     |      |           |    |      |
+|               | folder    |      |     |  ✓   |           |    |      |
+|               | page      |      |     |  ✓   |    ✓      |    |      |
+|               | asset     |      |     |  ✓   |    ✓      |    |      |
+| render:pre    | root      |  ✓   |     |      |           |    |      |
+|               | folder    |      |     |  ✓   |           |    |      |
+|               | page      |      |  ✓  |  ✓   |           | ✓  |  ✓   |
+|               | asset     |      |     |  ✓   |    ✓      |    |      |
+| render:post   | root      |  ✓   |     |      |           |    |      |
+|               | folder    |      |     |  ✓   |           |    |      |
+|               | page      |      |  ✓  |  ✓   |           | ✓  |  ✓   |
+|               | asset     |      |     |  ✓   |    ✓      |    |      |
 
-The post-generate event for the root node, `generate:post:root`, is called
+Events for the root of the site tree are specified as *generate:post:root*,
+*render:pre:root*, and *render:post:root*.
+
+The post-generate event for the root node, *generate:post:root*, is called
 after generating (building) the entire site tree, and can be used for global
 transformations of the tree. Please use your imagination, but don't break the
 site tree (well: it's your tree anyway).
 
-The post-render event is called after the root node has been rendered. The
-rendering algorithm of Bass is such that this is the last node to be
-rendered. That means that the post-render event for the root node can be used
-for uploading the generated site to another server.
+The post-render event, *render:post:root*, is called after the root node has
+been rendered. The rendering algorithm of Bass is such that this is the last
+node to be rendered. That means that the post-render event for the root node
+can be used for uploading the generated site to another server.
 
 #### Event handlers
 
-Event handlers are defined in the configuration file:
+Extensions, mostly in the form of event handlers, are put in a directory that
+is defined in the configuration file:
 
-    handlers: handler_dir
+    extension: extension_dir
 
-From the specified directory (default: `handlers`) Bass attempts to read the
+From the specified directory (default: `extension`) Bass attempts to read the
 module `__init__.py`. If it exists, this module defines zero or more event handlers,
 usually in the form of functions, but naturally any callable object is
 acceptable. An event handler is called with one parameter, namely the node that
@@ -419,7 +426,12 @@ Event handlers are assigned to an event by calling the function `add_handler`:
         ....
     add_handler('render:post:root', upload_site)
 
-There also convenience functions `copy_handler` and `remove_handler` (see examples below).
+If `add_handler` finds that there is already a built-in event handler for the
+given event, it combines the existing handler with the handler given as the
+second argument.
+
+There also convenience functions `copy_handler` and `remove_handler` (see
+examples below).
 
 #### Built-in event handlers
 

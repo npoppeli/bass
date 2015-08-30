@@ -1,3 +1,14 @@
+Version 0.9.2
+-------------
+
+### Features
+-   If a built-in event handler is present, a call to add_handler does not
+	override, but extend
+-   New events added for pages and assets.
+
+### Other
+-   Updated README and manual.
+
 Version 0.9.1
 -------------
 

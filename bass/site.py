@@ -9,7 +9,7 @@ import imp, logging, shutil,sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
-from .event import event, event_handler
+from .event import event_handler
 from .layout import read_templates
 from .tree import Folder, Page, Asset
 from fnmatch import fnmatch
@@ -31,7 +31,7 @@ def build_site():
     """build site in current project directory"""
     read_config()
     verify_project()
-    read_handlers()
+    read_extension()
     logging.info('Building site tree')
     root = build_tree()
     prepare_output()
@@ -54,11 +54,11 @@ def verify_project():
         logging.critical("Directories missing in project")
         sys.exit(1)
 
-def read_handlers():
-    """read handlers from directory specified in configuration file"""
-    if isdir(setting.handlers):
-        (fileobj, path, details) = imp.find_module('__init__', [setting.handlers])
-        module = imp.load_module('handlers', fileobj, path, details)
+def read_extension():
+    """read extension(s) of core functionality from directory specified in configuration file"""
+    if isdir(setting.extension):
+        (fileobj, path, details) = imp.find_module('__init__', [setting.extension])
+        module = imp.load_module(setting.extension, fileobj, path, details)
 
 def prepare_output():
     """clean output directory before rendering site tree"""
@@ -77,7 +77,6 @@ def build_tree():
     setting.pagetypes =  [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
     logging.info('Valid page extensions: %s', ' '.join(setting.pagetypes))
     root = create_folder('', '', None)
-    event('generate:post:root', root)
     return root
 
 def ignore_entry(name):
