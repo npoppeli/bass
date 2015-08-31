@@ -33,20 +33,20 @@ def build_site():
     verify_project()
     read_extension()
     logging.info('Building site tree')
-    root = build_tree()
+    setting.root = build_tree()
     prepare_output()
     read_templates()
     logging.info('Rendering site tree')
-    root.render()
+    setting.root.render()
 
 def rebuild_site():
     """rebuild site in current project directory"""
     logging.info('Building modified site tree')
-    root = build_tree()
+    setting.root = build_tree()
     prepare_output()
     read_templates()
     logging.info('Rendering modified site tree')
-    root.render()
+    setting.root.render()
 
 def verify_project():
     """verify existence of directories specified in configuration"""

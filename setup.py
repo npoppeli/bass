@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+
+from setuptools import setup
+
+from bass import version
+
+setup(
+    name='bass',
+    version=version.encode("utf8"),
+    author='Nico POppelier',
+    author_email='n.poppelier@xs4all.nl',
+    url='http://schier7.home.xs4all.nl/bass',
+    description='Static site generator',
+    long_description=
+        "Bass is a static website generator. It turns a collection of"
+        "content pages, assets (PNG, CSS, JS etc.) into a static website."
+        "You run it on your local computer, and it generates a directory"
+        "of files that you can upload to your web server, or serve directly.",
+    download_url="http://schier7.home.xs4all.nl/bass/download",
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "License :: OSI Approved :: MIT License",
+        'Operating System :: POSIX',
+        'Programming Language :: Python',
+    ],
+    install_requires=[
+        'Chameleon==2.22',
+        'markdown2==2.3.0',
+        'PyYAML==3.10'
+    ],
+    packages=['bass'],
+    scripts=['script/bass'],
+)

@@ -5,7 +5,7 @@ bass.event
 Objects and functions related to events and event handlers.
 """
 
-import logging, sys
+import logging, re, sys
 from datetime import datetime, date
 from os.path import join, splitext, getctime, basename
 from . import setting
@@ -123,6 +123,28 @@ def fix_date_time(meta, ctime):
         meta['date']     = ctime.date()
         meta['time']     = ctime.time()
 
+# define event handlers for the standard page types, depending on which Python packages are installed
+if setting.markdown:
+    markdown_processor = Processor(converter['mkd'])
+    add_handler('generate:post:page:extension:mkd', markdown_processor)
+    copy_handler('generate:post:page:extension:mkd', 'generate:post:page:extension:md')
+
+if setting.rest:
+    rest_processor = Processor(converter['rst'])
+    add_handler('generate:post:page:extension:rst', rest_processor)
+
+if setting.textile:
+    textile_processor = Processor(converter['txi'])
+    add_handler('generate:post:page:extension:txi', textile_processor)
+
+html_processor = Processor(converter['html'])
+add_handler('generate:post:page:extension:html', html_processor)
+
+text_processor = Processor(converter['txt'])
+add_handler('generate:post:page:extension:txt', text_processor)
+
+# auxiliary functions for extensions
+
 # partition and add_toc can be used in event handlers to produce index pages (with optional pagination).
 def partition(lst, size):
     """divide list in list of sub-lists of length <= size"""
@@ -168,22 +190,11 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
             previous = current
         previous.next = None # last subpage
 
-    # define event handlers for the standard page types, depending on which Python packages are installed
-if setting.markdown:
-    markdown_processor = Processor(converter['mkd'])
-    add_handler('generate:post:page:extension:mkd', markdown_processor)
-    copy_handler('generate:post:page:extension:mkd', 'generate:post:page:extension:md')
+# resolve_idref is an event handler for resolving idref notation in href attributes.
+def idref_replace(mo):
+    return "href={0}{1}{0}".format(mo.group(1), setting.root.pages(idref=mo.group(2), deep=True)[0].url)
 
-if setting.rest:
-    rest_processor = Processor(converter['rst'])
-    add_handler('generate:post:page:extension:rst', rest_processor)
-
-if setting.textile:
-    textile_processor = Processor(converter['txi'])
-    add_handler('generate:post:page:extension:txi', textile_processor)
-
-html_processor = Processor(converter['html'])
-add_handler('generate:post:page:extension:html', html_processor)
-
-text_processor = Processor(converter['txt'])
-add_handler('generate:post:page:extension:txt', text_processor)
+def resolve_idref(node):
+    """replace href="idref:FOO" with href="BAR" where BAR is the URL of the page with id=FOO"""
+    regex = re.compile(r"href=(['\"])idref:\s*(\w+?)\1")
+    node.content = regex.sub(idref_replace, node.content)

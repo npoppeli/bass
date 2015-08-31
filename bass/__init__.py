@@ -20,7 +20,8 @@ Functions:
 """
 
 from .config import parse_cmdline
-from .event  import add_toc, add_handler, copy_handler, remove_handler
+from .event  import add_toc, add_handler, copy_handler, remove_handler, resolve_idref
 from .layout import add_template_type, copy_template_type
 from .server import http_server
+from .setting import version
 from .site   import build_site, create_project

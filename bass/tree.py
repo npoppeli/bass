@@ -90,12 +90,20 @@ class Folder(Node):
                    if child.name == name and child.key == 'Page']
         return matches[0] if matches else None
 
-    def pages(self, tag=None, key='name'):
+    def _pages(self, deep=False):
+        result = [node for node in self.child if node.key == 'Page']
+        if deep:
+            for f in self.folders():
+                result.extend(f._pages(deep=True))
+        return result
+
+    def pages(self, tag=None, idref=None, deep=False, key='name'):
         """return page nodes with given tag in this folder"""
+        result = self._pages(deep=deep)
         if tag:
-            result = [child for child in self.child if child.key == 'Page' and tag in child.tags]
-        else:
-            result = [child for child in self.child if child.key == 'Page']
+            result = [node for node in result if tag in node.tags]
+        elif idref:
+            result = [node for node in result if idref == node.id]
         return sorted(result, key=lambda page: getattr(page, key))
 
     def render(self):
