@@ -192,7 +192,8 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
 
 # resolve_idref is an event handler for resolving idref notation in href attributes.
 def idref_replace(mo):
-    return "href={0}{1}{0}".format(mo.group(1), setting.root.pages(idref=mo.group(2), deep=True)[0].url)
+    catch = setting.root.pages(idref=mo.group(2), deep=True)
+    return "href={0}{1}{0}".format(mo.group(1), catch[0].url if catch else '#')
 
 def resolve_idref(node):
     """replace href="idref:FOO" with href="BAR" where BAR is the URL of the page with id=FOO"""
