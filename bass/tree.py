@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 bass.tree
 -----
@@ -38,12 +37,17 @@ class Node:
         self.child = []
         self.tags = []
 
+    def ready(self):
+        """abstract ready method"""
+        pass
+
     def render(self):
         """abstract render method"""
         pass
 
     def add(self, node):
         """add child node"""
+        node.parent = self
         self.child.append(node)
 
     def root(self): # follow parent chain until you get None
@@ -59,10 +63,6 @@ class Folder(Node):
         """create new Folder node"""
         super().__init__(name, path, parent)
         self.key = 'Folder'
-        if name == '':
-            event('generate:post:root', self)
-        else:
-            event('generate:post:folder:path:'+path, self)
 
     def asset(self, name):
         """return asset node with given name in this folder"""
@@ -106,6 +106,13 @@ class Folder(Node):
             result = [node for node in result if idref == node.id]
         return sorted(result, key=lambda page: getattr(page, key))
 
+    def ready(self):
+        """folder is ready: send event(s)"""
+        if self.name == '':
+            event('generate:post:root', self)
+        else:
+            event('generate:post:folder:path:'+self.path, self)
+
     def render(self):
         """render folder"""
         event('render:pre:root' if self.name == '' else 'render:pre:folder:path:'+self.path, self)
@@ -122,11 +129,9 @@ class Page(Node):
         """create new Page node"""
         super().__init__(name, path, parent)
         self.key = 'Page'
-        full_path = join(setting.input, parent.path, name)
+        full_path = join(setting.input, path)
+        # logging.debug("Page: name=%s path=%s full_path=%s", name, path, full_path)
         self.meta, self.preview, self.content = read_page(full_path)
-        suffix = splitext(path)[1][1:]
-        event('generate:post:page:path:'+path, self)
-        event('generate:post:page:extension:'+suffix, self)
 
     def copy(self, sep='_'):
         """create copy of page node, with its own name, path and URL, and empty children list"""
@@ -137,6 +142,12 @@ class Page(Node):
         newpage.path = pagename + sep + suffix
         newpage.url = '/' + pagename + sep + '.html'
         return newpage
+
+    def ready(self):
+        """page is ready: send event(s)"""
+        suffix = splitext(self.path)[1][1:]
+        event('generate:post:page:path:'+self.path, self)
+        event('generate:post:page:extension:'+suffix, self)
 
     def render(self):
         """render Page node"""
@@ -164,8 +175,11 @@ class Asset(Node):
         super().__init__(name, path, parent)
         self.key = 'Asset'
         self.url = '/' + self.path
-        suffix = splitext(path)[1][1:]
-        event('generate:post:asset:path:'+path, self)
+
+    def ready(self):
+        """asset is ready: send event(s)"""
+        suffix = splitext(self.path)[1][1:]
+        event('generate:post:asset:path:'+self.path, self)
         event('generate:post:asset:extension:'+suffix, self)
 
     def render(self):
@@ -179,6 +193,7 @@ class Asset(Node):
 
 def read_page(path):
     """read page from file and return triple (meta, preview, content)"""
+    # logging.debug("Reading page from file %s.", path)
     text = read_file(path)
     parts = text.split('\n---\n')
     if len(parts) == 1: # no metadata, just content

@@ -2,11 +2,9 @@
 
 from setuptools import setup
 
-from bass import version
-
 setup(
     name='bass',
-    version=version.encode("utf8"),
+    version='0.9.3',
     author='Nico POppelier',
     author_email='n.poppelier@xs4all.nl',
     url='http://schier7.home.xs4all.nl/bass',

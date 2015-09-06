@@ -125,7 +125,9 @@ Creating a site
 
 Bass is a tree transformation engine - no more, no less! The creation of a
 static website from a set of input files takes place in three phases: (1)
-generation of the site tree, (2) transformation of the site tree, (3) rendering.
+generation of the site tree, (2) transformation of the site tree, (3)
+rendering.  Generation is of the site tree is done bottom-up, and
+rendering of the site tree is done top-down.
 
 #### Generation phase
 
@@ -144,21 +146,28 @@ are considered to express the semantics of the site. The structure and names
 are maintained in the output directory (unless the user makes changes by using
 event handlers).
 
-The resulting site tree consists of nodes. There are three types of node:
-*Folder*, *Page*, *Asset*. The tree model was inspired by
-[StrangeCase][strangecase]. The details are explained below in the paragraphs
-[Content](#content) and [Tree model](#treemodel).
+The site tree is generated in bottom-up fashion, i.e. the root node is
+created last. The site tree consists of three types of node: *Folder*,
+*Page*, *Asset*. The tree model was inspired by [StrangeCase][strangecase]. The
+details are explained below in the paragraphs [Content](#content) and [Tree
+model](#treemodel).
 
 [strangecase]: https://github.com/colinta/StrangeCase
 
 After a node is created, one or more events are sent, depending on the node type:
 
+    generate:post:root
     generate:post:folder:path:<path>
     generate:post:page:path:<path>
     generate:post:page:extension:<extension>
     generate:post:asset:path:<path>
 
-See the paragraph [Events](#events) for an explanation of these events.
+See the paragraph [Events](#events) for an explanation of these events. Because
+the site tree is generate in bottom-up fashion, the event handler for
+*generate:post:root* or *generate:post:folder* can assume that the children of
+the node are also available (but not the parent or the siblings).
+
+the root of the tree
 
 #### Transformation phase
 
@@ -181,8 +190,8 @@ of the node.
 * *Asset*: send pre-render event(s), copy file from input to output directory,
   send post-render event(s)
 
-For the root node no directory is created: the output directory is assumed to
-exist when you call `bass -b`.
+This means that rendering is done top-down. For the root node no directory is
+created: the output directory is assumed to exist when you call `bass -b`.
 
 ### Content
 

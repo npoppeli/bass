@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 bass.site
 -----
@@ -13,8 +12,8 @@ from .event import event_handler
 from .layout import read_templates
 from .tree import Folder, Page, Asset
 from fnmatch import fnmatch
-from os import listdir, mkdir, unlink
-from os.path import isdir, isfile, islink, join, relpath, splitext
+from os import listdir, mkdir, unlink, walk
+from os.path import isdir, isfile, islink, join, relpath, splitext, split
 
 def create_project():
     """create new project directory, with default configuration"""
@@ -33,7 +32,7 @@ def build_site():
     verify_project()
     read_extension()
     logging.info('Building site tree')
-    setting.root = build_tree()
+    setting.root = generate_tree()
     prepare_output()
     read_templates()
     logging.info('Rendering site tree')
@@ -42,7 +41,7 @@ def build_site():
 def rebuild_site():
     """rebuild site in current project directory"""
     logging.info('Building modified site tree')
-    setting.root = build_tree()
+    setting.root = generate_tree()
     prepare_output()
     read_templates()
     logging.info('Rendering modified site tree')
@@ -70,38 +69,38 @@ def prepare_output():
         else:
             shutil.rmtree(path)
 
-def build_tree():
+def ignore_entry(name_rel,name):
+    """True if 'name_rel' matches one of the ignore patterns or 'name' is symbolic link"""
+    return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or islink(name)
+
+def generate_tree():
     """generate site tree from files and directories in input directory"""
     logging.info('Ignoring files/directories: %s', ' '.join(setting.ignore))
     prefix = 'generate:post:page:extension:'
-    setting.pagetypes =  [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
+    setting.pagetypes = [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
     logging.info('Valid page extensions: %s', ' '.join(setting.pagetypes))
-    root = create_folder('', '', None)
-    return root
-
-def ignore_entry(name):
-    """True if 'name' is symbolic link or if 'name' matches one of the ignore patterns"""
-    return any([fnmatch(name, pattern) for pattern in setting.ignore]) or islink(name)
-
-def create_folder(name, path, parent):
-    """create folder node in site tree"""
-    folder = Folder(name, path, parent)
-    if parent is None:
-        folder_path = setting.input
-    else:
-        folder_path = join(setting.input, path)
-    for name in listdir(folder_path):
-        path = join(folder_path, name)
-        rel_path = relpath(path, setting.input)
-        if ignore_entry(path):
-            logging.debug('Ignore %s', rel_path)
-        elif isfile(path):
+    folder_queue = {}
+    for dirpath, dirnames, filenames in walk(setting.input, topdown=False):
+        dirpath_rel = relpath(dirpath, setting.input)
+        folder_name = split(dirpath_rel)[1]
+        if dirpath_rel == '.':
+            dirpath_rel, folder_name = '', ''
+        if ignore_entry(dirpath_rel, dirpath):
+            logging.debug("Ignore directory %s", dirpath_rel)
+            continue
+        folder = Folder(folder_name, dirpath_rel, None)
+        for name in set(dirnames) & set(folder_queue.keys()):
+            folder.add(folder_queue[name])
+        for name in filenames: # pages and assets; become children of folder
+            filename_rel = name if dirpath_rel == '.' else join(dirpath_rel, name)
+            filename = join(dirpath, name)
+            if ignore_entry(filename_rel, filename):
+                logging.debug("Ignore file %s", filename_rel)
+                continue
             suffix = splitext(name)[1][1:]
-            this = (Page if suffix in setting.pagetypes else Asset)(name, rel_path, folder)
+            this = (Page if suffix in setting.pagetypes else Asset)(name, filename_rel, None)
             folder.add(this)
-        elif isdir(path):
-            this = create_folder(name, rel_path, folder)
-            folder.add(this)
-        else:
-            logging.debug('Ignore %s', rel_path)
-    return folder
+            this.ready()
+        folder_queue[folder_name] = folder
+        folder.ready()
+    return folder_queue['']

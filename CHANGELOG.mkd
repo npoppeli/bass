@@ -1,3 +1,13 @@
+Version 0.9.3
+-------------
+
+### Features
+-   Site tree is now generate bottom-up. Rendering has been top-down from the start.
+-   Events of the 'generate:post' type are sent when node is completely ready.
+
+### Other
+-   Updated README and manual.
+
 Version 0.9.2
 -------------
 
