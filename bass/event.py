@@ -36,7 +36,7 @@ def copy_handler(from_event, to_event):
         logging.debug('Event handler for %s copied from %s', to_event, from_event)
         event_handler[to_event] = event_handler[from_event]
     else:
-        logging.debug('No event handler for %s', from_event)
+        logging.debug('No event handler for %s - cannot copy', from_event)
 
 def remove_handler(event):
     """remove handler for event 'event'"""
@@ -44,7 +44,7 @@ def remove_handler(event):
         logging.debug('Event handler for %s removed', event)
         del event_handler[event]
     else:
-        logging.debug('No event handler for %s', event)
+        logging.debug('No event handler for %s - cannot remove', event)
 
 def event(event, node):
     """call handler for event 'event'"""
@@ -57,7 +57,8 @@ class Processor:
         self.convert = converter
 
     def __call__(self, node):
-        """convert node.content, node.preview; use elements of node.meta as attributes of node"""
+        """convert node.content, node.preview and node.meta, which are set by node.__init__();
+           use elements of node.meta as attributes of node; set node.url"""
         if self.convert:
             # convert node.content and node.preview
             node.preview = self.convert(node.preview) if node.preview else ''
@@ -69,6 +70,7 @@ class Processor:
         for key, value in node.meta.items():
             setattr(node, key, value)
         pagename = splitext(node.path)[0]
+        # node.url is pagename + HTML extension, prefixed with '/' since it is root-relative
         node.url = '/' + pagename + '.html'
 
 def complete_meta(meta, path):
@@ -168,8 +170,9 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     else:
         logging.critical("Bad parameter 'skin' in function 'add_toc'")
         sys.exit(1)
-    # one HTML fragment per node, then partitioned in chunks of 'size'
+    # create one HTML fragment per node, then partition the list of fragments in chunks of 'size'
     parts = partition([func(this=node) for node in nodelist], size)
+    # create 'prev' and 'next' links
     page.prev, page.next = None, None
     previous = page
     logging.debug('TOC main page name=%s path=%s', page.name, page.path)
@@ -194,7 +197,8 @@ def idref_replace(mo):
     catch = setting.root.pages(idref=mo.group(2), deep=True)
     return "href={0}{1}{0}".format(mo.group(1), catch[0].url if catch else '#')
 
+idref_regex = re.compile(r"href=(['\"])idref:\s*(\w+?)\1")
+
 def resolve_idref(node):
     """replace href="idref:FOO" with href="BAR" where BAR is the URL of the page with id=FOO"""
-    regex = re.compile(r"href=(['\"])idref:\s*(\w+?)\1")
-    node.content = regex.sub(idref_replace, node.content)
+    node.content = idref_regex.sub(idref_replace, node.content)

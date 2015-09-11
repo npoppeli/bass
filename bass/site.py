@@ -69,9 +69,9 @@ def prepare_output():
         else:
             shutil.rmtree(path)
 
-def ignore_entry(name_rel,name):
+def ignore_entry(name_rel, dirname):
     """True if 'name_rel' matches one of the ignore patterns or 'name' is symbolic link"""
-    return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or islink(name)
+    return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or islink(join(dirname, name_rel))
 
 def generate_tree():
     """generate site tree from files and directories in input directory"""
@@ -85,16 +85,15 @@ def generate_tree():
         folder_name = split(dirpath_rel)[1]
         if dirpath_rel == '.':
             dirpath_rel, folder_name = '', ''
-        if ignore_entry(dirpath_rel, dirpath):
+        if ignore_entry(dirpath_rel, setting.input):
             logging.debug("Ignore directory %s", dirpath_rel)
             continue
         folder = Folder(folder_name, dirpath_rel, None)
         for name in set(dirnames) & set(folder_queue.keys()):
             folder.add(folder_queue[name])
-        for name in filenames: # pages and assets; become children of folder
+        for name in filenames: # pages and assets; become children of this folder
             filename_rel = name if dirpath_rel == '.' else join(dirpath_rel, name)
-            filename = join(dirpath, name)
-            if ignore_entry(filename_rel, filename):
+            if ignore_entry(filename_rel, setting.input):
                 logging.debug("Ignore file %s", filename_rel)
                 continue
             suffix = splitext(name)[1][1:]
@@ -103,4 +102,5 @@ def generate_tree():
             this.ready()
         folder_queue[folder_name] = folder
         folder.ready()
+    # folder with name = '' is the root of the site tree
     return folder_queue['']

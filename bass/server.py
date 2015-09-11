@@ -49,12 +49,12 @@ try:
     except ImportError:
         from wsgiref.simple_server import make_server
         def serve(app, host, port):
-            """serve: basic WSGI server with same interface as waitress.serve"""
+            """serve: WSGI server with same interface as waitress.serve"""
             server = make_server(host, port, app)
             server.serve_forever()
 
     def http_server(host, port):
-        """http_server: basic WSGI-based web server with same interface as in standard library"""
+        """http_server: WSGI-based web server with same interface as in standard library"""
         static = DirectoryApp(setting.output, index_page=None)
         wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
         logging.debug('Starting HTTP server on port %d', port)

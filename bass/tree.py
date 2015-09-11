@@ -126,7 +126,7 @@ class Folder(Node):
 
 class Page(Node):
     def __init__(self, name, path, parent):
-        """create new Page node"""
+        """create new Page node; set content, preview and meta attributes"""
         super().__init__(name, path, parent)
         self.key = 'Page'
         full_path = join(setting.input, path)
