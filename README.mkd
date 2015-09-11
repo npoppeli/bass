@@ -64,7 +64,7 @@ least install one of the following three tools:
 - *Docutils*
 - *Textile*
 
-If you install with pip, they will be installed for you.
+If you install with pip, *Markdown2* will be installed automatically.
 
 #### Required
 
@@ -97,7 +97,7 @@ and then start a simple web server on port 8080. This web server is intended
 solely for local testing of the site during the development phase.
 
 If the Python package *WebOb* is available, a slightly more advanced server
-(WSGI) is made available. This server checks for changes in the `content` and
+(WSGI) is made available. This server checks for changes in the `input` and
 `layout` directories (see the manual) whenever a page is requested. If it
 detects a change in either of these directories, the site is regenerated before
 the page is returned. If the Python package *Waitress* is also installed, this

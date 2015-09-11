@@ -25,9 +25,9 @@ try:
             """return True if any file in one of the directories in self.checklist has changed
                since self.timestamp, otherwise False"""
             for checkdir in self.checklist:
-                for (root, _, filelist) in os.walk(checkdir):
-                    for f in filelist:
-                        path = os.path.join(root, f)
+                for (dirpath, _, filenames) in os.walk(checkdir):
+                    for f in filenames:
+                        path = os.path.join(dirpath, f)
                         if datetime.fromtimestamp(os.path.getmtime(path)) > self.timestamp:
                             logging.debug('%s has changed', path)
                             return True

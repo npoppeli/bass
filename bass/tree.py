@@ -21,7 +21,7 @@ class Node:
            - name: name of node (last part of path)
            - path: path of node
            - parent: parent node
-           - child: list of child nodes
+           - children: list of child nodes
 
        Instance methods:
            - render: abstract method
@@ -34,7 +34,7 @@ class Node:
         self.name = name
         self.path = path
         self.parent = parent
-        self.child = []
+        self.children = []
         self.tags = []
 
     def ready(self):
@@ -48,7 +48,7 @@ class Node:
     def add(self, node):
         """add child node"""
         node.parent = self
-        self.child.append(node)
+        self.children.append(node)
 
     def root(self): # follow parent chain until you get None
         """find root of tree in which this node lives"""
@@ -66,32 +66,32 @@ class Folder(Node):
 
     def asset(self, name):
         """return asset node with given name in this folder"""
-        matches = [child for child in self.child
+        matches = [child for child in self.children
                    if child.name == name and child.key == 'Asset']
         return matches[0] if matches else None
 
     def assets(self):
         """return all asset nodes in this folder"""
-        return [child.name for child in self.child if child.key == 'Asset']
+        return [child.name for child in self.children if child.key == 'Asset']
 
     def folder(self, name):
         """return folder node with given name in this folder"""
-        matches = [child for child in self.child
+        matches = [child for child in self.children
                    if child.name == name and child.key == 'Folder']
         return matches[0] if matches else None
 
     def folders(self):
         """return all folder nodes in this folder"""
-        return [child for child in self.child if child.key == 'Folder']
+        return [child for child in self.children if child.key == 'Folder']
 
     def page(self, name):
         """return page node with given name in this folder"""
-        matches = [child for child in self.child
+        matches = [child for child in self.children
                    if child.name == name and child.key == 'Page']
         return matches[0] if matches else None
 
     def _pages(self, deep=False):
-        result = [node for node in self.child if node.key == 'Page']
+        result = [node for node in self.children if node.key == 'Page']
         if deep:
             for f in self.folders():
                 result.extend(f._pages(deep=True))
@@ -119,7 +119,7 @@ class Folder(Node):
         if self.name != '': # root -> output directory, which already exists
             # render = create sub-directory 'self.path' in output directory
             mkdir(join(setting.output, self.path))
-        for node in self.child:
+        for node in self.children:
             node.render()
         event('render:post:root' if self.name == '' else 'render:post:folder:path:'+self.path, self)
 
@@ -136,7 +136,7 @@ class Page(Node):
     def copy(self, sep='_'):
         """create copy of page node, with its own name, path and URL, and empty children list"""
         newpage = copy(self)
-        newpage.child = []
+        newpage.children = []
         (pagename, suffix) = splitext(newpage.path)
         newpage.name += sep
         newpage.path = pagename + sep + suffix
@@ -160,8 +160,8 @@ class Page(Node):
         else:
             logging.critical("Template '%s' for page %s not available.", self.skin, self.path)
             sys.exit(1)
-        write_file(template.render(this=self, root=self.root()), join(setting.output, self.url[1:]))
-        for node in self.child: # (dynamically created) sub-pages
+        write_file(template.render(this=self), join(setting.output, self.url[1:]))
+        for node in self.children: # (dynamically created) sub-pages
             node.render()
         event('render:post:page:any', self)
         event('render:post:page:path:'+self.path, self)

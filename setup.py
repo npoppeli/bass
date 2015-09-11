@@ -4,8 +4,8 @@ from setuptools import setup
 
 setup(
     name='bass',
-    version='0.9.3',
-    author='Nico POppelier',
+    version='0.9.4',
+    author='Nico Poppelier',
     author_email='n.poppelier@xs4all.nl',
     url='http://schier7.home.xs4all.nl/bass',
     description='Static site generator',
@@ -22,9 +22,9 @@ setup(
         'Programming Language :: Python',
     ],
     install_requires=[
-        'Chameleon==2.22',
-        'markdown2==2.3.0',
-        'PyYAML==3.10'
+        'Chameleon>=2.10',
+        'markdown2>=2.0.0',
+        'PyYAML>=3.10'
     ],
     packages=['bass'],
     scripts=['script/bass'],

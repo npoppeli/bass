@@ -64,7 +64,7 @@ least install one of the following three tools:
 - *Docutils*
 - *Textile*
 
-If you install with pip, they will be installed for you.
+If you install with pip, *Markdown2* will be installed automatically.
 
 #### Required
 
@@ -97,7 +97,7 @@ and then start a simple web server on port 8080. This web server is intended
 solely for local testing of the site during the development phase.
 
 If the Python package *WebOb* is installed, a slightly more advanced server
-(WSGI-based) is made available. This server checks for changes in the `content`
+(WSGI-based) is made available. This server checks for changes in the `input`
 and `layout` directories (see below) whenever a page is requested. If it
 detects a change in either of these directories, the site is regenerated before
 the page is returned. If the Python package *Waitress* is also installed, this
@@ -134,7 +134,7 @@ rendering of the site tree is done top-down.
 The site tree is generated from the directories and files in the input
 directory (default: `input`). Directories and files are ignored if their names
 match one of the *ignore patterns*. Symbolic links are also ignored.  By
-default there is one ignore pattern: `.?*`. Other ignore patterns can be
+default there is one ignore pattern: `.?*`. Additional ignore patterns can be
 defined in the configuration file (option `ignore`). For example:
 
     ignore: "*.bak *~"
@@ -143,8 +143,8 @@ Note: the double quotes are required since `*` is a meta-character in YAML.
 
 The structure of the input directory, and the names of directories and files
 are considered to express the semantics of the site. The structure and names
-are maintained in the output directory (unless the user makes changes by using
-event handlers).
+are maintained in the output directory (unless the user changes the site tree
+by using event handlers).
 
 The site tree is generated in bottom-up fashion, i.e. the root node is
 created last. The site tree consists of three types of node: *Folder*,
@@ -163,19 +163,18 @@ After a node is created, one or more events are sent, depending on the node type
     generate:post:asset:path:<path>
 
 See the paragraph [Events](#events) for an explanation of these events. Because
-the site tree is generate in bottom-up fashion, the event handler for
-*generate:post:root* or *generate:post:folder* can assume that the children of
-the node are also available (but not the parent or the siblings).
-
-the root of the tree
+the site tree is generate in bottom-up fashion, the event handlers for
+*generate:post:root* and *generate:post:folder* can use the fact that the
+children of the node are available (but not the parent or the siblings).
 
 #### Transformation phase
 
 Using *event handlers* the site tree can be transformed. This step is optional:
-if there is no event handler for the events `generate:post:root` and
-`render:pre:root`, there is no tree transformation of the whole tree.
-Local tree transformations can be achieved by event handlers for `render:pre` events
-of other nodes. See the paragraph [Events](#events) for an explanation of these events.
+if there are no event handler for the events `generate:post:root` and
+`render:pre:root`, there is no tree transformation of the whole tree.  Local
+tree transformations can be achieved by event handlers for *generate:post* or
+*render:pre* events of other nodes. See the paragraph [Events](#events) for an
+explanation of these events.
 
 ###  Rendering phase
 
@@ -223,8 +222,8 @@ languages such as [Markdown][mkd], [ReStructuredText][rst] and
 *footnotes* and *tables*.
 
 It is also possible to write pages in HTML and in plain text. HTML pages are
-not changed during the tree generation phase. Pages of plain text are converted
-to very basic HTML by adding paragraph tags: each sequence of two or more line
+not changed during the generation phase. Pages of plain text are converted to
+very basic HTML by adding paragraph tags: each sequence of two or more line
 breaks is treated as end of paragraph.
 
 [mkd2]: https://github.com/trentm/python-markdown2
@@ -269,11 +268,11 @@ or events.
 
 A file is mapped to an asset if the extension of the file is *not* in the list
 of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An asset
-is not changed during the tree generation phase.
+is not changed during the generation phase.
 
 #### Folders
 
-A directory is mapped to a folder. A folder is not changed during the tree
+A directory is mapped to a folder. A folder is not changed during the
 generation phase.
 
 ### Layout
@@ -290,16 +289,16 @@ extensions are `.xml` and `.pt`. Other files are ignored, unless additional
 template engines are defined. There should at least be a template `default`.
 
 It is possible to use other template languages, e.g. [Mako][mako] or
-[Jinja][jinja]. The template factory for an extra template can be defined in
-the extension module by calling `add_template_type`. This is a convenience
+[Jinja][jinja]. Template factories for extra template languages can be defined
+in the extension modules by calling `add_template_type`. This is a convenience
 function that defines a template factory for a new file extension.  By default,
 there is one template factory: `chameleon.PageTemplateFile`. This is connected
 to the file extensions `.xml` and `.pt`. Other template factories can be
 defined, provided they implement the following protocol:
 
-    extension -> template factory: T = template_factory[extension]
-    filename -> template: t = T(filename)
-    node -> string: t.render(this=node, root=node.root()) returns HTML page for node 'this'
+    extension -> template factory: TF = template_factory[extension]
+    filename -> template: template = TF(filename)
+    node -> string: template.render(this=node) returns HTML page for node 'this'
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
@@ -322,7 +321,7 @@ The tree model consists of the following classes.
     - `Node.name`: name of node (last part of path)
     - `Node.path`: relative path of node in tree
     - `Node.parent`: parent node
-    - `Node.child`: list of child nodes
+    - `Node.children`: list of child nodes
 
 #### Folder
 * sub-class of Node
@@ -345,6 +344,7 @@ The tree model consists of the following classes.
     - `url`: absolute URL of page
     - `preview`: preview part of page (text between first and second divider `---`)
     - `content`: content of page
+    - `metadata`: metadata of page
 * metadata of a page are added as attributes of the node
 
 #### Asset
@@ -369,9 +369,9 @@ Bass keeps global parameters in a separate module `setting`.
 
 An event is a signal that is emitted during the generation phase or the
 rendering phase. The event model was inspired by [Pelican][pelican] and
-[Wok][wok]. An event can be handled by an event handler: a function (actually:
-a callable object) that is called when the event signal is given. If there is
-no handler for an event, the event signal is ignored.
+[Wok][wok]. An event is handled by an event handler: a function (actually: a
+callable object) that is called when the event signal is given. If there is no
+handler for an event, the event signal is ignored.
 
 There are three types of events: post-generate, pre-render and post-render
 events.  Events can be defined for all nodes in the tree. The node for which
@@ -411,10 +411,11 @@ after generating the site tree, and can be used for global transformations of
 the tree. Please use your imagination, but don't break the site tree (well:
 it's your tree anyway).
 
-The post-render event, *render:post:root*, is called after the root node has
-been rendered. The rendering algorithm of Bass is such that this is the last
-node to be rendered. That means that the post-render event for the root node
-can be used for uploading the generated site to another server, for example.
+The post-render event, *render:post:root*, is called after the root node and
+all its children have been rendered. This means that it is the last event to be
+signalled (see the paragraph [Rendering phase](#rendering) for more
+information). The handler for this event can therefore be used for uploading
+the generated site to another server, for example.
 
 #### Extensions
 
@@ -423,11 +424,11 @@ is defined in the configuration file:
 
     extension: extension_dir
 
-From the specified directory (default: `extension`) Bass attempts to read the
-module `__init__.py`. If it exists, this module defines zero or more event handlers,
-usually in the form of functions, but naturally any callable object is
-acceptable. An event handler is called with one parameter, namely the node that
-emitted the event.
+Bass attempts to read the module `__init__.py` from the specified directory
+(default: `extension`). If it exists, this module defines zero or more event
+handlers, usually in the form of functions, but naturally any callable object
+is acceptable. An event handler is called with one parameter, namely the node
+that emitted the event.
 
 Event handlers are assigned to an event by calling the function `add_handler`:
 
@@ -459,7 +460,7 @@ Table of contents (paginated).
 
     from bass import add_toc, add_handler
     def photo_toc(this):
-        add_toc(this, this.parent.folder('photo').child, skin='photo_entry', size=20)
+        add_toc(this, this.parent.folder('photo').children, skin='photo_entry', size=20)
     add_handler('render:pre:page:path:photo.mkd', photo_toc)
 
 #### Post-generate events
@@ -497,4 +498,4 @@ Define extra template type:
 
 This defines a new template factory for the extension `.mko`. Strictly speaking,
 this has nothing to do with event handling, but defining new template types is
-another form of extending the core ffunctionality.
+another form of extending the core functionality.

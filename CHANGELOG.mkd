@@ -1,9 +1,21 @@
+Version 0.9.4
+-------------
+
+### Features
+-   Templates are called with only one argument: 'this' (node to be rendered).
+-   Node.child has been renamed into Node.children.
+
+### Other
+-   Updated README and manual.
+-   Tested with various combinations of installed Python packages.
+-   Preparations for registration on PyPy.
+
 Version 0.9.3
 -------------
 
 ### Features
 -   Site tree is now generate bottom-up. Rendering has been top-down from the start.
--   Events of the 'generate:post' type are sent when node is completely ready.
+-   Events of the 'generate:post' type are sent when the node is completely ready.
 
 ### Other
 -   Updated README and manual.
@@ -12,8 +24,7 @@ Version 0.9.2
 -------------
 
 ### Features
--   If a built-in event handler is present, a call to add_handler does not
-	override, but extend
+-   If a built-in event handler is present, a call to add_handler does not override, but extend
 -   New events added for pages and assets.
 
 ### Other
@@ -31,7 +42,7 @@ Version 0.9
 
 ### Features
 -   Event handlers work
--   Internals hidden by introducing 5 convenience functions
+-   Internals hidden by introducing several convenience functions
 
 ### Other
 -   Production ready
