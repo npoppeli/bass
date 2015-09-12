@@ -71,16 +71,18 @@ def prepare_output():
 
 def ignore_entry(name_rel, dirname):
     """True if 'name_rel' matches one of the ignore patterns or 'name' is symbolic link"""
-    return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or islink(join(dirname, name_rel))
+    return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or \
+           (setting.follow_links and islink(join(dirname, name_rel)))
 
 def generate_tree():
     """generate site tree from files and directories in input directory"""
-    logging.info('Ignoring files/directories: %s', ' '.join(setting.ignore))
+    logging.info('Ignore files/directories: %s', ' '.join(setting.ignore))
+    logging.info('Follow symbolic links: %s', ('no','yes')[setting.follow_links])
     prefix = 'generate:post:page:extension:'
     setting.pagetypes = [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
     logging.info('Valid page extensions: %s', ' '.join(setting.pagetypes))
     folder_queue = {}
-    for dirpath, dirnames, filenames in walk(setting.input, topdown=False):
+    for dirpath, dirnames, filenames in walk(setting.input, topdown=False, followlinks=setting.follow_links):
         dirpath_rel = relpath(dirpath, setting.input)
         folder_name = split(dirpath_rel)[1]
         if dirpath_rel == '.':

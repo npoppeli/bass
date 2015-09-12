@@ -111,11 +111,12 @@ format. This is the file `config` in the project directory.
 
 Possible configuration options (and their defaults) are
 
-- `input`     (`input`):     directory of input files (pages and assets).
-- `ignore`    (`.?*`):       patterns of files and directories to be ignored.
-- `output`    (`output`):    directory of output files (the generated web site).
-- `layout`    (`layout`):    layout defined as a set of templates.
-- `extension` (`extension`): Python module(s) with extensions, mostly event handlers
+- `input`        (`input`):     directory of input files (pages and assets).
+- `ignore`       (`.?*`):       patterns of files and directories to be ignored.
+- `output`       (`output`):    directory of output files (the generated web site).
+- `layout`       (`layout`):    layout defined as a set of templates.
+- `follow_links` (`False`):     follow symbolic links while generating the site tree
+- `extension`    (`extension`): Python module(s) with extensions, mostly event handlers
   (see paragraph [Events](#events) for more information).
 
 Creating a site
@@ -132,10 +133,11 @@ rendering of the site tree is done top-down.
 #### Generation phase
 
 The site tree is generated from the directories and files in the input
-directory (default: `input`). Directories and files are ignored if their names
-match one of the *ignore patterns*. Symbolic links are also ignored.  By
-default there is one ignore pattern: `.?*`. Additional ignore patterns can be
-defined in the configuration file (option `ignore`). For example:
+directory (default: `input`). Directories and files are ignored if their
+names match one of the *ignore patterns*. Symbolic links are followed or
+ignored, depending on the configuration option `follow_links`. By default
+there is one ignore pattern: `.?*`. Additional ignore patterns can be defined
+in the configuration file (option `ignore`). For example:
 
     ignore: "*.bak *~"
 

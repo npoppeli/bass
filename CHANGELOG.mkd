@@ -3,6 +3,7 @@ Version 0.9.4
 
 ### Features
 -   Templates are called with only one argument: 'this' (node to be rendered).
+-   Added configuration option 'follow_symlink'
 -   Node.child has been renamed into Node.children.
 
 ### Other

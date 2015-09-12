@@ -11,11 +11,12 @@ from . import setting
 from .common import read_yaml_file
 
 config_default = {
-    'input':     'input',
-    'output':    'output',
     'extension': 'extension',
-    'layout':    'layout',
-    'ignore':    '.?*'
+    'follow_links': False,
+    'ignore': '.?*',
+    'input': 'input',
+    'output': 'output',
+    'layout': 'layout'
 }
 
 def read_config():
@@ -27,11 +28,12 @@ def read_config():
     setting.ignore = config['ignore'].split()
     if config_default['ignore'] not in setting.ignore:
         setting.ignore.append(config_default['ignore'])
-    setting.project   = getcwd()
-    setting.input     = join(setting.project, config['input'])
-    setting.output    = join(setting.project, config['output'])
-    setting.extension = join(setting.project, config['extension'])
-    setting.layout    = join(setting.project, config['layout'])
+    setting.project      = getcwd()
+    setting.extension    = join(setting.project, config['extension'])
+    setting.follow_links = config['follow_links']
+    setting.input        = join(setting.project, config['input'])
+    setting.layout       = join(setting.project, config['layout'])
+    setting.output       = join(setting.project, config['output'])
 
 def parse_cmdline():
     """parse command line, return parsed argument list"""
