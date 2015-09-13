@@ -4,7 +4,7 @@ bass.site
 Objects and functions related to site structure and site generation.
 """
 
-import imp, logging, shutil,sys, yaml
+import imp, logging, shutil, sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
@@ -23,7 +23,7 @@ def create_project():
         for k, v in config_default.items():
             if k != 'ignore': mkdir(v)
     else:
-        logging.warn('Current directory not empty')
+        logging.warning('Current directory not empty')
         sys.exit()
 
 def build_site():
@@ -49,13 +49,14 @@ def rebuild_site():
 
 def verify_project():
     """verify existence of directories specified in configuration"""
-    if not ( isdir(setting.input) and isdir(setting.output) and isdir(setting.layout) ):
+    if not (isdir(setting.input) and isdir(setting.output) and isdir(setting.layout)):
         logging.critical("Directories missing in project")
         sys.exit(1)
 
 def read_extension():
     """read extension(s) of core functionality from directory specified in configuration file"""
     if isdir(setting.extension):
+        # valid for Python 3.1-3.3; as of 3.4 we should use importlib.import_module
         (fileobj, path, details) = imp.find_module('__init__', [setting.extension])
         module = imp.load_module(setting.extension, fileobj, path, details)
 
@@ -79,8 +80,8 @@ def generate_tree():
     logging.info('Ignore files/directories: %s', ' '.join(setting.ignore))
     logging.info('Follow symbolic links: %s', ('no','yes')[setting.follow_links])
     prefix = 'generate:post:page:extension:'
-    setting.pagetypes = [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
-    logging.info('Valid page extensions: %s', ' '.join(setting.pagetypes))
+    pagetypes = [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
+    logging.info('Valid page extensions: %s', ' '.join(pagetypes))
     folder_queue = {}
     for dirpath, dirnames, filenames in walk(setting.input, topdown=False, followlinks=setting.follow_links):
         dirpath_rel = relpath(dirpath, setting.input)
@@ -99,7 +100,7 @@ def generate_tree():
                 logging.debug("Ignore file %s", filename_rel)
                 continue
             suffix = splitext(name)[1][1:]
-            this = (Page if suffix in setting.pagetypes else Asset)(name, filename_rel, None)
+            this = (Page if suffix in pagetypes else Asset)(name, filename_rel, None)
             folder.add(this)
             this.ready()
         folder_queue[folder_name] = folder

@@ -8,8 +8,8 @@ Version 0.9.4
 
 ### Other
 -   Updated README and manual.
--   Tested with various combinations of installed Python packages.
--   Preparations for registration on PyPy.
+-   Tested on Python 3.2, 3.3 and 3.4 with various combinations of installed packages.
+-   First version to become available on PyPI.
 
 Version 0.9.3
 -------------

@@ -129,6 +129,7 @@ class Page(Node):
         """create new Page node; set content, preview and meta attributes"""
         super().__init__(name, path, parent)
         self.key = 'Page'
+        self.skin = '' # should be set by page processor
         full_path = join(setting.input, path)
         # logging.debug("Page: name=%s path=%s full_path=%s", name, path, full_path)
         self.meta, self.preview, self.content = read_page(full_path)
@@ -155,6 +156,7 @@ class Page(Node):
         event('render:pre:page:path:'+self.path, self)
         if self.id: event('render:pre:page:id:'+self.id, self)
         for tag in self.tags: event('render:pre:page:tag:'+tag, self)
+        # 'skin' attribute should be set by page processor
         if self.skin in setting.template:
             template = setting.template[self.skin]
         else:

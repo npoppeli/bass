@@ -186,7 +186,8 @@ of the node.
 
 * *Folder*: send pre-render event(s), create directory, render children,
   send post-render event(s)
-* *Page*: send pre-render event(s), write HTML file to path, render children,
+* *Page*: send pre-render event(s), render content as HTML page (using the template
+  defined by the `skin` attribute), write HTML page to path, render children,
   send post-render event(s)
 * *Asset*: send pre-render event(s), copy file from input to output directory,
   send post-render event(s)
@@ -347,6 +348,7 @@ The tree model consists of the following classes.
     - `preview`: preview part of page (text between first and second divider `---`)
     - `content`: content of page
     - `metadata`: metadata of page
+    - `skin`: name of template to be used for rendering
 * metadata of a page are added as attributes of the node
 
 #### Asset

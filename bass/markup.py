@@ -35,9 +35,9 @@ if not setting.markdown:
 # RestructuredText
 try:
     import docutils.core
-    from docutils.writers.html4css1 import Writer as rst_writer
+    from docutils.writers.html4css1 import Writer
     def convert_rst(text):
-        return docutils.core.publish_parts(text, writer=rst_writer())['body']
+        return docutils.core.publish_parts(text, writer=Writer())['body']
     converter['rst'] = convert_rst
     setting.rest = True
 except ImportError:

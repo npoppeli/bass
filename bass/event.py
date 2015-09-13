@@ -69,9 +69,9 @@ class Processor:
         # add metadata as node attributes
         for key, value in node.meta.items():
             setattr(node, key, value)
-        pagename = splitext(node.path)[0]
-        # node.url is pagename + HTML extension, prefixed with '/' since it is root-relative
-        node.url = '/' + pagename + '.html'
+        page_name = splitext(node.path)[0]
+        # node.url is page_name + HTML extension, prefixed with '/' since it is root-relative
+        node.url = '/{0}.html'.format(page_name)
 
 def complete_meta(meta, path):
     """complete metadata for node with given path"""
