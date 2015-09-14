@@ -14,7 +14,7 @@ try:
     import markdown2
     markdown_found = True
     def convert_md2(text):
-        return markdown2.markdown(text, extras=['def_list', 'footnotes', 'tables'])
+        return markdown2.markdown(text, extras=['def_list', 'codehilite', 'footnotes', 'tables'])
     converter['mkd'] = convert_md2
     setting.markdown = True
 except ImportError:
@@ -25,6 +25,7 @@ if not setting.markdown:
         import markdown
         def convert_mkd(text):
             return markdown.markdown(text, extras=['markdown.extensions.def_list',
+                                                   'markdown.extensions.codehilite',
                                                    'markdown.extensions.footnotes',
                                                    'markdown.extensionstables'])
         converter['mkd'] = convert_mkd
