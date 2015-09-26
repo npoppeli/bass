@@ -1,0 +1,48 @@
+title: Home
+---
+Bass
+====
+
+Bass is a static website generator (Bass=Build A Static Site), written in
+Python 3. It turns a collection of content pages, assets (PNG, CSS, JS etc.)
+and templates into a static website, i.e. a website consisting only of
+directories, HTML pages and the same assets.
+
+The design of Bass borrows ideas from various static site generators, e.g.
+[Wok][wok], [Pelican][pelican], [Jekyll][jekyll] and [Wintersmith][wintersmith].
+
+Features
+--------
+
+- separation of content and presentation
+- content pages can have lightweight markup (Markdown, reStructuredText, Textile)
+- ignore certain files and directories in input directory, using file patterns
+- layout is specified by templates
+- templating system uses Chameleon as a basis, but other template engines can be aded
+- development Web server included
+- extension of core features through generic event mechanism
+
+[wok]: https://github.com/mythmon/wok
+[static]: https://www.staticgen.com/
+[wintersmith]: https://github.com/jnordberg/wintersmith
+[pelican]: https://github.com/getpelican/pelican
+[jekyll]: http://jekyllrb.com/
+
+Documentation
+-------------
+There is concise but complete [manual](/bass/manual.html).
+
+Download
+--------
+
+The recommended way to download and install Bass is from the Python Package Index.
+You can do that with pip:
+
+$ sudo pip install bass
+
+This will install Bass and the required dependencies.
+
+You can also download gzip-ped tar archives here:
+
+- [version 0.9.4](/bass/download/bass-0.9.4.tar.gz) (latest version)
+- earlier versions
