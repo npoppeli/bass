@@ -9,25 +9,35 @@ from . import setting
 
 converter = {}
 
+# Pygments
+try:
+    import pygments
+    setting.pygments = True
+except:
+    setting.pygments = False
+
 # Markdown
 try:
     import markdown2
-    markdown_found = True
     def convert_md2(text):
-        return markdown2.markdown(text, extras=['def_list', 'codehilite', 'footnotes', 'tables'])
+        extensions = ['tables']
+        if setting.pygments:
+            extensions.append('fenced-code-blocks')
+        return markdown2.markdown(text, extras=extensions)
     converter['mkd'] = convert_md2
-    setting.markdown = True
+    setting.markdown  = True
 except ImportError:
-    setting.markdown = False
+    setting.markdown  = False
 
 if not setting.markdown:
     try:
         import markdown
         def convert_mkd(text):
-            return markdown.markdown(text, extras=['markdown.extensions.def_list',
-                                                   'markdown.extensions.codehilite',
-                                                   'markdown.extensions.footnotes',
-                                                   'markdown.extensionstables'])
+            extras = ['markdown.extensions.tables']
+            if setting.pygments:
+                extras.extend(['markdown.extensions.codehilite',
+                               'markdown.extensions.fenced_code'])
+            return markdown.markdown(text, extensions=extras)
         converter['mkd'] = convert_mkd
         setting.markdown = True
     except ImportError:

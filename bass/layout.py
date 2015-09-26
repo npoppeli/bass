@@ -12,10 +12,11 @@ import logging, sys
 
 # By default, there is one template factory: chameleon.PageTemplate. This is connected
 # to the file extensions '.xml' and '.pt'. Other template factories can be defined, provided
-# they implement the following protocol:
-#   - extension -> template factory: T = template_factory[extension]
-#   - filename -> template: t = T(filename)
-#   - node -> string: t.render(this=node) is HTML page for node 'this'
+# they implement the following interface:
+#   - extension -> template factory: TF = template_factory[extension]
+#   - filename  -> template: template = TF(filename)
+#   - node      -> string: template.render(this=node) returns HTML page for node 'this'
+#                  (condition: node.skin should be equal to filename without extension)
 
 template_factory = {}
 

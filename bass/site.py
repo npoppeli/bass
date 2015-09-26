@@ -21,7 +21,8 @@ def create_project():
     if len(listdir()) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
         for k, v in config_default.items():
-            if k != 'ignore': mkdir(v)
+            if k not in ('ignore', 'follow_links'):
+                mkdir(v)
     else:
         logging.warning('Current directory not empty')
         sys.exit()
@@ -73,7 +74,7 @@ def prepare_output():
 def ignore_entry(name_rel, dirname):
     """True if 'name_rel' matches one of the ignore patterns or 'name' is symbolic link"""
     return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or \
-           (setting.follow_links and islink(join(dirname, name_rel)))
+           (not setting.follow_links and islink(join(dirname, name_rel)))
 
 def generate_tree():
     """generate site tree from files and directories in input directory"""

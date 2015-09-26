@@ -10,14 +10,8 @@ from os.path import exists, isfile, join
 from . import setting
 from .common import read_yaml_file
 
-config_default = {
-    'extension': 'extension',
-    'follow_links': False,
-    'ignore': '.?*',
-    'input': 'input',
-    'output': 'output',
-    'layout': 'layout'
-}
+config_default = dict(extension='extension', follow_links=False, ignore='.?*',
+                      input='input', output='output', layout='layout')
 
 def read_config():
     """read configuration file, define global settings"""

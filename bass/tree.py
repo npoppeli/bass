@@ -129,7 +129,9 @@ class Page(Node):
         """create new Page node; set content, preview and meta attributes"""
         super().__init__(name, path, parent)
         self.key = 'Page'
-        self.skin = '' # should be set by page processor
+        # attributes 'skin' and 'url' are derived from metadata by the page processor
+        self.skin = ''
+        self.url = ''
         full_path = join(setting.input, path)
         # logging.debug("Page: name=%s path=%s full_path=%s", name, path, full_path)
         self.meta, self.preview, self.content = read_page(full_path)

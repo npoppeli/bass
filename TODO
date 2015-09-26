@@ -1,0 +1,3 @@
+1. empty extension directory gives error in build_site
+
+2. running with debug option: not all three web servers log their messages to the standard log
