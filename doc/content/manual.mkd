@@ -4,10 +4,10 @@ Bass
 ====
 
 Bass is a static website generator (Bass=Build A Static Site), written in
-Python 3. It turns a collection of content pages, assets (PNG, CSS, JS etc.)
-and templates into a static website, i.e. a website consisting only of
-directories, HTML pages and the same assets. Bass is distributed under the MIT
-license (see the LICENSE file for more details).
+Python 3. It turns a collection of content pages, assets (PNG, CSS, JS
+etcetera) and templates into a static website, i.e. a website consisting only
+of directories, HTML pages and the same assets. Bass is distributed under the
+MIT license (see the LICENSE file for more details).
 
 The idea behind a static site generator is that you don't need a
 content-management system on the server to generate pages dynamically: you
@@ -135,11 +135,11 @@ rendering of the site tree is done top-down.
 #### Generation phase
 
 The site tree is generated from the directories and files in the input
-directory (default: `input`). Directories and files are ignored if their
-names match one of the *ignore patterns*. Symbolic links are followed or
-ignored, depending on the configuration option `follow_links`. By default
-there is one ignore pattern: `.?*`. Additional ignore patterns can be defined
-in the configuration file (option `ignore`). For example:
+directory (default: `input`). Directories and files are ignored if their names
+match one of the *ignore patterns*. Symbolic links are followed or ignored,
+depending on the configuration option `follow_links`. By default there is one
+ignore pattern: `.?*`. Additional ignore patterns can be defined in the
+configuration file (option `ignore`). For example:
 
     ignore: "*.bak *~"
 
@@ -236,22 +236,22 @@ breaks is treated as end of paragraph.
 [rst]: http://docutils.sourceforge.net/rst.html
 [txi]: https://github.com/sebix/python-textile
 
-Each page can start with a metadata section in YAML form, but this is
-optional. Suppose there is a file named `index.mkd` in the input directory, with the
-following contents.
+Each page may optionally can start with a metadata section in YAML
+form. Suppose there is a file named `index.mkd` in the input directory, with
+the following contents.
 
     title: Home
     ---
     This is the home page. Add useful text here.
-   
+
 This is a minimal Markdown page. The part above the divider `---` contains the
 metadata for the page. Below the `---` is the content of the page.  The
 metadata section is not required.
 
 The content itself can also contain a line with `---`. The part between the
 first and second divider is the preview, and the part below the second divider
-is the rest of the text. The preview part can be used on a front page, for
-example, with links to the complete page.
+is the remainder of the page content. The preview part can be used on a front
+page, for example, with links to the complete page.
 
 The basic set of metadata is this.
 
@@ -262,8 +262,9 @@ The basic set of metadata is this.
 * `skin`: the name of the template used to render this page as a complete HTML file
   (default: `default`)
 * `id`: an identifier of the node (default: `''`)
-* `date`, `time`, `datetime`: date, time and date-time in ISO notation; datetime can be derived
-  from date and time, or vice versa (default: `ctime` of the file)
+* `date`, `time`, `datetime`: date, time and date-time in ISO notation;
+  datetime can be derived from date and time, or vice versa
+  (default: `ctime` of the file)
 
 Other metadata fields can be defined in the header of the page. All metadata
 fields are added as attributes of the *Page* node, and can be used in templates
