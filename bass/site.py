@@ -58,8 +58,11 @@ def read_extension():
     """read extension(s) of core functionality from directory specified in configuration file"""
     if isdir(setting.extension):
         # valid for Python 3.1-3.3; as of 3.4 we should use importlib.import_module
-        (fileobj, path, details) = imp.find_module('__init__', [setting.extension])
-        module = imp.load_module(setting.extension, fileobj, path, details)
+        try:
+            (fileobj, path, details) = imp.find_module('__init__', [setting.extension])
+            module = imp.load_module(setting.extension, fileobj, path, details)
+        except ImportError:
+            logging.debug("Extension directory {} does not contain __init__.py".format(setting.extension))
 
 def prepare_output():
     """clean output directory before rendering site tree"""
@@ -104,7 +107,7 @@ def generate_tree():
             this = (Page if suffix in pagetypes else Asset)(name, filename_rel, None)
             folder.add(this)
             this.ready()
-        folder_queue[folder_name] = folder
         folder.ready()
-    # folder with name = '' is the root of the site tree
+        folder_queue[folder_name] = folder
+    # by definition: folder with name = '' is the root of the site tree
     return folder_queue['']

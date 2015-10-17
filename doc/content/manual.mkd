@@ -113,12 +113,12 @@ format. This is the file `config` in the project directory.
 
 Possible configuration options (and their defaults) are
 
-- `input`        (`input`):     directory of input files (pages and assets).
-- `ignore`       (`.?*`):       patterns of files and directories to be ignored.
-- `output`       (`output`):    directory of output files (the generated web site).
-- `layout`       (`layout`):    layout defined as a set of templates.
-- `follow_links` (`False`):     follow symbolic links while generating the site tree
-- `extension`    (`extension`): Python module(s) with extensions, mostly event handlers
+- `input`        (`input`):  directory of input files (pages and assets).
+- `ignore`       (`.?*`):    patterns of files and directories to be ignored.
+- `output`       (`output`): directory of output files (the generated web site).
+- `layout`       (`layout`): layout defined as a set of templates.
+- `follow_links` (`False`):  follow symbolic links while generating the site tree
+- `extension`    (none):     Python module(s) with extensions, mostly event handlers
   (see paragraph [Events](#events) for more information).
 
 Creating a site
@@ -351,7 +351,7 @@ The tree model consists of the following classes.
     - `url`: absolute URL of page
     - `preview`: preview part of page (text between first and second divider `---`)
     - `content`: content of page
-    - `metadata`: metadata of page
+    - `meta`: metadata of page
     - `skin`: name of template to be used for rendering
 * metadata of a page are added as attributes of the node
 
@@ -419,10 +419,10 @@ after generating the site tree, and can be used for global transformations of
 the tree. Please use your imagination, but don't break the site tree (well:
 it's your tree anyway).
 
-The post-render event, *render:post:root*, is called after the root node and
-all its children have been rendered. This means that it is the last event to be
-signalled (see the paragraph [Rendering phase](#rendering) for more
-information). The handler for this event can therefore be used for uploading
+The post-render event, *render:post:root*, is the last event to be sent,
+after the root node and all its children have been rendered (see the paragraph
+[Rendering phase](#rendering) for more information).
+The handler for this event can therefore be used for uploading
 the generated site to another server, for example.
 
 #### Extensions
