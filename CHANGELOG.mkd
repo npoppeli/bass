@@ -1,3 +1,13 @@
+Version 0.9.5
+-------------
+
+### Features
+-   Extension directory is now optional
+-   When the web server runs, there is always logging output, even in the case of WebOb + Waitress
+
+### Other
+-   Updated README and manual.
+
 Version 0.9.4
 -------------
 
