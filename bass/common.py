@@ -1,8 +1,29 @@
 """
 bass.common
 -----
-Basic functions shared by other modules.
+Basic objects and functions shared by other modules.
+
+Logging
+-------
+Logging levels are DEBUG, INFO, WARNING, ERROR, CRITICAL.
+Bass uses logging level INFO by default, and DEBUG if called with --debug.
+
+Basic (no webob, no waitress):
+
+Webob available:
+
+Webob and Waitress available:
+Waitress uses a logger object named 'waitress', and sets the logging level to WARNING.
 """
+
+import logging
+# configure logging
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+try:
+    import waitress
+    logger = logging.getLogger('waitress')
+except ImportError:
+    logger = logging.getLogger('bass')
 
 from yaml import load
 try:

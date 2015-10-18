@@ -4,11 +4,12 @@ bass.event
 Objects and functions related to events and event handlers.
 """
 
-import logging, re, sys
+import re, sys
 from datetime import datetime, date
 from os.path import join, splitext, getctime, basename
 from . import setting
 from .markup import converter
+from .common import logger
 
 event_handler = {}
 
@@ -22,29 +23,29 @@ def add_handler(event, handler):
     """add handler for event 'event'"""
     if callable(handler):
         if event in event_handler:
-            logging.debug('Event handler for %s extended', event)
+            logger.debug('Event handler for %s extended', event)
             event_handler[event] = combine(event_handler[event], handler)
         else:
-            logging.debug('New event handler for %s', event)
+            logger.debug('New event handler for %s', event)
             event_handler[event] = handler
     else:
-        logging.debug('Event handler for %s is not a callable', event)
+        logger.debug('Event handler for %s is not a callable', event)
 
 def copy_handler(from_event, to_event):
     """copy handler for event 'from_event' to event 'to_event'"""
     if from_event in event_handler:
-        logging.debug('Event handler for %s copied from %s', to_event, from_event)
+        logger.debug('Event handler for %s copied from %s', to_event, from_event)
         event_handler[to_event] = event_handler[from_event]
     else:
-        logging.debug('No event handler for %s - cannot copy', from_event)
+        logger.debug('No event handler for %s - cannot copy', from_event)
 
 def remove_handler(event):
     """remove handler for event 'event'"""
     if event in event_handler:
-        logging.debug('Event handler for %s removed', event)
+        logger.debug('Event handler for %s removed', event)
         del event_handler[event]
     else:
-        logging.debug('No event handler for %s - cannot remove', event)
+        logger.debug('No event handler for %s - cannot remove', event)
 
 def event(event, node):
     """call handler for event 'event'"""
@@ -168,15 +169,15 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     elif isinstance(skin, str):
         func = setting.template[skin].render
     else:
-        logging.critical("Bad parameter 'skin' in function 'add_toc'")
+        logger.critical("Bad parameter 'skin' in function 'add_toc'")
         sys.exit(1)
     # create one HTML fragment per node, then partition the list of fragments in chunks of 'size'
     parts = partition([func(this=node) for node in nodelist], size)
     # create 'prev' and 'next' links
     page.prev, page.next = None, None
     previous = page
-    logging.debug('TOC main page name=%s path=%s', page.name, page.path)
-    logging.debug('TOC has %d parts', len(parts))
+    logger.debug('TOC main page name=%s path=%s', page.name, page.path)
+    logger.debug('TOC has %d parts', len(parts))
     if len(parts) > 0:
         page.toc = '\n'.join(parts[0])
     else:
@@ -184,7 +185,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     if len(parts) > 1:
         for p, part in enumerate(parts[1:]):
             current = page.copy(sep+str(p+1))
-            logging.debug('subpage name=%s path=%s', current.name, current.path)
+            logger.debug('subpage name=%s path=%s', current.name, current.path)
             current.toc = '\n'.join(part)
             page.add(current)
             previous.next = current

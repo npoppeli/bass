@@ -4,10 +4,11 @@ bass.server
 Simple web server for development and test purposes.
 """
 
-import logging, os
+import os
 from datetime import datetime
-from .site import rebuild_site
+from . import site
 from . import setting
+from .common import logger
 
 try:
     from webob import Request, Response
@@ -29,7 +30,7 @@ try:
                     for f in filenames:
                         path = os.path.join(dirpath, f)
                         if datetime.fromtimestamp(os.path.getmtime(path)) > self.timestamp:
-                            logging.debug('%s has changed', path)
+                            logger.debug('%s has changed', path)
                             return True
             return False
 
@@ -38,10 +39,14 @@ try:
             request = Request(environ)
             # check for modifications every time a page (not an asset) is requested
             if request.path.endswith('.html') and self.changed():
-                logging.debug('Rebuilding site')
+                logger.debug('Rebuilding site')
                 self.timestamp = datetime.now()
                 self.callback()
             response = request.get_response(self.wrapped)
+            dt = datetime.strftime(datetime.now(), "%d/%b/%Y %H:%M:%S")
+            logger.info('{} - - [{}] "{} {}" {} {}'.\
+                        format(request.server_name, dt, request.method, request.path_info,
+                               response.status, response.content_length))
             return response(environ, start_response)
 
     try:
@@ -56,15 +61,16 @@ try:
     def http_server(host, port):
         """http_server: WSGI-based web server with same interface as in standard library"""
         static = DirectoryApp(setting.output, index_page=None)
-        wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
-        logging.debug('Starting HTTP server on port %d', port)
+        wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=site.rebuild_site)
+        logger.debug('Starting HTTP server on port %d', port)
         serve(wrapped, host=host, port=port)
 
 except ImportError:
     from http.server import HTTPServer, SimpleHTTPRequestHandler
+    logger = logger.getLogger('bass')
     def http_server(host, port):
         """http_server: basic web server based on standard library"""
         os.chdir(setting.output)
         httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
-        logging.debug('Starting HTTP server on port %d', port)
+        logger.debug('Starting HTTP server on port %d', port)
         httpd.serve_forever()

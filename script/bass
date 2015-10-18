@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import logging, sys
+import logging
+from bass import parse_cmdline, create_project, build_site, http_server, logger
 
-# configure logging
-logging.basicConfig(format='%(levelname)s: %(message)s', stream=sys.stdout,
-                    level=logging.INFO)
-
-from bass import parse_cmdline, create_project, build_site, http_server
+def level(lvl):
+    return logging.getLevelName(lvl)
 
 # parse command line
 args = parse_cmdline()
 if args.debug:
-    logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
+
+print("Our logger is called '{}', has level {} and {} handlers".\
+      format(logger.name, level(logger.getEffectiveLevel()), 'has' if logger.hasHandlers() else 'does not have'))
 
 if args.create: # create new project
     create_project()
@@ -22,4 +22,4 @@ elif args.build: # build site in existing project
     if args.server:
         http_server('localhost', 8080)
 else:
-    logging.info('not building, not creating')
+    logger.info('not building, not creating')

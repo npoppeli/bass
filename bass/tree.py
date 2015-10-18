@@ -4,12 +4,12 @@ bass.tree
 Objects and functions related to the site tree.
 """
 
-import logging, shutil, sys
+import shutil, sys
 from copy import copy
 from os import mkdir
 from os.path import join, splitext
 from . import setting
-from .common import read_file, read_yaml_string, write_file
+from .common import read_file, read_yaml_string, write_file, logger
 from .event import event
 
 # node classes
@@ -133,7 +133,6 @@ class Page(Node):
         self.skin = ''
         self.url = ''
         full_path = join(setting.input, path)
-        # logging.debug("Page: name=%s path=%s full_path=%s", name, path, full_path)
         self.meta, self.preview, self.content = read_page(full_path)
 
     def copy(self, sep='_'):
@@ -162,7 +161,7 @@ class Page(Node):
         if self.skin in setting.template:
             template = setting.template[self.skin]
         else:
-            logging.critical("Template '%s' for page %s not available.", self.skin, self.path)
+            logger.critical("Template '%s' for page %s not available.", self.skin, self.path)
             sys.exit(1)
         write_file(template.render(this=self), join(setting.output, self.url[1:]))
         for node in self.children: # (dynamically created) sub-pages
@@ -197,7 +196,6 @@ class Asset(Node):
 
 def read_page(path):
     """read page from file and return triple (meta, preview, content)"""
-    # logging.debug("Reading page from file %s.", path)
     text = read_file(path)
     parts = text.split('\n---\n')
     if len(parts) == 1: # no metadata, just content

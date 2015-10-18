@@ -18,6 +18,7 @@ Functions:
     - copy_template_type: copy template type (existing template factory + new extension)
 """
 
+from .common import logger
 from .config import parse_cmdline
 from .event  import add_toc, add_handler, copy_handler, remove_handler, resolve_idref
 from .layout import add_template_type, copy_template_type
