@@ -1,3 +1,5 @@
 follow_links: true
+ignore: '*~'
 input: content
 extension: extension
+root_url: /bass/

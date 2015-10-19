@@ -8,10 +8,10 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="title" content="Bass: build a static site" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/bass/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="${root}css/bootstrap.min.css" rel="stylesheet"/>
     <!-- <link href="/css/font-awesome.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"/>
-    <link href="/bass/css/codehilite.css" rel="stylesheet" />
+    <link href="${root}css/codehilite.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
@@ -19,7 +19,7 @@
       </div>
     </div>
     <!-- Javascript modules -->
-    <script src="/js/jquery-min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="${root}js/jquery-min.js"></script>
+    <script src="${root}js/bootstrap.min.js"></script>
   </body>
 </html>

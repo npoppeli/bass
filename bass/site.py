@@ -57,7 +57,7 @@ def verify_project():
 
 def read_extension():
     """read extension(s) of core functionality from directory specified in configuration file"""
-    if isdir(setting.extension):
+    if setting.extension and isdir(setting.extension):
         # valid for Python 3.1-3.3; as of 3.4 we should use importlib.import_module
         try:
             (fileobj, path, details) = imp.find_module('__init__', [setting.extension])

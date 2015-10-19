@@ -6,7 +6,7 @@ Objects and functions related to the site tree.
 
 import shutil, sys
 from copy import copy
-from os import mkdir
+from os import makedirs
 from os.path import join, splitext
 from . import setting
 from .common import read_file, read_yaml_string, write_file, logger
@@ -118,7 +118,9 @@ class Folder(Node):
         event('render:pre:root' if self.name == '' else 'render:pre:folder:path:'+self.path, self)
         if self.name != '': # root -> output directory, which already exists
             # render = create sub-directory 'self.path' in output directory
-            mkdir(join(setting.output, self.path))
+            dirpath = join(setting.output, setting.root_url[1:], self.path)
+            logger.debug("Creating directory %s", dirpath)
+            makedirs(dirpath)
         for node in self.children:
             node.render()
         event('render:post:root' if self.name == '' else 'render:post:folder:path:'+self.path, self)
@@ -142,7 +144,7 @@ class Page(Node):
         (pagename, suffix) = splitext(newpage.path)
         newpage.name += sep
         newpage.path = pagename + sep + suffix
-        newpage.url = '/' + pagename + sep + '.html'
+        newpage.url = setting.root_url + pagename + sep + '.html'
         return newpage
 
     def ready(self):
@@ -163,7 +165,9 @@ class Page(Node):
         else:
             logger.critical("Template '%s' for page %s not available.", self.skin, self.path)
             sys.exit(1)
-        write_file(template.render(this=self), join(setting.output, self.url[1:]))
+        filepath = join(setting.output, self.url[1:])
+        logger.debug("Writing page %s", filepath)
+        write_file(template.render(this=self, root=setting.root_url), filepath)
         for node in self.children: # (dynamically created) sub-pages
             node.render()
         event('render:post:page:any', self)
@@ -177,7 +181,7 @@ class Asset(Node):
         """create new Asset node"""
         super().__init__(name, path, parent)
         self.key = 'Asset'
-        self.url = '/' + self.path
+        self.url = setting.root_url + self.path
 
     def ready(self):
         """asset is ready: send event(s)"""
@@ -190,7 +194,9 @@ class Asset(Node):
         suffix = splitext(self.path)[1][1:]
         event('render:pre:asset:path:'+self.path, self)
         event('render:pre:asset:extension:'+suffix, self)
-        shutil.copy(join(setting.input, self.path), join(setting.output, self.path))
+        filepath = join(setting.output, setting.root_url[1:], self.path)
+        logger.debug("Writing asset %s", filepath)
+        shutil.copy(join(setting.input, self.path), filepath)
         event('render:post:asset:path:'+self.path, self)
         event('render:post:asset:extension:'+suffix, self)
 

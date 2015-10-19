@@ -10,7 +10,7 @@ from os.path import exists, isfile, join
 from . import setting
 from .common import read_yaml_file
 
-config_default = dict(follow_links=False, ignore='.?*',
+config_default = dict(follow_links=False, ignore='.?*', root_url='/',
                       input='input', output='output', layout='layout')
 
 def read_config():
@@ -21,6 +21,7 @@ def read_config():
         config.update(read_yaml_file(config_file))
     setting.follow_links  = config['follow_links']
     setting.ignore = config['ignore'].split()
+    setting.root_url = config['root_url']
     if config_default['ignore'] not in setting.ignore:
         setting.ignore.append(config_default['ignore'])
     setting.project       = getcwd()
@@ -35,6 +36,6 @@ def parse_cmdline():
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--build',  help='build',  action='store_true', default=False)
     parser.add_argument('-c', '--create', help='create', action='store_true', default=False)
-    parser.add_argument('-d', '--debug',  help='debug', action='store_true', default=False)
+    parser.add_argument('-d', '--debug',  help='debug',  action='store_true', default=False)
     parser.add_argument('-s', '--server', help='server', action='store_true')
     return parser.parse_args()

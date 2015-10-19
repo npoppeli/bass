@@ -11,9 +11,6 @@ args = parse_cmdline()
 if args.debug:
     logger.setLevel(logging.DEBUG)
 
-print("Our logger is called '{}', has level {} and {} handlers".\
-      format(logger.name, level(logger.getEffectiveLevel()), 'has' if logger.hasHandlers() else 'does not have'))
-
 if args.create: # create new project
     create_project()
 elif args.build: # build site in existing project
