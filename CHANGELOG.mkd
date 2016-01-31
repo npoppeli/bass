@@ -3,6 +3,7 @@ Version 0.9.5
 
 ### Features
 -   Extension directory is now optional
+-   New configuration option 'root_url' (default '/') to specify the URL of the root of the site tree
 -   When the web server runs, there is always logging output, even in the case of WebOb + Waitress
 
 ### Other

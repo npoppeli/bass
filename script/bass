@@ -3,9 +3,6 @@
 import logging
 from bass import parse_cmdline, create_project, build_site, http_server, logger
 
-def level(lvl):
-    return logging.getLevelName(lvl)
-
 # parse command line
 args = parse_cmdline()
 if args.debug:
