@@ -438,8 +438,8 @@ other Python modules.
 
 The package should define zero or more event handlers, usually in the form of functions, but
 as always any callable object is acceptable. An event handler is called with one parameter,
-namely the node that emitted the event. During the import of the package, the event handlers are
-assigned to an event by calling the function `add_handler`:
+namely the node that emitted the event. During the import of the package, the event handlers should
+be assigned to an event by calling the function `add_handler`:
 
 ```python
 def upload_site(root):
@@ -451,7 +451,7 @@ If `add_handler` finds that there is already a built-in event handler for the
 given event, it combines the existing handler with the handler given as the
 second argument.
 
-There also convenience functions `copy_handler` and `remove_handler` (see
+There are also convenience functions `copy_handler` and `remove_handler` (see
 examples below).
 
 #### Built-in event handlers
