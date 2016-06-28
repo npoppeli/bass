@@ -29,13 +29,14 @@ def read_config():
     setting.layout        = join(setting.project, config['layout'])
     setting.output        = join(setting.project, config['output'])
     if 'extension' in config:
-        setting.extension = join(setting.project, config['extension'])
+        setting.extension = config['extension']
 
 def parse_cmdline():
     """parse command line, return parsed argument list"""
     parser = argparse.ArgumentParser()
-    parser.add_argument('-b', '--build',  help='build',  action='store_true', default=False)
-    parser.add_argument('-c', '--create', help='create', action='store_true', default=False)
-    parser.add_argument('-d', '--debug',  help='debug',  action='store_true', default=False)
-    parser.add_argument('-s', '--server', help='server', action='store_true')
+    parser.add_argument('-b', '--build',   help='build',   action='store_true', default=False)
+    parser.add_argument('-v', '--version', help='version', action='store_true', default=False)
+    parser.add_argument('-c', '--create',  help='create',  action='store_true', default=False)
+    parser.add_argument('-d', '--debug',   help='debug',   action='store_true', default=False)
+    parser.add_argument('-s', '--server',  help='server',  action='store_true')
     return parser.parse_args()

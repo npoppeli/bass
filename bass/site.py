@@ -13,6 +13,7 @@ from .layout import read_templates
 from .common import logger
 from .tree import Folder, Page, Asset
 from fnmatch import fnmatch
+from importlib import import_module
 from os import listdir, mkdir, unlink, walk
 from os.path import isdir, isfile, islink, join, relpath, splitext, split
 
@@ -56,14 +57,15 @@ def verify_project():
         sys.exit(1)
 
 def read_extension():
-    """read extension(s) of core functionality from directory specified in configuration file"""
-    if setting.extension and isdir(setting.extension):
-        # valid for Python 3.1-3.3; as of 3.4 we should use importlib.import_module
+    """read extension(s) from package specified in configuration file"""
+    if setting.extension and isdir(join(setting.project, setting.extension)):
         try:
-            (fileobj, path, details) = imp.find_module('__init__', [setting.extension])
-            module = imp.load_module(setting.extension, fileobj, path, details)
+            logger.debug("Adding project directory {} to Python path".format(setting.project))
+            sys.path.insert(0, setting.project)
+            logger.debug("Importing package {}".format(setting.extension))
+            module = import_module(setting.extension)
         except ImportError:
-            logger.debug("Extension directory {} does not contain __init__.py".format(setting.extension))
+            logger.debug("Extension directory {} is not a Python package".format(setting.extension))
 
 def prepare_output():
     """clean output directory before rendering site tree"""

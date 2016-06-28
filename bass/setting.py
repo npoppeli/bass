@@ -4,7 +4,7 @@ bass.setting
 Global settings, shared by all modules.
 """
 
-version      = '0.9.4'
+version      = '1.0.0'
 project      = None
 root         = None
 template     = None

@@ -427,18 +427,19 @@ the generated site to another server, for example.
 
 #### Extensions
 
-Extensions, mostly in the form of event handlers, are put in a directory that
+Extensions, mostly in the form of event handlers, are put in a Python package that
 is defined in the configuration file:
 
-    extension: extension_dir
+    extension: package_name
 
-Bass attempts to read the module `__init__.py` from the specified directory
-(default: `extension`). If it exists, this module defines zero or more event
-handlers, usually in the form of functions, but naturally any callable object
-is acceptable. An event handler is called with one parameter, namely the node
-that emitted the event.
+Bass attempts to import the package `package_name`. This means that the project directory should
+contain a sub-directory `package_name`, which contain at least a file `__init__.py` and possibly
+other Python modules.
 
-Event handlers are assigned to an event by calling the function `add_handler`:
+The package should define zero or more event handlers, usually in the form of functions, but
+as always any callable object is acceptable. An event handler is called with one parameter,
+namely the node that emitted the event. During the import of the package, the event handlers are
+assigned to an event by calling the function `add_handler`:
 
 ```python
 def upload_site(root):

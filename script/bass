@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 import logging
-from bass import parse_cmdline, create_project, build_site, http_server, logger
+from bass import parse_cmdline, create_project, build_site, http_server, logger, version
 
 # parse command line
 args = parse_cmdline()
 if args.debug:
     logger.setLevel(logging.DEBUG)
 
-if args.create: # create new project
+if args.version: # print version number
+    logger.info('version: {}'.format(version))
+elif args.create: # create new project
     create_project()
 elif args.build: # build site in existing project
     build_site()

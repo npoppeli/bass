@@ -44,5 +44,6 @@ This will install Bass and the required dependencies.
 
 You can also download gzip-ped tar archives here:
 
-- [version 0.9.4](/bass/download/bass-0.9.4.tar.gz) (latest version)
+- [version 1.0.0](/bass/download/bass-1.0.0.tar.gz) (latest version)
+- [version 0.9.4](/bass/download/bass-0.9.4.tar.gz) (previous version)
 - earlier versions
