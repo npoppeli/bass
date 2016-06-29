@@ -370,7 +370,7 @@ Bass keeps global parameters in a separate module `setting`.
 * `ignore`:    list of ignore patterns
 * `layout`:    layout directory
 * `output`:    output directory
-* `extension`: extension directory
+* `extension`: extension package name
 * `project`:   project directory, parent of input, layout, handler and output directories
 
 ### Events
@@ -444,7 +444,7 @@ be assigned to an event by calling the function `add_handler`:
 ```python
 def upload_site(root):
     ...
-    add_handler('render:post:root', upload_site)
+add_handler('render:post:root', upload_site)
 ```
 
 If `add_handler` finds that there is already a built-in event handler for the
