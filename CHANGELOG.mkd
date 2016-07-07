@@ -8,6 +8,7 @@ Version 1.0.0
     can be defined in the configuration file
 
 ### Other
+-   API change: they 'key' attribute of Node and its sub-classes was renamed to 'kind'
 -   Updated README and manual.
 
 Version 0.9.5
