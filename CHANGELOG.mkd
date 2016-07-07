@@ -3,6 +3,9 @@ Version 1.0.0
 
 ### Features
 -   Extension directory is treated as a package
+-   When a node is rendered, only one argument (the node itself) is passed to the template
+-   Options for the web server, 'host' (default 'localhost') and 'port' (default 8080),
+    can be defined in the configuration file
 
 ### Other
 -   Updated README and manual.

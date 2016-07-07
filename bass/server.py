@@ -4,9 +4,10 @@ bass.server
 Simple web server for development and test purposes.
 """
 
-import os
+from os import chdir, walk
+from os.path import join, getmtime
 from datetime import datetime
-from . import site
+from .site import rebuild_site
 from . import setting
 from .common import logger
 
@@ -26,10 +27,10 @@ try:
             """return True if any file in one of the directories in self.checklist has changed
                since self.timestamp, otherwise False"""
             for checkdir in self.checklist:
-                for (dirpath, _, filenames) in os.walk(checkdir):
+                for (dirpath, _, filenames) in walk(checkdir):
                     for f in filenames:
-                        path = os.path.join(dirpath, f)
-                        if datetime.fromtimestamp(os.path.getmtime(path)) > self.timestamp:
+                        path = join(dirpath, f)
+                        if datetime.fromtimestamp(getmtime(path)) > self.timestamp:
                             logger.debug('%s has changed', path)
                             return True
             return False
@@ -61,16 +62,15 @@ try:
     def http_server(host, port):
         """http_server: WSGI-based web server with same interface as in standard library"""
         static = DirectoryApp(setting.output, index_page=None)
-        wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=site.rebuild_site)
+        wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
         logger.debug('Starting HTTP server on port %d', port)
         serve(wrapped, host=host, port=port)
 
 except ImportError:
     from http.server import HTTPServer, SimpleHTTPRequestHandler
-    logger = logger.getLogger('bass')
     def http_server(host, port):
         """http_server: basic web server based on standard library"""
-        os.chdir(setting.output)
+        chdir(setting.output)
         httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
         logger.debug('Starting HTTP server on port %d', port)
         httpd.serve_forever()

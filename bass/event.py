@@ -20,7 +20,7 @@ def combine(h1, h2):
     return _h12
 
 def add_handler(event, handler):
-    """add handler for event 'event'"""
+    """add handler for event"""
     if callable(handler):
         if event in event_handler:
             logger.debug('Event handler for %s extended', event)
@@ -58,8 +58,8 @@ class Processor:
         self.convert = converter
 
     def __call__(self, node):
-        """convert node.content, node.preview and node.meta, which are set by node.__init__();
-           use elements of node.meta as attributes of node; set node.url"""
+        """convert node.content, node.preview and node.meta, which are set by the node constructor,
+           to HTML; set elements of node.meta as attributes of node; set node.url"""
         if self.convert:
             # convert node.content and node.preview
             node.preview = self.convert(node.preview) if node.preview else ''
@@ -126,16 +126,16 @@ def fix_date_time(meta, ctime):
         meta['time']     = ctime.time()
 
 # define event handlers for the standard page types, depending on which Python packages are installed
-if setting.markdown:
+if 'mkd' in converter:
     markdown_processor = Processor(converter['mkd'])
     add_handler('generate:post:page:extension:mkd', markdown_processor)
     copy_handler('generate:post:page:extension:mkd', 'generate:post:page:extension:md')
 
-if setting.rest:
+if 'rst' in converter:
     rest_processor = Processor(converter['rst'])
     add_handler('generate:post:page:extension:rst', rest_processor)
 
-if setting.textile:
+if 'txi' in converter:
     textile_processor = Processor(converter['txi'])
     add_handler('generate:post:page:extension:txi', textile_processor)
 
@@ -194,12 +194,11 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
         previous.next = None # last subpage
 
 # resolve_idref is an event handler for resolving idref notation in href attributes.
-def idref_replace(mo):
-    catch = setting.root.pages(idref=mo.group(2), deep=True)
-    return "href={0}{1}{0}".format(mo.group(1), catch[0].url if catch else '#')
-
 idref_regex = re.compile(r"href=(['\"])idref:\s*(\w+?)\1")
 
 def resolve_idref(node):
-    """replace href="idref:FOO" with href="BAR" where BAR is the URL of the page with id=FOO"""
+    """replace href='idref:FOO' with href='BAR', where BAR is the URL of the page with id=FOO"""
+    def idref_replace(mo):
+        catch = node.root().pages(idref=mo.group(2), deep=True)
+        return "href={0}{1}{0}".format(mo.group(1), catch[0].url if catch else '#')
     node.content = idref_regex.sub(idref_replace, node.content)

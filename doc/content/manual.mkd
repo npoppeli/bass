@@ -110,16 +110,20 @@ Configuration
 
 Settings can be changed in the configuration file, which is in YAML
 format. This is the file `config` in the project directory.
+Settings are kept in the module `setting` of the Bass package.
 
 Possible configuration options (and their defaults) are
 
-- `input`        (`input`):  directory of input files (pages and assets).
-- `ignore`       (`.?*`):    patterns of files and directories to be ignored.
-- `output`       (`output`): directory of output files (the generated web site).
-- `layout`       (`layout`): layout defined as a set of templates.
-- `follow_links` (`False`):  follow symbolic links while generating the site tree
-- `extension`    (none):     Python module(s) with extensions, mostly event handlers
+- `input`        (`input`):   directory of input files (pages and assets).
+- `ignore`       (`.?*`):     patterns of files and directories to be ignored.
+- `output`       (`output`):  directory of output files (the generated web site).
+- `layout`       (`layout`):  layout defined as a set of templates.
+- `follow_links` (`False`):   follow symbolic links while generating the site tree
+- `extension`    (none):      Python module(s) with extensions, mostly event handlers
   (see paragraph [Events](#events) for more information).
+- `host`         (localhost): host the HTTP server runs on
+- `port`         (8080):      port the HTTP server runs on
+- `root_url`     (`/`):       root of the site tree
 
 Creating a site
 ---------------
@@ -199,25 +203,30 @@ created: the output directory is assumed to exist when you call `bass -b`.
 
 ### Content
 
-All content of the site is in the input directory (default: `input`). Content
-consists of folders, pages and assets (the term *asset* was borrowed from
-[Jekyll][jekyll]). A directory is mapped to a folder in the site tree. A file
-is mapped to a page or an asset in the site tree. Loosely speaking, pages are
-text files with some form of markup, and assets are images, CSS files,
-Javascript modules and other files.
+All content of the site is in the input directory (default: `input`). Content consists of
+folders, pages and assets (the term *asset* was borrowed from [Jekyll][jekyll]). A directory is
+mapped to a folder in the site tree. A file is mapped to a page or an asset in the site tree.
+Loosely speaking, pages are text files with some form of markup, and assets are images, CSS
+files, Javascript modules and other files.
 
 [jekyll]: http://jekyllrb.com/
 
 At a technical level, a page is a file for which an event handler
-*generate:post:page:extension:abc* is defined. Bass defines such event handlers
-for plain text (extension `.txt`), HTML fragment (extension`.html`), Markdown
-(extensions `.md`, `.mkd`), ReStructuredText (extension `.rst`), and Textile
-(extension `.txi`). For Markdown, ReStructuredText and Textile the related
-Python packages need to be installed of course.
+*generate:post:page:extension:abc* is defined, where the suffix or *page type* `abc`
+is the file extension minus the period.
+Bass defines such event handlers for plain text (suffix `txt`), HTML fragment (suffix
+`html`), Markdown (suffixes `md` and `mkd`), ReStructuredText (suffixn `rst`), and Textile
+(suffix `txi`). For Markdown, ReStructuredText and Textile the related Python packages need
+to be installed of course.
 
 In other words: a file is mapped to a page if the extension of the file is in
 the list of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt',
 'html']`. All other files are mapped to an asset.
+
+The event handler for *generate:post:page:extension:abc* should perform the following tasks:
+- convert `node.content`, `node.preview` and `node.meta` (which are set by the node constructor) to HTML
+- set all elements of `node.meta` as attributes of the node
+- set `node.url`
 
 #### Pages
 
@@ -287,8 +296,8 @@ The layout of the site is created by templates, which are put in the layout
 directory (default: `layout`). This is a flat directory, i.e. sub-directories
 are not scanned. Bass uses [Chameleon][chameleon] templates to create HTML
 pages. This is a very flexible templating environment with control flow,
-filters, and other features. When a template is called, two arguments are
-passed, namely the current node (`this`) and the root node (`root`).
+filters, and other features. When a template is called, one argument is
+passed, namely the node to be rendered (`this`).
 
 Chameleon templates are XML files in the template directory. The possible file
 extensions are `.xml` and `.pt`. Other files are ignored, unless additional
@@ -299,13 +308,14 @@ It is possible to use other template languages, e.g. [Mako][mako] or
 in the extension modules by calling `add_template_type`. This is a convenience
 function that defines a template factory for a new file extension.  By default,
 there is one template factory: `chameleon.PageTemplateFile`. This is connected
-to the file extensions `.xml` and `.pt`. Other template factories can be
+to the layout types `xml` and `pt`. Other template factories can be
 defined, provided they implement the following interface:
 
-    extension -> template factory: TF = template_factory[extension]
-    filename  -> template: template = TF(filename)
-    node      -> string: template.render(this=node) returns HTML page for node 'this'
-                 (condition: node.skin should be equal to filename without extension)
+    filename -> template: template = template_factory(filename)
+    node     -> string: template.render(this=node) returns HTML page for node 'this'
+                (condition: node.skin should be equal to filename without extension)
+
+Template factories are stored in a dictionary `template_factory`, with the suffix as key.
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
@@ -323,7 +333,7 @@ The tree model consists of the following classes.
     - `Node.add(child)`: add `child` node to list of children of this node
     - `Node.root()`: return root node of tree
 * variables:
-    - `Node.key`: 'Node'
+    - `Node.kind`: class name
     - `Node.id`: identifier of this node (default: empty)
     - `Node.name`: name of node (last part of path)
     - `Node.path`: relative path of node in tree
@@ -372,6 +382,7 @@ Bass keeps global parameters in a separate module `setting`.
 * `output`:    output directory
 * `extension`: extension package name
 * `project`:   project directory, parent of input, layout, handler and output directories
+* `root_url`:  root URL of site tree
 
 ### Events
 

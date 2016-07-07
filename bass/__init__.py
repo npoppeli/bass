@@ -16,12 +16,14 @@ Functions:
     - remove_handler: remove event handler
     - add_template_type: add template type (template factory + extension)
     - copy_template_type: copy template type (existing template factory + new extension)
+    - logger: logging object
+    - resolve_idref: event handler for resolving idref notation
+    - add_toc: helper function for creating event handler
 """
 
-from .common import logger
-from .config import parse_cmdline
-from .event  import add_toc, add_handler, copy_handler, remove_handler, resolve_idref
-from .layout import add_template_type, copy_template_type
-from .server import http_server
-from .setting import version
-from .site   import build_site, create_project
+from .common  import logger
+from .config  import parse_cmdline
+from .event   import add_toc, add_handler, copy_handler, remove_handler, resolve_idref
+from .layout  import add_template_type, copy_template_type
+from .server  import http_server
+from .site    import build_site, create_project

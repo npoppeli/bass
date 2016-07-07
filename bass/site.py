@@ -4,7 +4,7 @@ bass.site
 Objects and functions related to site structure and site generation.
 """
 
-import imp, shutil, sys, yaml
+import shutil, sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
@@ -22,9 +22,9 @@ def create_project():
     logger.info('Creating project')
     if len(listdir()) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
-        for k, v in config_default.items():
-            if k not in ('ignore', 'follow_links'):
-                mkdir(v)
+        mkdir(config_default['input'])
+        mkdir(config_default['output'])
+        mkdir(config_default['layout'])
     else:
         logger.warning('Current directory not empty')
         sys.exit()
@@ -35,20 +35,20 @@ def build_site():
     verify_project()
     read_extension()
     logger.info('Building site tree')
-    setting.root = generate_tree()
+    root = generate_tree()
     prepare_output()
     read_templates()
     logger.info('Rendering site tree')
-    setting.root.render()
+    root.render()
 
 def rebuild_site():
     """rebuild site in current project directory"""
     logger.info('Building modified site tree')
-    setting.root = generate_tree()
+    root = generate_tree()
     prepare_output()
     read_templates()
     logger.info('Rendering modified site tree')
-    setting.root.render()
+    root.render()
 
 def verify_project():
     """verify existence of directories specified in configuration"""
@@ -78,7 +78,7 @@ def prepare_output():
             shutil.rmtree(path)
 
 def ignore_entry(name_rel, dirname):
-    """True if 'name_rel' matches one of the ignore patterns or 'name' is symbolic link"""
+    """True if 'name_rel' matches one of the ignore patterns or if 'name_rel' refers to a symbolic link"""
     return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or \
            (not setting.follow_links and islink(join(dirname, name_rel)))
 
@@ -88,7 +88,7 @@ def generate_tree():
     logger.info('Follow symbolic links: %s', ('no','yes')[setting.follow_links])
     prefix = 'generate:post:page:extension:'
     pagetypes = [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
-    logger.info('Valid page extensions: %s', ' '.join(pagetypes))
+    logger.info('Page types: %s', ' '.join(pagetypes))
     folder_queue = {}
     for dirpath, dirnames, filenames in walk(setting.input, topdown=False, followlinks=setting.follow_links):
         dirpath_rel = relpath(dirpath, setting.input)

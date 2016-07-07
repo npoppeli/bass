@@ -5,43 +5,42 @@ Objects and functions related to markup of text pages.
 """
 
 import re
-from . import setting
 
 converter = {}
 
 # Pygments
 try:
     import pygments
-    setting.pygments = True
+    have_pygments = True
 except:
-    setting.pygments = False
+    have_pygments = False
 
 # Markdown
 try:
     import markdown2
     def convert_md2(text):
         extensions = ['tables']
-        if setting.pygments:
+        if have_pygments:
             extensions.append('fenced-code-blocks')
         return markdown2.markdown(text, extras=extensions)
     converter['mkd'] = convert_md2
-    setting.markdown  = True
+    have_markdown  = True
 except ImportError:
-    setting.markdown  = False
+    have_markdown  = False
 
-if not setting.markdown:
+if not have_markdown:
     try:
         import markdown
         def convert_mkd(text):
             extras = ['markdown.extensions.tables']
-            if setting.pygments:
+            if have_pygments:
                 extras.extend(['markdown.extensions.codehilite',
                                'markdown.extensions.fenced_code'])
             return markdown.markdown(text, extensions=extras)
         converter['mkd'] = convert_mkd
-        setting.markdown = True
+        have_markdown = True
     except ImportError:
-        setting.markdown = False
+        have_markdown = False
 
 # RestructuredText
 try:
@@ -50,9 +49,9 @@ try:
     def convert_rst(text):
         return docutils.core.publish_parts(text, writer=Writer())['body']
     converter['rst'] = convert_rst
-    setting.rest = True
+    have_rest = True
 except ImportError:
-    setting.rest = False
+    have_rest = False
 
 # Textile
 try:
@@ -60,9 +59,9 @@ try:
     def convert_txi(text):
         return textile.textile(text)
     converter['txi'] = convert_txi
-    setting.textile = True
+    have_textile = True
 except ImportError:
-    setting.textile = False
+    have_textile = False
 
 # HTML
 def convert_html(text):

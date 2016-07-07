@@ -29,7 +29,7 @@ class Node:
     """
     def __init__(self, name, path, parent=None):
         """construct Node with given name, path and parent"""
-        self.key = ''
+        self.kind = 'Node'
         self.id = ''
         self.name = name
         self.path = path
@@ -62,36 +62,36 @@ class Folder(Node):
     def __init__(self, name, path, parent):
         """create new Folder node"""
         super().__init__(name, path, parent)
-        self.key = 'Folder'
+        self.kind = 'Folder'
 
     def asset(self, name):
         """return asset node with given name in this folder"""
         matches = [child for child in self.children
-                   if child.name == name and child.key == 'Asset']
+                   if child.name == name and child.kind == 'Asset']
         return matches[0] if matches else None
 
     def assets(self):
         """return all asset nodes in this folder"""
-        return [child.name for child in self.children if child.key == 'Asset']
+        return [child.name for child in self.children if child.kind == 'Asset']
 
     def folder(self, name):
         """return folder node with given name in this folder"""
         matches = [child for child in self.children
-                   if child.name == name and child.key == 'Folder']
+                   if child.name == name and child.kind == 'Folder']
         return matches[0] if matches else None
 
     def folders(self):
         """return all folder nodes in this folder"""
-        return [child for child in self.children if child.key == 'Folder']
+        return [child for child in self.children if child.kind == 'Folder']
 
     def page(self, name):
         """return page node with given name in this folder"""
         matches = [child for child in self.children
-                   if child.name == name and child.key == 'Page']
+                   if child.name == name and child.kind == 'Page']
         return matches[0] if matches else None
 
     def _pages(self, deep=False):
-        result = [node for node in self.children if node.key == 'Page']
+        result = [node for node in self.children if node.kind == 'Page']
         if deep:
             for f in self.folders():
                 result.extend(f._pages(deep=True))
@@ -108,10 +108,7 @@ class Folder(Node):
 
     def ready(self):
         """folder is ready: send event(s)"""
-        if self.name == '':
-            event('generate:post:root', self)
-        else:
-            event('generate:post:folder:path:'+self.path, self)
+        event('generate:post:root' if self.name == '' else 'generate:post:folder:path:'+self.path, self)
 
     def render(self):
         """render folder"""
@@ -130,7 +127,7 @@ class Page(Node):
     def __init__(self, name, path, parent):
         """create new Page node; set content, preview and meta attributes"""
         super().__init__(name, path, parent)
-        self.key = 'Page'
+        self.kind = 'Page'
         # attributes 'skin' and 'url' are derived from metadata by the page processor
         self.skin = ''
         self.url = ''
@@ -141,10 +138,10 @@ class Page(Node):
         """create copy of page node, with its own name, path and URL, and empty children list"""
         newpage = copy(self)
         newpage.children = []
-        (pagename, suffix) = splitext(newpage.path)
+        (page_name, suffix) = splitext(newpage.path)
         newpage.name += sep
-        newpage.path = pagename + sep + suffix
-        newpage.url = setting.root_url + pagename + sep + '.html'
+        newpage.path = page_name + sep + suffix
+        newpage.url = '{0}{1}{2}.html'.format(setting.root_url, page_name, sep)
         return newpage
 
     def ready(self):
@@ -167,7 +164,7 @@ class Page(Node):
             sys.exit(1)
         filepath = join(setting.output, self.url[1:])
         logger.debug("Writing page %s", filepath)
-        write_file(template.render(this=self, root=setting.root_url), filepath)
+        write_file(template.render(this=self), filepath)
         for node in self.children: # (dynamically created) sub-pages
             node.render()
         event('render:post:page:any', self)
@@ -180,7 +177,7 @@ class Asset(Node):
     def __init__(self, name, path, parent):
         """create new Asset node"""
         super().__init__(name, path, parent)
-        self.key = 'Asset'
+        self.kind = 'Asset'
         self.url = setting.root_url + self.path
 
     def ready(self):
