@@ -30,7 +30,7 @@ Features
 
 Documentation
 -------------
-There is concise but complete [manual](/bass/manual.html).
+There is a concise but complete [manual](/bass/manual.html).
 
 Download
 --------
