@@ -3,40 +3,34 @@ tags: table
 Bass
 ====
 
-Bass is a static website generator (Bass=Build A Static Site), written in
-Python 3. It turns a collection of content pages, assets (PNG, CSS, JS
-etcetera) and templates into a static website, i.e. a website consisting only
-of directories, HTML pages and the same assets. Bass is distributed under the
-MIT license (see the LICENSE file for more details).
+Bass is a static website generator (Bass=Build A Static Site), written in Python 3. It turns a
+collection of content pages, assets (PNG, CSS, JS etcetera) and templates into a static website,
+i.e. a website consisting only of directories, HTML pages and the same assets. Bass is
+distributed under the MIT license (see the LICENSE file for more details).
 
-The idea behind a static site generator is that you don't need a
-content-management system on the server to generate pages dynamically: you
-generate the content, upload it to the server, and repeat this process when
-something has changed. That way, there is no need to install complex software
-on the server, with the associated maintenance effort (software upgrade,
-backup) and security issues.
+The idea behind a static site generator is that you don't need a content-management system on the
+server to generate pages dynamically: you generate the content, upload it to the server, and
+repeat this process when something has changed. That way, there is no need to install complex
+software on the server, with the associated maintenance effort (software upgrade, backup) and
+security issues.
 
-The design of Bass borrows ideas from [Wok][wok] and other static site
-generators (see [overview][static]). Before I created Bass, I used Wok for
-about a year, created two websites with it, and also looked at alternatives.
-During that year I noticed several drawbacks, which led to the development of
-Bass.
+The design of Bass borrows ideas from [Wok][wok] and other static site generators (see
+[overview][static]). Before I created Bass, I used Wok for about a year, created two websites
+with it, and also looked at alternatives. During that year I noticed several drawbacks, which led
+to the development of Bass.
 
-The most important feature of Bass is that it gives the user complete freedom
-in organizing the input directory, considers this organization as meaningful,
-and therefore preserves it in the site tree.  With organization of the input
-directory I mean: (1) the structure of the tree of files and sub-directories in
-the input directory, and (2) the names of files and sub-directories. This
-concept was borrowed from [Wintersmith][wintersmith]. Other static site
-generators are designed primarily for blog sites, and use an input directory
-with a fixed structure, or completely ignore the structure of the input
-directory, creating the structure of the site tree from metadata (Wok for
-example).
+The most important feature of Bass is that it gives the user complete freedom in organizing the
+input directory, treas this organization as meaningful, and therefore preserves it in the site
+tree.  With organization of the input directory I mean: (1) the structure of the tree of files
+and sub-directories in the input directory, and (2) the names of files and sub-directories. This
+concept was borrowed from [Wintersmith][wintersmith]. Other static site generators are designed
+primarily for blog sites, and use an input directory with a fixed structure, or completely ignore
+the structure of the input directory, creating the structure of the site tree from metadata (Wok
+for example).
 
-Other features that were added: extension through generic event mechanism
-(inspired by [Pelican][pelican] and Wok); use of template engines other than
-Jinja; ignoring specified files in the content directory (e.g. Emacs backup
-files); flexible pagination.
+Other features that were added: extension through generic event mechanism (inspired by
+[Pelican][pelican] and Wok); use of template engines other than Jinja; ignoring specified files
+in the content directory (e.g. Emacs backup files); flexible pagination.
 
 [wok]: https://github.com/mythmon/wok
 [static]: https://www.staticgen.com/
@@ -59,8 +53,8 @@ with this command: `sudo pip install bass`.
 
 ### Dependencies
 
-All dependencies are available through pip. Although optional, you should at
-least install one of the following three tools:
+All dependencies are available through pip. Although optional, it is recommended that you install
+at least one of the following three tools:
 
 - *Markdown* (*Markdown2* is an alternative)
 - *Docutils*
@@ -84,44 +78,41 @@ If you install with pip, *Markdown2* will be installed automatically.
 Usage
 -----
 
-To use Bass, go to the project directory (the directory where the input files
-and generated site will be located), and run the command `bass -c` or `bass
---create`. This will create a basic directory structure and corresponding
-configuration file. You can change the names of the directories, provided you
-apply the changes in the configuration file as well.
+To use Bass, go to the project directory (the directory where the input files and generated site
+will be located), and run the command `bass -c` or `bass --create`. This will create a basic
+directory structure and corresponding configuration file. You can change the names of the
+directories, provided you apply the changes in the configuration file as well.
 
-Put your content in the input directory (default: `input`). Build the site with
+Put your content in the input directory (defined in the configuration). Build the site with
 `bass -b` or `bass --build`. If you want to see debugging information, use
 `bass -b -d` or `bass --build --debug`.
 
-If you add the option `-s` or `--serve`, Bass will generate the site as usual,
-and then start a simple web server on port 8080. This web server is intended
-solely for local testing of the site during the development phase.
+If you add the option `-s` or `--serve`, Bass will generate the site as usual, and then start a
+simple web server on port 8080. This web server is intended solely for local testing of the site
+during the development phase.
 
-If the Python package *WebOb* is installed, a slightly more advanced server
-(WSGI-based) is made available. This server checks for changes in the `input`
-and `layout` directories (see below) whenever a page is requested. If it
-detects a change in either of these directories, the site is regenerated before
-the page is returned. If the Python package *Waitress* is also installed, this
+If the Python package *WebOb* is installed, a slightly more advanced server (WSGI-based) is made
+available. This server checks for changes in the `input` and `layout` directories (see below)
+whenever a page is requested. If it detects a change in either of these directories, the site is
+regenerated before the page is returned. If the Python package *Waitress* is also installed, this
 WSGI-based server is replaced with a faster one.
 
 Configuration
 -------------
 
-Settings can be changed in the configuration file, which is in YAML
-format. This is the file `config` in the project directory.
-Settings are kept in the module `setting` of the Bass package.
+Settings can be changed in the configuration file, which is in YAML format. This is the file
+`config` in the project directory. Settings are kept in the module `setting` of the Bass package.
 
 Possible configuration options (and their defaults) are
 
+- `extension`    (none):      Python package with extensions, mostly event handlers
+- `follow_links` (`False`):   follow symbolic links while generating the site tree
+- `host`         (localhost): host the HTTP server runs on
 - `input`        (`input`):   directory of input files (pages and assets).
 - `ignore`       (`.?*`):     patterns of files and directories to be ignored.
-- `output`       (`output`):  directory of output files (the generated web site).
 - `layout`       (`layout`):  layout defined as a set of templates.
-- `follow_links` (`False`):   follow symbolic links while generating the site tree
-- `extension`    (none):      Python module(s) with extensions, mostly event handlers
+- `output`       (`output`):  directory of output files (the generated web site).
   (see paragraph [Events](#events) for more information).
-- `host`         (localhost): host the HTTP server runs on
 - `port`         (8080):      port the HTTP server runs on
 - `root_url`     (`/`):       root of the site tree
 
@@ -130,35 +121,31 @@ Creating a site
 
 ### Process
 
-Bass is a tree transformation engine - no more, no less! The creation of a
-static website from a set of input files takes place in three phases: (1)
-generation of the site tree, (2) transformation of the site tree, (3)
-rendering.  Generation is of the site tree is done bottom-up, and
-rendering of the site tree is done top-down.
+Bass is a tree transformation engine - no more, no less! The creation of a static website from a
+set of input files takes place in three phases: (1) generation of the site tree, (2)
+transformation of the site tree, (3) rendering.  Generation of the site tree is done bottom-up,
+and rendering of the site tree is done top-down.
 
 #### Generation phase
 
-The site tree is generated from the directories and files in the input
-directory (default: `input`). Directories and files are ignored if their names
-match one of the *ignore patterns*. Symbolic links are followed or ignored,
-depending on the configuration option `follow_links`. By default there is one
-ignore pattern: `.?*`. Additional ignore patterns can be defined in the
-configuration file (option `ignore`). For example:
+The site tree is generated from the directories and files in the input directory (see
+configuration). Symbolic links are followed or ignored, depending on the configuration option
+`follow_links`. Directories and files are ignored if their names match one of the *ignore
+patterns*. By default there is one ignore pattern: `.?*`. Additional ignore patterns can be
+defined in the configuration file (option `ignore`). For example:
 
     ignore: "*.bak *~"
 
 Note: the double quotes are required since `*` is a meta-character in YAML.
 
-The structure of the input directory, and the names of directories and files
-are considered to express the semantics of the site. The structure and names
-are maintained in the output directory (unless the user changes the site tree
-by using event handlers).
+The structure of the input directory, and the names of directories and files are considered to
+express the semantics of the site. The structure and names are maintained in the output directory
+(unless the user changes the site tree by means of event handlers).
 
-The site tree is generated in bottom-up fashion, i.e. the root node is
-created last. The site tree consists of three types of node: *Folder*,
-*Page*, *Asset*. The tree model was inspired by [StrangeCase][strangecase]. The
-details are explained below in the paragraphs [Content](#content) and [Tree
-model](#treemodel).
+The site tree is generated in bottom-up fashion, i.e. the root node is created last. The site
+tree consists of three types of node: *Folder*, *Page*, *Asset*. The tree model was inspired by
+[StrangeCase][strangecase]. The details are explained below in the paragraphs [Content](#content)
+and [Tree model](#treemodel).
 
 [strangecase]: https://github.com/colinta/StrangeCase
 
@@ -170,25 +157,23 @@ After a node is created, one or more events are sent, depending on the node type
     generate:post:page:extension:<extension>
     generate:post:asset:path:<path>
 
-See the paragraph [Events](#events) for an explanation of these events. Because
-the site tree is generate in bottom-up fashion, the event handlers for
-*generate:post:root* and *generate:post:folder* can use the fact that the
-children of the node are available (but not the parent or the siblings).
+See the paragraph [Events](#events) for an explanation of these events. Because the site tree is
+generated in bottom-up fashion, the event handlers for *generate:post:root* and
+*generate:post:folder* can use the fact that the children of the node are available (but not the
+parent or the siblings).
 
 #### Transformation phase
 
-Using *event handlers* the site tree can be transformed. This step is optional:
-if there are no event handler for the events `generate:post:root` and
-`render:pre:root`, there is no tree transformation of the whole tree.  Local
-tree transformations can be achieved by event handlers for *generate:post* or
-*render:pre* events of other nodes. See the paragraph [Events](#events) for an
-explanation of these events.
+By means of *event handlers* the site tree can be transformed. This step is optional: if there
+are no event handlers for the events `generate:post:root` and `render:pre:root`, there is no tree
+transformation of the whole tree.  Local tree transformations can be performed by event handlers
+for *generate:post* or *render:pre* events of other nodes. See the paragraph [Events](#events)
+for an explanation of these events.
 
 ###  Rendering phase
 
-Rendering means writing the site tree to the output directory (default:
-`output`). Rendering is defined as a series of actions, depending on the type
-of the node.
+Rendering means writing the site tree to the output directory (defined in the configuration).
+Rendering is defined as a series of actions, depending on the type of the node.
 
 * *Folder*: send pre-render event(s), create directory, render children,
   send post-render event(s)
@@ -198,69 +183,65 @@ of the node.
 * *Asset*: send pre-render event(s), copy file from input to output directory,
   send post-render event(s)
 
-This means that rendering is done top-down. For the root node no directory is
-created: the output directory is assumed to exist when you call `bass -b`.
+This means that rendering is done top-down. For the root node no directory is created: the output
+directory is assumed to exist when you call `bass -b`.
 
 ### Content
 
-All content of the site is in the input directory (default: `input`). Content consists of
-folders, pages and assets (the term *asset* was borrowed from [Jekyll][jekyll]). A directory is
-mapped to a folder in the site tree. A file is mapped to a page or an asset in the site tree.
-Loosely speaking, pages are text files with some form of markup, and assets are images, CSS
-files, Javascript modules and other files.
+All content of the site is in the input directory (defined in the configuration). Content
+consists of folders, pages and assets (the term *asset* was borrowed from [Jekyll][jekyll]). A
+directory is mapped to a folder in the site tree. A file is mapped to a page or an asset in the
+site tree. Loosely speaking, pages are text files with some form of markup, and assets are
+images, CSS files, Javascript modules and other files.
 
 [jekyll]: http://jekyllrb.com/
 
 At a technical level, a page is a file for which an event handler
-*generate:post:page:extension:abc* is defined, where the suffix or *page type* `abc`
-is the file extension minus the period.
-Bass defines such event handlers for plain text (suffix `txt`), HTML fragment (suffix
-`html`), Markdown (suffixes `md` and `mkd`), ReStructuredText (suffixn `rst`), and Textile
-(suffix `txi`). For Markdown, ReStructuredText and Textile the related Python packages need
-to be installed of course.
+*generate:post:page:extension:abc* is defined, where the suffix or *page type* `abc` is the file
+extension minus the period. Bass defines such event handlers for plain text (suffix `txt`), HTML
+fragment (suffix `html`), Markdown (suffixes `md` and `mkd`), ReStructuredText (suffixn `rst`),
+and Textile (suffix `txi`). For Markdown, ReStructuredText and Textile the related Python
+packages need to be installed of course.
 
-In other words: a file is mapped to a page if the extension of the file is in
-the list of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt',
-'html']`. All other files are mapped to an asset.
+In other words: a file is mapped to a page if the suffix of the file is in the list of page
+types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. All other files are mapped to an
+asset.
 
 The event handler for *generate:post:page:extension:abc* should perform the following tasks:
+
 - convert `node.content`, `node.preview` and `node.meta` (which are set by the node constructor) to HTML
 - set all elements of `node.meta` as attributes of the node
 - set `node.url`
 
 #### Pages
 
-The easiest way to write pages with formatting is to use lightweight markup
-languages such as [Markdown][mkd], [ReStructuredText][rst] and
-[Textile][txi]. Markdown is used with the extensions *definition list*,
-*footnotes* and *tables*.
+The easiest way to write pages with formatting is to use lightweight markup languages such as
+[Markdown][mkd], [ReStructuredText][rst] or [Textile][txi]. Markdown is used with the extensions
+ *definition list*, *footnotes* and *tables*.
 
-It is also possible to write pages in HTML and in plain text. HTML pages are
-not changed during the generation phase. Pages of plain text are converted to
-very basic HTML by adding paragraph tags: each sequence of two or more line
-breaks is treated as end of paragraph.
+It is also possible to write pages in HTML and in plain text. HTML pages are not changed during
+the generation phase. Pages of plain text are converted to very basic HTML by adding paragraph
+tags: each sequence of two or more line breaks is treated as end of paragraph.
 
 [mkd2]: https://github.com/trentm/python-markdown2
 [mkd]: http://daringfireball.net/projects/markdown/
 [rst]: http://docutils.sourceforge.net/rst.html
 [txi]: https://github.com/sebix/python-textile
 
-Each page may optionally can start with a metadata section in YAML
-form. Suppose there is a file named `index.mkd` in the input directory, with
-the following contents.
+Each page may optionally can start with a metadata section in YAML form. Suppose there is a file
+named `index.mkd` in the input directory, with the following contents.
 
     title: Home
     ---
     This is the home page. Add useful text here.
 
-This is a minimal Markdown page. The part above the divider `---` contains the
-metadata for the page. Below the `---` is the content of the page.  The
-metadata section is not required.
+This is a minimal Markdown page. The part above the divider `---` contains the metadata for the
+page. Below the `---` is the content of the page.  The metadata section is not required.
 
-The content itself can also contain a line with `---`. The part between the
-first and second divider is the preview, and the part below the second divider
-is the remainder of the page content. The preview part can be used on a front
-page, for example, with links to the complete page.
+The content itself can also contain a line with `---`. The part between the first and second
+divider is the preview, and the part below the second divider is the remainder of the page
+content. The preview part can be used on a front page, for example, with links to the complete
+page.
 
 The basic set of metadata is this.
 
@@ -275,47 +256,44 @@ The basic set of metadata is this.
   datetime can be derived from date and time, or vice versa
   (default: `ctime` of the file)
 
-Other metadata fields can be defined in the header of the page. All metadata
-fields are added as attributes of the *Page* node, and can be used in templates
-or events.
+Other metadata fields can be defined in the header of the page. All metadata fields are added as
+attributes of the *Page* node, and can be used in templates or events.
 
 #### Assets
 
-A file is mapped to an asset if the extension of the file is *not* in the list
-of page types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An asset
-is not changed during the generation phase.
+A file is mapped to an asset if the extension of the file is *not* in the list of page types,
+usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An asset is not changed during the
+generation phase.
 
 #### Folders
 
-A directory is mapped to a folder. A folder is not changed during the
-generation phase.
+A directory is mapped to a folder. A folder is not changed during the generation phase.
 
 ### Layout
 
-The layout of the site is created by templates, which are put in the layout
-directory (default: `layout`). This is a flat directory, i.e. sub-directories
-are not scanned. Bass uses [Chameleon][chameleon] templates to create HTML
-pages. This is a very flexible templating environment with control flow,
-filters, and other features. When a template is called, one argument is
-passed, namely the node to be rendered (`this`).
+The layout of the site is created by templates, which are placed in the layout directory (defined
+in the configuration). This is a flat directory, i.e. sub-directories are not scanned. Bass uses
+[Chameleon][chameleon] templates to create HTML pages. This is a very flexible templating
+environment with control flow, filters, and other features. When a template is called, one
+argument is passed, namely the node to be rendered (`this`).
 
-Chameleon templates are XML files in the template directory. The possible file
-extensions are `.xml` and `.pt`. Other files are ignored, unless additional
-template engines are defined. There should at least be a template `default`.
+Chameleon templates are XML files in the template directory. The possible file extensions are
+`.xml` and `.pt`. Other files are ignored, unless additional template engines are defined. There
+should at least be a template `default`.
 
-It is possible to use other template languages, e.g. [Mako][mako] or
-[Jinja][jinja]. Template factories for extra template languages can be defined
-in the extension modules by calling `add_template_type`. This is a convenience
-function that defines a template factory for a new file extension.  By default,
-there is one template factory: `chameleon.PageTemplateFile`. This is connected
-to the layout types `xml` and `pt`. Other template factories can be
-defined, provided they implement the following interface:
+It is possible to use other template languages, e.g. [Mako][mako] or [Jinja][jinja]. Template
+factories for extra template languages can be defined in the extension modules by calling
+`add_template_type`. This is a convenience function that defines a template factory for a new
+file extension.  By default, there is one template factory: `chameleon.PageTemplateFile`. This is
+connected to the layout types `xml` and `pt`. Other template factories can be defined, provided
+they implement the following interface:
 
     filename -> template: template = template_factory(filename)
     node     -> string: template.render(this=node) returns HTML page for node 'this'
                 (condition: node.skin should be equal to filename without extension)
 
-Template factories are stored in a dictionary `template_factory`, with the suffix as key.
+Template factories are stored in a dictionary `template_factory`, with the suffix
+(template type) as key.
 
 [chameleon]: https://github.com/malthe/chameleon
 [jinja]: http://jinja.pocoo.org/
@@ -386,17 +364,15 @@ Bass keeps global parameters in a separate module `setting`.
 
 ### Events
 
-An event is a signal that is emitted during the generation phase or the
-rendering phase. The event model was inspired by [Pelican][pelican] and
-[Wok][wok]. An event is handled by an event handler: a function (actually: a
-callable object) that is called when the event signal is given. If there is no
-handler for an event, the event signal is ignored.
+An event is a signal that is emitted during the generation phase or the rendering phase. The
+event model was inspired by [Pelican][pelican] and [Wok][wok]. An event is handled by an event
+handler: a function (actually: a callable object) that is called when the event signal is given.
+If there is no handler for an event, the event signal is ignored.
 
-There are three types of events: post-generate, pre-render and post-render
-events.  Events can be defined for all nodes in the tree. The node for which
-the event signal is emitted, is specified by its type and one of the following:
-(1) path, (2) extension, (3) identifier (*id*) attribute, (4) tag, (5)
-any. Below we give examples of each.
+There are three types of events: post-generate, pre-render and post-render events.  Events can be
+defined for all nodes in the tree. The node for which the event signal is emitted, is specified
+by its type and one of the following: (1) path, (2) extension, (3) identifier (*id*) attribute,
+(4) tag, (5) any. Below we give examples of each.
 
 1. path:       *generate:post:folder:path:articles*
 2. extension:  *generate:post:page:extension:mkd*, *render:post:asset:extension:js*
@@ -425,21 +401,19 @@ that are currently in use (*none* means that no details of the node are specifie
 Events for the root of the site tree are specified as *generate:post:root*,
 *render:pre:root*, and *render:post:root*.
 
-The post-generate event for the root node, *generate:post:root*, is called
-after generating the site tree, and can be used for global transformations of
-the tree. Please use your imagination, but don't break the site tree (well:
-it's your tree anyway).
+The post-generate event for the root node, *generate:post:root*, is called after generating the
+site tree, and can be used for global transformations of the tree. Please use your imagination,
+but don't break the site tree (well: it's your tree anyway).
 
-The post-render event, *render:post:root*, is the last event to be sent,
-after the root node and all its children have been rendered (see the paragraph
-[Rendering phase](#rendering) for more information).
-The handler for this event can therefore be used for uploading
-the generated site to another server, for example.
+The post-render event, *render:post:root*, is the last event to be sent, after the root node and
+all its children have been rendered (see the paragraph [Rendering phase](#rendering) for more
+information). The handler for this event can therefore be used for uploading the generated site
+to another server, for example.
 
 #### Extensions
 
-Extensions, mostly in the form of event handlers, are put in a Python package that
-is defined in the configuration file:
+Extensions, mostly in the form of event handlers, are put in a Python package that is defined in
+the configuration file:
 
     extension: package_name
 
@@ -447,10 +421,10 @@ Bass attempts to import the package `package_name`. This means that the project 
 contain a sub-directory `package_name`, which contain at least a file `__init__.py` and possibly
 other Python modules.
 
-The package should define zero or more event handlers, usually in the form of functions, but
-as always any callable object is acceptable. An event handler is called with one parameter,
-namely the node that emitted the event. During the import of the package, the event handlers should
-be assigned to an event by calling the function `add_handler`:
+The package should define zero or more event handlers, usually in the form of functions, but as
+always any callable object is acceptable. An event handler is called with one parameter, namely
+the node that emitted the event. During the import of the package, the event handlers should be
+assigned to an event by calling the function `add_handler`:
 
 ```python
 def upload_site(root):
@@ -458,12 +432,10 @@ def upload_site(root):
 add_handler('render:post:root', upload_site)
 ```
 
-If `add_handler` finds that there is already a built-in event handler for the
-given event, it combines the existing handler with the handler given as the
-second argument.
+If `add_handler` finds that there is already a built-in event handler for the given event, it
+combines the existing handler with the handler given as the second argument.
 
-There are also convenience functions `copy_handler` and `remove_handler` (see
-examples below).
+There are also convenience functions `copy_handler` and `remove_handler` (see examples below).
 
 #### Built-in event handlers
 
@@ -516,8 +488,8 @@ from bass import copy_handler
 copy_handler('generate:post:page:extension:rst', 'generate:post:page:extension:rest')
 ```
 
-If you do this, files with extension `.rest` are treated the same as files
-(pages) with extension `.rst`.
+If you do this, files with extension `.rest` are treated the same as files (pages) with extension
+`.rst`.
 
 Define extra template type:
 
@@ -527,6 +499,6 @@ from mako.template import Template
 add_template_type('mko', lambda name: Template(filename=name))
 ```
 
-This defines a new template factory for the extension `.mko`. Strictly speaking,
-this has nothing to do with event handling, but defining new template types is
-another form of extending the core functionality.
+This defines a new template factory for the extension `.mko`. Strictly speaking, this has nothing
+to do with event handling, but defining new template types is another form of extending the core
+functionality.

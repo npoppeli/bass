@@ -3,10 +3,9 @@ title: Home
 Bass
 ====
 
-Bass is a static website generator (Bass=Build A Static Site), written in
-Python 3. It turns a collection of content pages, assets (PNG, CSS, JS etc.)
-and templates into a static website, i.e. a website consisting only of
-directories, HTML pages and the same assets.
+Bass is a static website generator (Bass=Build A Static Site), written in Python 3. It turns a
+collection of content pages, assets (PNG, CSS, JS etc.) and templates into a static website, i.e.
+ a website consisting only of directories, HTML pages and the same assets.
 
 The design of Bass borrows ideas from various static site generators, e.g.
 [Wok][wok], [Pelican][pelican], [Jekyll][jekyll] and [Wintersmith][wintersmith].
