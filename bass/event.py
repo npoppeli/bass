@@ -201,4 +201,6 @@ def resolve_idref(node):
     def idref_replace(mo):
         catch = node.root().pages(idref=mo.group(2), deep=True)
         return "href={0}{1}{0}".format(mo.group(1), catch[0].url if catch else '#')
+
+    node.preview = idref_regex.sub(idref_replace, node.preview)
     node.content = idref_regex.sub(idref_replace, node.content)
