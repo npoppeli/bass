@@ -11,9 +11,9 @@ from os import listdir
 from os.path import join, splitext, isfile
 import sys
 
-# By default, there is one template factory: chameleon.PageTemplateFile. This is connected
-# to the file extensions '.xml' and '.pt'. Other template factories can be defined, provided
-# they implement the following interface:
+# By default, there is one template factory: chameleon.PageTemplateFile. This is associated
+# with the file extensions '.xml' and '.pt' (suffixes 'xml' and 'pt'). Other template
+# factories can be defined, provided they implement the following interface:
 #   - filename -> template: template = template_factory(filename)
 #   - node     -> string: template.render(this=node) returns HTML page for node 'this'
 #                 (condition: node.skin should be equal to filename without extension)

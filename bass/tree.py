@@ -17,7 +17,7 @@ class Node:
     """Node is the base class for Folder, Page and Asset
        Instance variables:
            - kind: type of node
-           - id: identifier of node (usually unique within tree)
+           - id: identifier of node (usually unique within the tree)
            - name: name of node (last part of path)
            - path: path of node
            - parent: parent node

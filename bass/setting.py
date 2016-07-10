@@ -4,16 +4,15 @@ bass.setting
 Global settings, shared by all modules.
 """
 
-version      = '1.0.0'
-project      = None
-template     = None
-# these settings will get a value from the configuration file
 extension    = None
 follow_links = None
+host         = None
 ignore       = None
 input        = None
-output       = None
 layout       = None
-host         = None
+output       = None
 port         = None
+project      = None
 root_url     = None
+template     = None
+version      = '1.0.0'

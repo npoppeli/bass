@@ -15,6 +15,7 @@ from .tree import Folder, Page, Asset
 from fnmatch import fnmatch
 from importlib import import_module
 from os import listdir, mkdir, unlink, walk
+# TODO: Python >=3.5 offers scandir as replacement for listdir
 from os.path import isdir, isfile, islink, join, relpath, splitext, split
 
 def create_project():
@@ -30,7 +31,7 @@ def create_project():
         sys.exit()
 
 def build_site():
-    """build site in current project directory"""
+    """build site in project directory"""
     read_config()
     verify_project()
     read_extension()
@@ -42,7 +43,7 @@ def build_site():
     root.render()
 
 def rebuild_site():
-    """rebuild site in current project directory"""
+    """rebuild site in project directory"""
     logger.info('Building modified site tree')
     root = generate_tree()
     prepare_output()
@@ -78,7 +79,8 @@ def prepare_output():
             shutil.rmtree(path)
 
 def ignore_entry(name_rel, dirname):
-    """True if 'name_rel' matches one of the ignore patterns or if 'name_rel' refers to a symbolic link"""
+    """True if 'name_rel' matches one of the ignore patterns or
+    if 'name_rel' refers to a symbolic link"""
     return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or \
            (not setting.follow_links and islink(join(dirname, name_rel)))
 
