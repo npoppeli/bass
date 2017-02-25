@@ -12,41 +12,41 @@ from os.path import join, splitext, isfile
 import sys
 
 # By default, there is one template factory: chameleon.PageTemplateFile. This is associated
-# with the file extensions '.xml' and '.pt' (suffixes 'xml' and 'pt'). Other template
-# factories can be defined, provided they implement the following interface:
+# with the file extensions '.xml' and '.pt'. Other template factories can be defined,
+# provided they implement the following interface:
 #   - filename -> template: template = template_factory(filename)
 #   - node     -> string: template.render(this=node) returns HTML page for node 'this'
 #                 (condition: node.skin should be equal to filename without extension)
-# Template factories are stored in a dictionary template_factory, with the suffix as key.
+# Template factories are stored in a dictionary template_factory, with the extension as key.
 
 template_factory = {}
 
-def add_template_type(suffix, factory):
+def add_template_type(extension, factory):
     """
-    add template factory for given suffix
-    :param suffix: file extension minus the period
-    :param factory: template factory (callable object)
+    add template factory for given extension
+    :param extension: file extension (.foo)
+    :param factory:   template factory (callable object)
     """
-    if suffix in template_factory:
-        logger.debug('Cannot redefine template type %s', suffix)
+    if extension in template_factory:
+        logger.debug('Cannot redefine template type %s', extension)
     else:
-        logger.debug('Define new template type %s', suffix)
-        template_factory[suffix] = factory
+        logger.debug('Define new template type %s', extension)
+        template_factory[extension] = factory
 
-def copy_template_type(from_suffix, to_suffix):
-    """copy existing template factory to another suffix"""
-    if to_suffix in template_factory:
-        logger.debug('Cannot redefine template type %s', to_suffix)
-    elif from_suffix in template_factory:
-        logger.debug('Template type %s copied from %s', to_suffix, from_suffix)
-        template_factory[to_suffix] = template_factory[from_suffix]
+def copy_template_type(from_extension, to_extension):
+    """copy existing template factory to another extension"""
+    if to_extension in template_factory:
+        logger.debug('Cannot redefine template type %s', to_extension)
+    elif from_extension in template_factory:
+        logger.debug('Template type %s copied from %s', to_extension, from_extension)
+        template_factory[to_extension] = template_factory[from_extension]
     else:
-        logger.debug('No template type %s', from_suffix)
+        logger.debug('No template type %s', from_extension)
 
 try:
     from chameleon import PageTemplateFile
-    add_template_type('xml', PageTemplateFile)
-    copy_template_type('xml', 'pt')
+    add_template_type('.xml', PageTemplateFile)
+    copy_template_type('.xml', '.pt')
 except ImportError:
     logger.critical('Chameleon template engine not available')
     sys.exit(1)
@@ -60,12 +60,11 @@ def read_templates():
     logger.debug('Template types: {0}'.format(' '.join(template_types)))
     for filename in listdir(setting.layout):
         (name, extension) = splitext(filename)
-        suffix = extension[1:]
         file_path = join(setting.layout, filename)
-        # all files (not symbolic links) with a recognized suffix are possible templates
-        if isfile(file_path) and suffix in template_types: # other files are ignored
+        # all files (not symbolic links) with a recognized extension are possible templates
+        if isfile(file_path) and extension in template_types: # other files are ignored
             try:
-                template[name] = template_factory[suffix](file_path)
+                template[name] = template_factory[extension](file_path)
             except Exception as e:
                 logger.debug('Error in template for {0} in file {1}'.format(name, filename))
                 logger.debug(str(e))
