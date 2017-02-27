@@ -63,7 +63,7 @@ try:
         """http_server: WSGI-based web server with same interface as in standard library"""
         static = DirectoryApp(setting.output, index_page=None)
         wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
-        logger.debug('Starting HTTP server on port %d', port)
+        logger.info('Starting HTTP server on port %d', port)
         serve(wrapped, host=host, port=port)
 
 except ImportError:
@@ -72,5 +72,5 @@ except ImportError:
         """http_server: basic web server based on standard library"""
         chdir(setting.output)
         httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
-        logger.debug('Starting HTTP server on port %d', port)
+        logger.info('Starting HTTP server on port %d', port)
         httpd.serve_forever()

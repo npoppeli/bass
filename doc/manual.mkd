@@ -197,15 +197,15 @@ images, CSS files, Javascript modules and other files.
 [jekyll]: http://jekyllrb.com/
 
 At a technical level, a page is a file for which an event handler
-*generate:post:page:extension:abc* is defined, where the suffix or *page type* `abc` is the file
-extension minus the period. Bass defines such event handlers for plain text (suffix `txt`), HTML
-fragment (suffix `html`), Markdown (suffixes `md` and `mkd`), ReStructuredText (suffixn `rst`),
-and Textile (suffix `txi`). For Markdown, ReStructuredText and Textile the related Python
-packages need to be installed of course.
+*generate:post:page:extension:abc* is defined, where `.abc` is the file extension. Bass defines
+such event handlers for plain text (extension `.txt`), HTML fragment (extension `.html`),
+Markdown (extensions `.md` and `.mkd`), ReStructuredText (extension `.rst`), and Textile
+(extension `.txi`). For Markdown, ReStructuredText and Textile the related Python packages need
+to be installed of of course.
 
-In other words: a file is mapped to a page if the suffix of the file is in the list of page
-types, usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. All other files are mapped to an
-asset.
+In other words: a file is mapped to a page if the extension of the file is in the list of page
+types, usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. All other files are mapped to
+an asset.
 
 The event handler for *generate:post:page:extension:abc* should perform the following tasks:
 
@@ -262,7 +262,7 @@ attributes of the *Page* node, and can be used in templates or events.
 #### Assets
 
 A file is mapped to an asset if the extension of the file is *not* in the list of page types,
-usually `['md', 'mkd', 'rst', 'txi', 'txt', 'html']`. An asset is not changed during the
+usually `['.md', '.mkd', '.rst', '.txi', '.txt', '.html']`. An asset is not changed during the
 generation phase.
 
 #### Folders
@@ -292,7 +292,7 @@ they implement the following interface:
     node     -> string: template.render(this=node) returns HTML page for node 'this'
                 (condition: node.skin should be equal to filename without extension)
 
-Template factories are stored in a dictionary `template_factory`, with the suffix
+Template factories are stored in a dictionary `template_factory`, with the extension
 (template type) as key.
 
 [chameleon]: https://github.com/malthe/chameleon

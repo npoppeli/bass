@@ -23,7 +23,7 @@ try:
         if have_pygments:
             extensions.append('fenced-code-blocks')
         return markdown2.markdown(text, extras=extensions)
-    converter['mkd'] = convert_md2
+    converter['.mkd'] = convert_md2
     have_markdown  = True
 except ImportError:
     have_markdown  = False
@@ -37,7 +37,7 @@ if not have_markdown:
                 extras.extend(['markdown.extensions.codehilite',
                                'markdown.extensions.fenced_code'])
             return markdown.markdown(text, extensions=extras)
-        converter['mkd'] = convert_mkd
+        converter['.mkd'] = convert_mkd
         have_markdown = True
     except ImportError:
         have_markdown = False
@@ -48,7 +48,7 @@ try:
     from docutils.writers.html4css1 import Writer
     def convert_rst(text):
         return docutils.core.publish_parts(text, writer=Writer())['body']
-    converter['rst'] = convert_rst
+    converter['.rst'] = convert_rst
     have_rest = True
 except ImportError:
     have_rest = False
@@ -58,7 +58,7 @@ try:
     import textile
     def convert_txi(text):
         return textile.textile(text)
-    converter['txi'] = convert_txi
+    converter['.txi'] = convert_txi
     have_textile = True
 except ImportError:
     have_textile = False
@@ -66,9 +66,9 @@ except ImportError:
 # HTML
 def convert_html(text):
     return text
-converter['html'] = convert_html
+converter['.html'] = convert_html
 
 # plain text
 def convert_txt(text):
     return '<p>' + re.sub(r'\n{2,}', '</p><p>', text) + '</p>'
-converter['txt'] = convert_txt
+converter['.txt'] = convert_txt

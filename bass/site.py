@@ -89,7 +89,7 @@ def generate_tree():
     logger.info('Ignore files/directories: %s', ' '.join(setting.ignore))
     logger.info('Follow symbolic links: %s', ('no','yes')[setting.follow_links])
     prefix = 'generate:post:page:extension:'
-    pagetypes = [key.replace(prefix, '') for key in event_handler.keys() if key.startswith(prefix)]
+    pagetypes = [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
     logger.info('Page types: %s', ' '.join(pagetypes))
     folder_queue = {}
     for dirpath, dirnames, filenames in walk(setting.input, topdown=False, followlinks=setting.follow_links):
@@ -108,8 +108,8 @@ def generate_tree():
             if ignore_entry(filename_rel, setting.input):
                 logger.debug("Ignore file %s", filename_rel)
                 continue
-            suffix = splitext(name)[1][1:]
-            this = (Page if suffix in pagetypes else Asset)(name, filename_rel, None)
+            extension = splitext(name)[1]
+            this = (Page if extension in pagetypes else Asset)(name, filename_rel, None)
             folder.add(this)
             this.ready()
         folder.ready()

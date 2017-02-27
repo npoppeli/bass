@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='bass',
-    version='1.0.0',
+    version='1.1.0',
     author='Nico Poppelier',
     author_email='n.poppelier@xs4all.nl',
     license='MIT',

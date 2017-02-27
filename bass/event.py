@@ -126,23 +126,23 @@ def fix_date_time(meta, ctime):
         meta['time']     = ctime.time()
 
 # define event handlers for the standard page types, depending on which Python packages are installed
-if 'mkd' in converter:
-    markdown_processor = Processor(converter['mkd'])
+if '.mkd' in converter:
+    markdown_processor = Processor(converter['.mkd'])
     add_handler('generate:post:page:extension:mkd', markdown_processor)
     copy_handler('generate:post:page:extension:mkd', 'generate:post:page:extension:md')
 
-if 'rst' in converter:
-    rest_processor = Processor(converter['rst'])
+if '.rst' in converter:
+    rest_processor = Processor(converter['.rst'])
     add_handler('generate:post:page:extension:rst', rest_processor)
 
-if 'txi' in converter:
-    textile_processor = Processor(converter['txi'])
+if '.txi' in converter:
+    textile_processor = Processor(converter['.txi'])
     add_handler('generate:post:page:extension:txi', textile_processor)
 
-html_processor = Processor(converter['html'])
+html_processor = Processor(converter['.html'])
 add_handler('generate:post:page:extension:html', html_processor)
 
-text_processor = Processor(converter['txt'])
+text_processor = Processor(converter['.txt'])
 add_handler('generate:post:page:extension:txt', text_processor)
 
 # auxiliary functions for extensions

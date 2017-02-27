@@ -50,7 +50,7 @@ class Node:
         node.parent = self
         self.children.append(node)
 
-    def root(self): # follow parent chain until you get None
+    def root(self): # follow parent chain until you get 'None'
         """find root of tree in which this node lives"""
         this = self
         while this.parent is not None:
