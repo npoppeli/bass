@@ -27,3 +27,4 @@ from .event   import add_toc, add_handler, copy_handler, remove_handler, resolve
 from .layout  import add_template_type, copy_template_type
 from .server  import http_server
 from .site    import build_site, create_project
+from .tree    import add_transformer
