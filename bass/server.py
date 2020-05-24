@@ -15,7 +15,7 @@ try:
     from webob import Request, Response
     from webob.static import DirectoryApp
 
-    class Monitor():
+    class Monitor:
         """class for generating WSGI middleware handler"""
         def __init__(self, app, checklist, callback):
             self.wrapped = app
@@ -31,7 +31,7 @@ try:
                     for f in filenames:
                         path = join(dirpath, f)
                         if datetime.fromtimestamp(getmtime(path)) > self.timestamp:
-                            logger.debug('%s has changed', path)
+                            logger.debug('{} has changed'.format(path))
                             return True
             return False
 
@@ -63,7 +63,7 @@ try:
         """http_server: WSGI-based web server with same interface as in standard library"""
         static = DirectoryApp(setting.output, index_page=None)
         wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
-        logger.info('Starting HTTP server on port %d', port)
+        logger.info('Starting HTTP server on port {}'.format(port))
         serve(wrapped, host=host, port=port)
 
 except ImportError:
@@ -72,5 +72,5 @@ except ImportError:
         """http_server: basic web server based on standard library"""
         chdir(setting.output)
         httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
-        logger.info('Starting HTTP server on port %d', port)
+        logger.info('Starting HTTP server on port {}'.format(port))
         httpd.serve_forever()

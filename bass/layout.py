@@ -28,20 +28,20 @@ def add_template_type(extension, factory):
     :param factory:   template factory (callable object)
     """
     if extension in template_factory:
-        logger.debug('Cannot redefine template type %s', extension)
+        logger.debug('Cannot redefine template type {}'.format(extension))
     else:
-        logger.debug('Define new template type %s', extension)
+        logger.debug('Define new template type {}'.format(extension))
         template_factory[extension] = factory
 
 def copy_template_type(from_extension, to_extension):
     """copy existing template factory to another extension"""
     if to_extension in template_factory:
-        logger.debug('Cannot redefine template type %s', to_extension)
+        logger.debug('Cannot redefine template type {}'.format(to_extension))
     elif from_extension in template_factory:
-        logger.debug('Template type %s copied from %s', to_extension, from_extension)
+        logger.debug('Template type {} copied from {}'.format(to_extension, from_extension))
         template_factory[to_extension] = template_factory[from_extension]
     else:
-        logger.debug('No template type %s', from_extension)
+        logger.debug('No template type {}', from_extension)
 
 try:
     from chameleon import PageTemplateFile
@@ -56,8 +56,8 @@ def read_templates():
     just before rendering the site tree and after the extensions have been imported."""
     template = {}
     template_types = list(template_factory.keys())
-    logger.debug('Scanning for templates in {0}'.format(setting.layout))
-    logger.debug('Template types: {0}'.format(' '.join(template_types)))
+    logger.debug('Scanning for templates in {}'.format(setting.layout))
+    logger.debug('Template types: {}'.format(' '.join(template_types)))
     for filename in listdir(setting.layout):
         (name, extension) = splitext(filename)
         file_path = join(setting.layout, filename)
@@ -66,7 +66,7 @@ def read_templates():
             try:
                 template[name] = template_factory[extension](file_path)
             except Exception as e:
-                logger.debug('Error in template for {0} in file {1}'.format(name, filename))
+                logger.debug('Error in template for {} in file {}'.format(name, filename))
                 logger.debug(str(e))
     if 'default' in template:
         setting.template = template

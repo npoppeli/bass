@@ -23,29 +23,29 @@ def add_handler(event, handler):
     """add handler for event"""
     if callable(handler):
         if event in event_handler:
-            logger.debug('Event handler for %s extended', event)
+            logger.debug('Event handler for {} extended'.format(event))
             event_handler[event] = combine(event_handler[event], handler)
         else:
-            logger.debug('New event handler for %s', event)
+            logger.debug('New event handler for {}'.format(event))
             event_handler[event] = handler
     else:
-        logger.debug('Event handler for %s is not a callable', event)
+        logger.debug('Event handler for {} is not a callable'.format(event))
 
 def copy_handler(from_event, to_event):
     """copy handler for event 'from_event' to event 'to_event'"""
     if from_event in event_handler:
-        logger.debug('Event handler for %s copied from %s', to_event, from_event)
+        logger.debug('Event handler for {} copied from {}'.format(to_event, from_event))
         event_handler[to_event] = event_handler[from_event]
     else:
-        logger.debug('No event handler for %s - cannot copy', from_event)
+        logger.debug('No event handler for {} - cannot copy'.format(from_event))
 
 def remove_handler(event):
     """remove handler for event 'event'"""
     if event in event_handler:
-        logger.debug('Event handler for %s removed', event)
+        logger.debug('Event handler for {} removed'.format(event))
         del event_handler[event]
     else:
-        logger.debug('No event handler for %s - cannot remove', event)
+        logger.debug('No event handler for {} - cannot remove'.format(event))
 
 def event(event, node):
     """call handler for event 'event'"""
@@ -165,8 +165,10 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     """
     # determine method for converting node to HTML fragment
     if callable(skin):
+        logger.debug('add_toc: skin is callable')
         func = skin
     elif isinstance(skin, str):
+        logger.debug('add_toc: skin is template')
         func = setting.template[skin].render
     else:
         logger.critical("Bad parameter 'skin' in function 'add_toc'")
@@ -176,8 +178,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     # create 'prev' and 'next' links
     page.prev, page.next = None, None
     previous = page
-    logger.debug('TOC main page name=%s path=%s', page.name, page.path)
-    logger.debug('TOC has %d parts', len(parts))
+    logger.debug('add_toc: main page name={} path={}, {} parts'.format(page.name, page.path, len(parts)))
     if len(parts) > 0:
         page.toc = '\n'.join(parts[0])
     else:
@@ -185,7 +186,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     if len(parts) > 1:
         for p, part in enumerate(parts[1:]):
             current = page.copy(sep+str(p+1))
-            logger.debug('subpage name=%s path=%s', current.name, current.path)
+            logger.debug('subpage name={} path={}'.format(current.name, current.path))
             current.toc = '\n'.join(part)
             page.add(current)
             previous.next = current

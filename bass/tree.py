@@ -5,12 +5,34 @@ Objects and functions related to the site tree.
 """
 
 import shutil, sys
-from copy import copy
+from copy import copy as shallow_copy
 from os import makedirs
 from os.path import join, splitext
 from . import setting
 from .common import read_file, read_yaml_string, write_file, logger
 from .event import event
+
+# available assets transformers
+transformer = {
+    '*': shutil.copy
+}
+
+# More complicated examples:
+# - browserify vue/dist/vue.runtime.common.js > bundle.js
+# - browserify axios/index.js > bundle.js
+# - coffee -t -p index.coffee|cs > index.js
+
+def add_transformer(extension, transform):
+    """add transformer for asset type (extension)"""
+    if callable(transform):
+        if extension in transformer:
+            # do not use 'combine', since transformations are not by definition commutable
+            logger.debug('Attempt to redefine transformer for {}'.format(extension))
+        else:
+            logger.debug('New transformer for {}'.format(extension))
+            transformer[extension] = transform
+    else:
+        logger.debug('Transformer for {} is not a callable'.format(extension))
 
 # node classes
 class Node:
@@ -116,7 +138,7 @@ class Folder(Node):
         if self.name != '': # root -> output directory, which already exists
             # render = create sub-directory 'self.path' in output directory
             dirpath = join(setting.output, setting.root_url[1:], self.path)
-            logger.debug("Creating directory %s", dirpath)
+            logger.debug("Creating directory {}".format(dirpath))
             makedirs(dirpath)
         for node in self.children:
             node.render()
@@ -136,7 +158,7 @@ class Page(Node):
 
     def copy(self, sep='_'):
         """create copy of page node, with its own name, path and URL, and empty children list"""
-        newpage = copy(self)
+        newpage = shallow_copy(self)
         newpage.children = []
         (page_name, suffix) = splitext(newpage.path)
         newpage.name += sep
@@ -153,22 +175,22 @@ class Page(Node):
     def render(self):
         """render Page node"""
         event('render:pre:page:any', self)
-        event('render:pre:page:path:'+self.path, self)
+        event('render:pre:page:name:' + self.name, self)
         if self.id: event('render:pre:page:id:'+self.id, self)
         for tag in self.tags: event('render:pre:page:tag:'+tag, self)
         # 'skin' attribute should be set by page processor
         if self.skin in setting.template:
             template = setting.template[self.skin]
         else:
-            logger.critical("Template '%s' for page %s not available.", self.skin, self.path)
+            logger.critical("Template '{}' for page {} not available.".format(self.skin, self.path))
             sys.exit(1)
         filepath = join(setting.output, self.url[1:])
-        logger.debug("Writing page %s", filepath)
+        logger.debug('Writing page {}'.format(filepath))
         write_file(template.render(this=self), filepath)
         for node in self.children: # (dynamically created) sub-pages
             node.render()
         event('render:post:page:any', self)
-        event('render:post:page:path:'+self.path, self)
+        event('render:post:page:name:' + self.name, self)
         if self.id: event('render:post:page:id:'+self.id, self)
         for tag in self.tags: event('render:post:page:tag:'+tag, self)
 
@@ -183,18 +205,19 @@ class Asset(Node):
     def ready(self):
         """asset is ready: send event(s)"""
         suffix = splitext(self.path)[1][1:]
-        event('generate:post:asset:path:'+self.path, self)
+        event('generate:post:asset:name:'+self.name, self)
         event('generate:post:asset:extension:'+suffix, self)
 
     def render(self):
         """render Asset node"""
         suffix = splitext(self.path)[1][1:]
-        event('render:pre:asset:path:'+self.path, self)
+        event('render:pre:asset:name:'+self.name, self)
         event('render:pre:asset:extension:'+suffix, self)
-        filepath = join(setting.output, setting.root_url[1:], self.path)
-        logger.debug("Writing asset %s", filepath)
-        shutil.copy(join(setting.input, self.path), filepath)
-        event('render:post:asset:path:'+self.path, self)
+        output_path = join(setting.output, setting.root_url[1:], self.path)
+        logger.debug('Writing asset {}'.format(output_path))
+        transform = transformer[suffix] if suffix in transformer else transformer['*']
+        transform(join(setting.input, self.path), output_path)
+        event('render:post:asset:name:'+self.name, self)
         event('render:post:asset:extension:'+suffix, self)
 
 def read_page(path):

@@ -70,7 +70,7 @@ def read_extension():
 
 def prepare_output():
     """clean output directory before rendering site tree"""
-    logger.debug('Clean output directory %s', setting.output)
+    logger.debug('Clean output directory {}'.format(setting.output))
     for name in [n for n in listdir(setting.output) if n[0] != '.']:
         path = join(setting.output, name)
         if isfile(path):
@@ -86,11 +86,11 @@ def ignore_entry(name_rel, dirname):
 
 def generate_tree():
     """generate site tree from files and directories in input directory"""
-    logger.info('Ignore files/directories: %s', ' '.join(setting.ignore))
-    logger.info('Follow symbolic links: %s', ('no','yes')[setting.follow_links])
+    logger.info('Ignore files/directories: {}'.format(' '.join(setting.ignore)))
+    logger.info('Follow symbolic links: {}'.format(('no','yes')[setting.follow_links]))
     prefix = 'generate:post:page:extension:'
     pagetypes = [key.replace(prefix, '.') for key in event_handler.keys() if key.startswith(prefix)]
-    logger.info('Page types: %s', ' '.join(pagetypes))
+    logger.info('Page types: {}'.format(' '.join(pagetypes)))
     folder_queue = {}
     for dirpath, dirnames, filenames in walk(setting.input, topdown=False, followlinks=setting.follow_links):
         dirpath_rel = relpath(dirpath, setting.input)
@@ -98,7 +98,7 @@ def generate_tree():
         if dirpath_rel == '.':
             dirpath_rel, folder_name = '', ''
         if ignore_entry(dirpath_rel, setting.input):
-            logger.debug("Ignore directory %s", dirpath_rel)
+            logger.debug("Ignore directory {}".format(dirpath_rel))
             continue
         folder = Folder(folder_name, dirpath_rel, None)
         for name in set(dirnames) & set(folder_queue.keys()):
@@ -106,7 +106,7 @@ def generate_tree():
         for name in filenames: # pages and assets; become children of this folder
             filename_rel = name if dirpath_rel == '.' else join(dirpath_rel, name)
             if ignore_entry(filename_rel, setting.input):
-                logger.debug("Ignore file %s", filename_rel)
+                logger.debug("Ignore file {}".format(filename_rel))
                 continue
             extension = splitext(name)[1]
             this = (Page if extension in pagetypes else Asset)(name, filename_rel, None)
