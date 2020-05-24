@@ -34,7 +34,11 @@ except ImportError:
 def read_file(filename):
     """read entire file, return content as one string"""
     with open(filename, 'rU') as f:
-        text = ''.join(f.readlines())
+        try:
+            text = ''.join(f.readlines())
+        except UnicodeError:
+            text = ''
+            logger.debug('Unicode error in file {}'.format(filename))
     return text
 
 def write_file(text, filename):
