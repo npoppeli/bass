@@ -6,6 +6,7 @@ Objects and functions related to markup of text pages.
 
 import re
 
+# available page converters
 converter = {}
 
 # Pygments
