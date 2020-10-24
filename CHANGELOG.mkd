@@ -2,7 +2,7 @@ Version 1.1.0
 -------------
 
 ### Other
--   API change: removed distinction between extension and suffix ('markup' and 'layout' modules)
+-   API changes: event option 'path' has been renamed to 'name'; added Asset transformers
 -   Updated README and manual.
 
 Version 1.0.0

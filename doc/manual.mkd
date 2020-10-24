@@ -152,10 +152,10 @@ and [Tree model](#treemodel).
 After a node is created, one or more events are sent, depending on the node type:
 
     generate:post:root
-    generate:post:folder:path:<path>
-    generate:post:page:path:<path>
+    generate:post:folder:name:<name>
+    generate:post:page:name:<name>
     generate:post:page:extension:<extension>
-    generate:post:asset:path:<path>
+    generate:post:asset:name:<name>
 
 See the paragraph [Events](#events) for an explanation of these events. Because the site tree is
 generated in bottom-up fashion, the event handlers for *generate:post:root* and
@@ -371,10 +371,10 @@ If there is no handler for an event, the event signal is ignored.
 
 There are three types of events: post-generate, pre-render and post-render events.  Events can be
 defined for all nodes in the tree. The node for which the event signal is emitted, is specified
-by its type and one of the following: (1) path, (2) extension, (3) identifier (*id*) attribute,
-(4) tag, (5) any. Below we give examples of each.
+by its type and one of the following: (1) name (last part of path), (2) extension,
+(3) identifier (*id*) attribute, (4) tag, (5) any. Below we give examples of each.
 
-1. path:       *generate:post:folder:path:articles*
+1. name:       *generate:post:folder:name:articles*
 2. extension:  *generate:post:page:extension:mkd*, *render:post:asset:extension:js*
 3. identifier: *render:pre:page:id:intro*
 4. tag:        *render:pre:page:tag:table*
@@ -383,7 +383,7 @@ by its type and one of the following: (1) path, (2) extension, (3) identifier (*
 The table below specifies the combinations of event type, node type and details
 that are currently in use (*none* means that no details of the node are specified).
 
-| event type    | node type | none | any | path | extension | id | tag  |
+| event type    | node type | none | any | name | extension | id | tag  |
 |---------------|-----------|:----:|:---:|:----:|:---------:|:--:|:----:|
 | generate:post | root      |  ✓   |     |      |           |    |      |
 |               | folder    |      |     |  ✓   |           |    |      |
@@ -456,7 +456,7 @@ Table of contents (paginated).
 from bass import add_toc, add_handler
 def photo_toc(this):
     add_toc(this, this.parent.folder('photo').children, skin='photo_entry', size=20)
-add_handler('render:pre:page:path:photo.mkd', photo_toc)
+add_handler('render:pre:page:name:photo.mkd', photo_toc)
 ```
 
 #### Post-generate events
