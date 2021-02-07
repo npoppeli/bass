@@ -38,7 +38,7 @@ def read_file(filename):
             text = ''.join(f.readlines())
         except UnicodeError:
             text = ''
-            logger.debug('Unicode error in file {}'.format(filename))
+            logger.debug(f'Unicode error in file {filename}')
     return text
 
 def write_file(text, filename):

@@ -23,29 +23,29 @@ def add_handler(event, handler):
     """add handler for event"""
     if callable(handler):
         if event in event_handler:
-            logger.debug('Event handler for {} extended'.format(event))
+            logger.debug(f'Event handler for {event} extended')
             event_handler[event] = combine(event_handler[event], handler)
         else:
-            logger.debug('New event handler for {}'.format(event))
+            logger.debug(f'New event handler for {event}')
             event_handler[event] = handler
     else:
-        logger.debug('Event handler for {} is not a callable'.format(event))
+        logger.debug(f'Event handler for {event} is not a callable')
 
 def copy_handler(from_event, to_event):
     """copy handler for event 'from_event' to event 'to_event'"""
     if from_event in event_handler:
-        logger.debug('Event handler for {} copied from {}'.format(to_event, from_event))
+        logger.debug(f'Event handler for {to_event} copied from {from_event}')
         event_handler[to_event] = event_handler[from_event]
     else:
-        logger.debug('No event handler for {} - cannot copy'.format(from_event))
+        logger.debug(f'No event handler for {from_event} - cannot copy')
 
 def remove_handler(event):
     """remove handler for event 'event'"""
     if event in event_handler:
-        logger.debug('Event handler for {} removed'.format(event))
+        logger.debug(f'Event handler for {event} removed')
         del event_handler[event]
     else:
-        logger.debug('No event handler for {} - cannot remove'.format(event))
+        logger.debug(f'No event handler for {event} - cannot remove')
 
 def event(event, node):
     """call handler for event 'event'"""

@@ -26,12 +26,12 @@ try:
         def changed(self):
             """return True if any file in one of the directories in self.checklist has changed
                since self.timestamp, otherwise False"""
-            for checkdir in self.checklist:
-                for (dirpath, _, filenames) in walk(checkdir):
+            for entry in self.checklist:
+                for (dirpath, _, filenames) in walk(entry):
                     for f in filenames:
                         path = join(dirpath, f)
                         if datetime.fromtimestamp(getmtime(path)) > self.timestamp:
-                            logger.debug('{} has changed'.format(path))
+                            logger.debug(f'File {path} has changed')
                             return True
             return False
 
@@ -63,7 +63,7 @@ try:
         """http_server: WSGI-based web server with same interface as in standard library"""
         static = DirectoryApp(setting.output, index_page=None)
         wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
-        logger.info('Starting HTTP server on port {}'.format(port))
+        logger.info(f'Starting HTTP server (+watcher) on port {port}')
         serve(wrapped, host=host, port=port)
 
 except ImportError:
@@ -72,5 +72,5 @@ except ImportError:
         """http_server: basic web server based on standard library"""
         chdir(setting.output)
         httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
-        logger.info('Starting HTTP server on port {}'.format(port))
+        logger.info(f'Starting HTTP server on port {port}')
         httpd.serve_forever()

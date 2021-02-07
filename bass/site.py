@@ -14,14 +14,13 @@ from .common import logger
 from .tree import Folder, Page, Asset
 from fnmatch import fnmatch
 from importlib import import_module
-from os import listdir, mkdir, unlink, walk
-# TODO: Python >=3.5 offers scandir as replacement for listdir
+from os import scandir, mkdir, unlink, walk
 from os.path import isdir, isfile, islink, join, relpath, splitext, split
 
 def create_project():
     """create new project directory, with default configuration"""
     logger.info('Creating project')
-    if len(listdir()) == 0:
+    if len(list(scandir())) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
         mkdir(config_default['input'])
         mkdir(config_default['output'])
@@ -54,24 +53,24 @@ def rebuild_site():
 def verify_project():
     """verify existence of directories specified in configuration"""
     if not (isdir(setting.input) and isdir(setting.output) and isdir(setting.layout)):
-        logger.critical("Directories missing in project")
+        logger.critical('Directories missing in project')
         sys.exit(1)
 
 def read_extension():
     """read extension(s) from package specified in configuration file"""
     if setting.extension and isdir(join(setting.project, setting.extension)):
         try:
-            logger.debug("Adding project directory {} to Python path".format(setting.project))
+            logger.debug(f'Adding project directory {setting.project} to Python path')
             sys.path.insert(0, setting.project)
-            logger.debug("Importing package {}".format(setting.extension))
+            logger.debug(f'Importing package {setting.extension}')
             module = import_module(setting.extension)
         except ImportError:
-            logger.debug("Extension directory {} is not a Python package".format(setting.extension))
+            logger.debug(f'Extension directory {setting.extension} is not a Python package')
 
 def prepare_output():
     """clean output directory before rendering site tree"""
-    logger.debug('Clean output directory {}'.format(setting.output))
-    for name in [n for n in listdir(setting.output) if n[0] != '.']:
+    logger.debug(f'Clean output directory {setting.output}')
+    for name in [n for n in scandir(setting.output) if n.name != '.']:
         path = join(setting.output, name)
         if isfile(path):
             unlink(path)
@@ -98,7 +97,7 @@ def generate_tree():
         if dirpath_rel == '.':
             dirpath_rel, folder_name = '', ''
         if ignore_entry(dirpath_rel, setting.input):
-            logger.debug("Ignore directory {}".format(dirpath_rel))
+            logger.debug(f'Ignore directory {dirpath_rel}')
             continue
         folder = Folder(folder_name, dirpath_rel, None)
         for name in set(dirnames) & set(folder_queue.keys()):
@@ -106,7 +105,7 @@ def generate_tree():
         for name in filenames: # pages and assets; become children of this folder
             filename_rel = name if dirpath_rel == '.' else join(dirpath_rel, name)
             if ignore_entry(filename_rel, setting.input):
-                logger.debug("Ignore file {}".format(filename_rel))
+                logger.debug(f'Ignore file {filename_rel}')
                 continue
             extension = splitext(name)[1]
             this = (Page if extension in pagetypes else Asset)(name, filename_rel, None)

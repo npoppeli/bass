@@ -28,20 +28,20 @@ def add_template_type(extension, factory):
     :param factory:   template factory (callable object)
     """
     if extension in template_factory:
-        logger.debug('Cannot redefine template type {}'.format(extension))
+        logger.debug(f'Cannot redefine template type {extension}')
     else:
-        logger.debug('Define new template type {}'.format(extension))
+        logger.debug(f'Define new template type {extension}')
         template_factory[extension] = factory
 
 def copy_template_type(from_extension, to_extension):
     """copy existing template factory to another extension"""
     if to_extension in template_factory:
-        logger.debug('Cannot redefine template type {}'.format(to_extension))
+        logger.debug(f'Cannot redefine template type {to_extension}')
     elif from_extension in template_factory:
-        logger.debug('Template type {} copied from {}'.format(to_extension, from_extension))
+        logger.debug(f'Template type {to_extension} copied from {from_extension}')
         template_factory[to_extension] = template_factory[from_extension]
     else:
-        logger.debug('No template type {}', from_extension)
+        logger.debug(f'No template type {from_extension}')
 
 try:
     from chameleon import PageTemplateFile
@@ -66,7 +66,7 @@ def read_templates():
             try:
                 template[name] = template_factory[extension](file_path)
             except Exception as e:
-                logger.debug('Error in template for {} in file {}'.format(name, filename))
+                logger.debug(f'Error in template for {name} in file {filename}')
                 logger.debug(str(e))
     if 'default' in template:
         setting.template = template
