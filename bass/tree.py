@@ -136,7 +136,7 @@ class Folder(Node):
         """render folder"""
         event('render:pre:root' if self.name == '' else 'render:pre:folder:path:'+self.path, self)
         if self.name != '': # root -> output directory, which already exists
-            # render = create sub-directory 'self.path' in output directory
+            # rendering a folder means: create sub-directory 'self.path' in output directory
             dirpath = join(setting.output, setting.root_url[1:], self.path)
             logger.debug(f"Creating directory {dirpath}")
             makedirs(dirpath)
