@@ -76,7 +76,7 @@ class Processor:
 
 def complete_meta(meta, path):
     """complete metadata for node with given path"""
-    # title: if missing, create one from path
+    # title: if this is missing, create one from path
     if 'title' not in meta:
         title = splitext(basename(path))[0]
         meta['title'] = title.replace('-', ' ').replace('_', ' ').capitalize()
@@ -178,7 +178,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     # create 'prev' and 'next' links
     page.prev, page.next = None, None
     previous = page
-    logger.debug('add_toc: main page name={} path={}, {} parts'.format(page.name, page.path, len(parts)))
+    logger.debug(f'add_toc: main page name={page.name} path={page.path}, {len(parts)} parts')
     if len(parts) > 0:
         page.toc = '\n'.join(parts[0])
     else:
@@ -186,7 +186,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
     if len(parts) > 1:
         for p, part in enumerate(parts[1:]):
             current = page.copy(sep+str(p+1))
-            logger.debug('subpage name={} path={}'.format(current.name, current.path))
+            logger.debug(f'subpage name={current.name} path={current.path}')
             current.toc = '\n'.join(part)
             page.add(current)
             previous.next = current

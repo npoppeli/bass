@@ -27,12 +27,12 @@ def add_transformer(extension, transform):
     if callable(transform):
         if extension in transformer:
             # do not use 'combine', since transformations are not by definition commutable
-            logger.debug('Attempt to redefine transformer for {}'.format(extension))
+            logger.debug(f'Attempt to redefine transformer for {extension}')
         else:
-            logger.debug('New transformer for {}'.format(extension))
+            logger.debug(f'New transformer for {extension}')
             transformer[extension] = transform
     else:
-        logger.debug('Transformer for {} is not a callable'.format(extension))
+        logger.debug(f'Transformer for {extension} is not a callable')
 
 # node classes
 class Node:
@@ -138,7 +138,7 @@ class Folder(Node):
         if self.name != '': # root -> output directory, which already exists
             # render = create sub-directory 'self.path' in output directory
             dirpath = join(setting.output, setting.root_url[1:], self.path)
-            logger.debug("Creating directory {}".format(dirpath))
+            logger.debug(f"Creating directory {dirpath}")
             makedirs(dirpath)
         for node in self.children:
             node.render()
@@ -163,7 +163,7 @@ class Page(Node):
         (page_name, suffix) = splitext(newpage.path)
         newpage.name += sep
         newpage.path = page_name + sep + suffix
-        newpage.url = '{0}{1}{2}.html'.format(setting.root_url, page_name, sep)
+        newpage.url = f'{setting.root_url}{page_name}{sep}.html'
         return newpage
 
     def ready(self):
@@ -182,7 +182,7 @@ class Page(Node):
         if self.skin in setting.template:
             template = setting.template[self.skin]
         else:
-            logger.critical("Template '{}' for page {} not available.".format(self.skin, self.path))
+            logger.critical(f"Template '{self.skin}' for page {self.path} not available.")
             sys.exit(1)
         filepath = join(setting.output, self.url[1:])
         logger.debug('Writing page {}'.format(filepath))
@@ -214,7 +214,7 @@ class Asset(Node):
         event('render:pre:asset:name:'+self.name, self)
         event('render:pre:asset:extension:'+suffix, self)
         output_path = join(setting.output, setting.root_url[1:], self.path)
-        logger.debug('Writing asset {}'.format(output_path))
+        logger.debug(f'Writing asset {output_path}')
         transform = transformer[suffix] if suffix in transformer else transformer['*']
         transform(join(setting.input, self.path), output_path)
         event('render:post:asset:name:'+self.name, self)

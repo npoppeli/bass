@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='bass',
-    version='1.2.0',
+    version='1.3.0',
     author='Nico Poppelier',
     author_email='n.poppelier@xs4all.nl',
     license='MIT',
@@ -26,9 +26,9 @@ setup(
         'Programming Language :: Python :: 3.8'
     ],
     install_requires=[
-        'Chameleon>=2.10',
-        'markdown2>=2.0.0',
-        'PyYAML>=3.10'
+        'chameleon>=3.0',
+        'markdown2>=2.3.0',
+        'pyyaml>=5.1'
     ],
     packages=['bass'],
     scripts=['script/bass'],

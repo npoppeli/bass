@@ -35,8 +35,7 @@ if not have_markdown:
         def convert_mkd(text):
             extras = ['markdown.extensions.tables']
             if have_pygments:
-                extras.extend(['markdown.extensions.codehilite',
-                               'markdown.extensions.fenced_code'])
+                extras.extend(['markdown.extensions.codehilite', 'markdown.extensions.fenced_code'])
             return markdown.markdown(text, extensions=extras)
         converter['.mkd'] = convert_mkd
         have_markdown = True
