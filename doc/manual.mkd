@@ -20,7 +20,7 @@ with it, and also looked at alternatives. During that year I noticed several dra
 to the development of Bass.
 
 The most important feature of Bass is that it gives the user complete freedom in organizing the
-input directory, treas this organization as meaningful, and therefore preserves it in the site
+input directory, treats this organization as meaningful, and therefore preserves it in the site
 tree.  With organization of the input directory I mean: (1) the structure of the tree of files
 and sub-directories in the input directory, and (2) the names of files and sub-directories. This
 concept was borrowed from [Wintersmith][wintersmith]. Other static site generators are designed
