@@ -1,10 +1,5 @@
 general
 -------
-add file 'requirements.txt' (minimum: pip, wheel, twine)
-publish on PyPI with twine
-pip install -r requirements.txt
-python setup.py sdist bdist_wheel
-twine upload dist/[new files]
 
 Improve doc strings:
 

@@ -1,0 +1,31 @@
+[project]
+name = "bass"
+version = "1.3.0"
+authors = [
+  { name='Nico Poppelier', email='n.poppelier@xs4all.nl' },
+]
+description = "Static site generator"
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    'chameleon>=3.0',
+    'markdown2>=2.3.0',
+    'pyyaml>=5.1'
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    'Operating System :: POSIX',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10'
+]
+
+[project.urls]
+Homepage   = "http://schier7.home.xs4all.nl/bass"
+Repository = "https://github.com/npoppeli/bass"
+Issues     = "https://github.com/npoppeli/bass/issues"
