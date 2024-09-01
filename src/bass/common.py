@@ -9,11 +9,13 @@ Logging levels are DEBUG, INFO, WARNING, ERROR, CRITICAL.
 Bass uses logging level INFO by default, and DEBUG if called with --debug.
 
 Basic (no webob, no waitress):
+Create new logger object 'bass'.
 
 Webob available:
+Create new logger object 'bass'.
 
 Webob and Waitress available:
-Waitress uses a logger object named 'waitress', and sets the logging level to WARNING.
+Use the logger object of Waitress, called 'waitress'.
 """
 
 import logging
@@ -31,28 +33,54 @@ try:
 except ImportError:
     from yaml import Loader
 
-def read_file(filename):
-    """read entire file, return content as one string"""
-    with open(filename, 'rU') as f:
+def read_file(path: str) -> str:
+    """Read entire file, return content as one string.
+    
+    Arguments:
+        path (str): path to file to read
+
+    Returns:
+        text (str): content of file
+    """
+    with open(path, 'rU') as f:
         try:
             text = ''.join(f.readlines())
         except UnicodeError:
             text = ''
-            logger.debug(f'Unicode error in file {filename}')
+            logger.debug(f'Unicode error in file {path}')
     return text
 
-def write_file(text, filename):
-    """write text to file"""
-    with open(filename, 'w') as f:
+def write_file(text: str, path: str) -> None:
+    """Write text to file.
+    
+    Arguments:
+        text (str): content of file to be written
+        path (str): path to file to write
+    """
+    with open(path, 'w') as f:
         f.write(text)
 
-def read_yaml_file(path):
-    """read file, return YAML content as dictionary"""
+def read_yaml_file(path: str) -> dict:
+    """Read file, return YAML content as dictionary.
+    
+        Arguments:
+        path (str): path to file to read
+
+    Returns:
+        text (dict): content of file
+    """
     with open(path, 'r') as f:
         result = load(f, Loader=Loader)
     return result
 
-def read_yaml_string(string):
-    """read string, return YAML content as dictionary"""
+def read_yaml_string(string: str) -> dict: 
+    """Read string, return YAML content as dictionary.
+
+    Arguments:
+        string (str): string in YAML format
+
+    Returns:
+        text (dict): content of string
+    """
     result = load(string, Loader=Loader)
     return result

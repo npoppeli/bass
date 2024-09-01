@@ -3,6 +3,14 @@ bass.layout
 -----
 Objects and functions related to the layout of the rendered pages.
 Chameleon is the primary template engine. Other template engines can be added.
+
+By default, there is one template factory: chameleon.PageTemplateFile. This is associated
+with the file extensions '.xml' and '.pt'. Other template factories can be defined,
+provided they implement the following interface:
+  - filename -> template: template = template_factory(filename)
+  - node     -> string: template.render(this=node) returns HTML page for node 'this'
+                (condition: node.skin should be equal to filename without extension)
+Template factories are stored in a dictionary template_factory, with the extension as key.
 """
 
 from . import setting
@@ -10,22 +18,17 @@ from .common import logger
 from os import listdir
 from os.path import join, splitext, isfile
 import sys
-
-# By default, there is one template factory: chameleon.PageTemplateFile. This is associated
-# with the file extensions '.xml' and '.pt'. Other template factories can be defined,
-# provided they implement the following interface:
-#   - filename -> template: template = template_factory(filename)
-#   - node     -> string: template.render(this=node) returns HTML page for node 'this'
-#                 (condition: node.skin should be equal to filename without extension)
-# Template factories are stored in a dictionary template_factory, with the extension as key.
+from typing import Callable
 
 template_factory = {}
 
-def add_template_type(extension, factory):
+def add_template_type(extension: str, factory: Callable) -> None:
     """
-    add template factory for given extension
-    :param extension: file extension (.foo)
-    :param factory:   template factory (callable object)
+    Add template factory for given extension.
+
+    Arguments:
+        extension: file extension (.foo)
+        factory:   template factory (callable object)
     """
     if extension in template_factory:
         logger.debug(f'Cannot redefine template type {extension}')
@@ -33,8 +36,13 @@ def add_template_type(extension, factory):
         logger.debug(f'Define new template type {extension}')
         template_factory[extension] = factory
 
-def copy_template_type(from_extension, to_extension):
-    """copy existing template factory to another extension"""
+def copy_template_type(from_extension: str, to_extension: str) -> None:
+    """Copy existing template factory to another extension.
+
+    Arguments:
+        from_extension: file extension (.foo)
+        to_extension  : file extension (.bar)
+    """
     if to_extension in template_factory:
         logger.debug(f'Cannot redefine template type {to_extension}')
     elif from_extension in template_factory:
@@ -53,7 +61,8 @@ except ImportError:
 
 def read_templates():
     """Read templates from layout directory. This function should be called
-    just before rendering the site tree and after the extensions have been imported."""
+    just before rendering the site tree and after the extensions have been imported.
+    """
     template = {}
     template_types = list(template_factory.keys())
     logger.debug('Scanning for templates in {}'.format(setting.layout))

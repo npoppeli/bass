@@ -2,6 +2,9 @@
 bass.markup
 -----
 Objects and functions related to markup of text pages.
+
+On module initialization, the dictionary 'converter' is populated with available markup
+converters, depending on which external packages are available.
 """
 
 import re

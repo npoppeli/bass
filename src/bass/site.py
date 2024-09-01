@@ -4,21 +4,22 @@ bass.site
 Objects and functions related to site structure and site generation.
 """
 
-import shutil, sys, yaml
+import os, shutil, sys, yaml
 from . import setting
 from .common import write_file
 from .config import config_default, read_config
 from .event import event_handler
 from .layout import read_templates
 from .common import logger
-from .tree import Folder, Page, Asset
+from .tree import Folder, Page, Asset, add_transformer
 from fnmatch import fnmatch
 from importlib import import_module
 from os import scandir, mkdir, unlink, walk
 from os.path import isdir, isfile, islink, join, relpath, splitext, split
 
 def create_project():
-    """create new project directory, with default configuration"""
+    """Create new project directory, with default configuration.
+"""
     logger.info('Creating project')
     if len(list(scandir())) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
@@ -27,13 +28,16 @@ def create_project():
         mkdir(config_default['layout'])
     else:
         logger.warning('Current directory not empty')
-        sys.exit()
+        sys.exit(1)
 
 def build_site():
-    """build site in project directory"""
+    """Build site in project directory.
+    """
     read_config()
     verify_project()
     read_extension()
+    if setting.hard_links:
+        add_transformer('*', os.link)
     logger.info('Building site tree')
     root = generate_tree()
     prepare_output()
@@ -42,7 +46,8 @@ def build_site():
     root.render()
 
 def rebuild_site():
-    """rebuild site in project directory"""
+    """Rebuild site in project directory.
+    """
     logger.info('Building modified site tree')
     root = generate_tree()
     prepare_output()
@@ -51,13 +56,15 @@ def rebuild_site():
     root.render()
 
 def verify_project():
-    """verify existence of directories specified in configuration"""
+    """Verify existence of directories specified in configuration.
+    """
     if not (isdir(setting.input) and isdir(setting.output) and isdir(setting.layout)):
         logger.critical('Directories missing in project')
         sys.exit(1)
 
 def read_extension():
-    """read extension(s) from package specified in configuration file"""
+    """Read extension(s) from package specified in configuration file.
+    """
     if setting.extension and isdir(join(setting.project, setting.extension)):
         try:
             logger.debug(f'Adding project directory {setting.project} to Python path')
@@ -68,7 +75,8 @@ def read_extension():
             logger.debug(f'Extension directory {setting.extension} is not a Python package')
 
 def prepare_output():
-    """clean output directory before rendering site tree"""
+    """Clean output directory before rendering site tree.
+    """
     logger.debug(f'Clean output directory {setting.output}')
     for name in [n for n in scandir(setting.output) if n.name != '.']:
         path = join(setting.output, name)
@@ -77,14 +85,23 @@ def prepare_output():
         else:
             shutil.rmtree(path)
 
-def ignore_entry(name_rel, dirname):
-    """True if 'name_rel' matches one of the ignore patterns or
-    if 'name_rel' refers to a symbolic link"""
+def ignore_entry(name_rel: str, dirname: str) -> bool:
+    """Determine if file 'name_rel' can be ignored.
+
+    Arguments:
+        name_rel (str): relative path of file
+        dirname (str): path to directory
+
+    Returns:
+        Returns True if 'name_rel' matches one of the ignore patterns or
+        if 'name_rel' refers to a symbolic link.
+    """
     return any([fnmatch(name_rel, pattern) for pattern in setting.ignore]) or \
-           (not setting.follow_links and islink(join(dirname, name_rel)))
+           not (setting.follow_links or not islink(join(dirname, name_rel)))
 
 def generate_tree():
-    """generate site tree from files and directories in input directory"""
+    """Generate site tree from files and directories in input directory.
+    """
     logger.info('Ignore files/directories: {}'.format(' '.join(setting.ignore)))
     logger.info('Follow symbolic links: {}'.format(('no','yes')[setting.follow_links]))
     prefix = 'generate:post:page:extension:'
@@ -113,5 +130,5 @@ def generate_tree():
             this.ready()
         folder.ready()
         folder_queue[folder_name] = folder
-    # by definition: folder with name = '' is the root of the site tree
+    # By definition: the root of the site tree is a folder with name = ''
     return folder_queue['']
