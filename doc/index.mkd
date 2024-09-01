@@ -38,8 +38,3 @@ You can do that with pip:
 $ sudo pip install bass
 
 This will install Bass and the required dependencies.
-
-You can also download gzip-ped tar archives here:
-
-- [version 1.3.0](/bass/download/bass-1.3.0.tar.gz) (latest version)
-- [version 1.0.0](/bass/download/bass-1.0.0.tar.gz) (previous version)
