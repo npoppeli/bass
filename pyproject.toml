@@ -1,6 +1,8 @@
+metadata-version = "2.1"
+
 [project]
 name = "bass"
-version = "1.3.0"
+version = "1.4.0"
 authors = [
   { name='Nico Poppelier', email='n.poppelier@xs4all.nl' },
 ]
