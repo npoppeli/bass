@@ -23,8 +23,7 @@ from typing import Callable
 template_factory = {}
 
 def add_template_type(extension: str, factory: Callable) -> None:
-    """
-    Add template factory for given extension.
+    """Add template factory for given extension.
 
     Arguments:
         extension: file extension (.foo)
@@ -61,7 +60,7 @@ except ImportError:
 
 def read_templates():
     """Read templates from layout directory. This function should be called
-    just before rendering the site tree and after the extensions have been imported.
+       just before rendering the site tree and after the extensions have been imported.
     """
     template = {}
     template_types = list(template_factory.keys())

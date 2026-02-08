@@ -16,7 +16,7 @@ try:
     from webob.static import DirectoryApp
 
     class Monitor:
-        """class for generating WSGI middleware handler"""
+        """class for generating WSGI middleware handler."""
         def __init__(self, app, checklist, callback):
             self.wrapped = app
             self.timestamp = datetime.now()
@@ -25,7 +25,7 @@ try:
 
         def changed(self):
             """return True if any file in one of the directories in self.checklist has changed
-               since self.timestamp, otherwise False"""
+               since self.timestamp, otherwise False."""
             for entry in self.checklist:
                 for (dirpath, _, filenames) in walk(entry):
                     for f in filenames:
@@ -36,7 +36,7 @@ try:
             return False
 
         def __call__(self, environ, start_response):
-            """this __call__ method turns an instance into a WSGI middleware handler"""
+            """this __call__ method turns an instance into a WSGI middleware handler."""
             request = Request(environ)
             # check for modifications every time a page (not an asset) is requested
             if request.path.endswith('.html') and self.changed():
@@ -51,12 +51,12 @@ try:
     except ImportError:
         from wsgiref.simple_server import make_server
         def serve(app, host, port):
-            """serve: WSGI server with same interface as waitress.serve"""
+            """serve: WSGI server with same interface as waitress.serve."""
             server = make_server(host, port, app)
             server.serve_forever()
 
     def http_server(host, port):
-        """http_server: WSGI-based web server with same interface as in standard library"""
+        """http_server: WSGI-based web server with same interface as in standard library."""
         static = DirectoryApp(setting.output, index_page=None)
         wrapped = Monitor(static, checklist=[setting.input, setting.layout], callback=rebuild_site)
         logger.info(f'Starting HTTP server (+watcher) on port {port}')
@@ -65,7 +65,7 @@ try:
 except ImportError:
     from http.server import HTTPServer, SimpleHTTPRequestHandler
     def http_server(host, port):
-        """http_server: basic web server based on standard library"""
+        """http_server: basic web server based on standard library."""
         chdir(setting.output)
         httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
         logger.info(f'Starting HTTP server on port {port}')

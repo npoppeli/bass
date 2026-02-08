@@ -1,14 +1,3 @@
-general
+General
 -------
-
-Improve doc strings:
-
-    """Decode string in JSON form to dictionary.
-
-    Arguments:
-        s (str): string in JSON form
-
-    Returns:
-        list|dict: JSON document
-    """
-
+Add option to use hard links instead of file copies for assets.

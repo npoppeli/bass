@@ -18,8 +18,7 @@ from os import scandir, mkdir, unlink, walk
 from os.path import isdir, isfile, islink, join, relpath, splitext, split
 
 def create_project():
-    """Create new project directory, with default configuration.
-"""
+    """Create new project directory, with default configuration."""
     logger.info('Creating project')
     if len(list(scandir())) == 0:
         write_file(yaml.dump(config_default, default_flow_style=False), 'config')
@@ -31,8 +30,7 @@ def create_project():
         sys.exit(1)
 
 def build_site():
-    """Build site in project directory.
-    """
+    """Build site in project directory."""
     read_config()
     verify_project()
     read_extension()
@@ -46,8 +44,7 @@ def build_site():
     root.render()
 
 def rebuild_site():
-    """Rebuild site in project directory.
-    """
+    """Rebuild site in project directory."""
     logger.info('Building modified site tree')
     root = generate_tree()
     prepare_output()
@@ -56,15 +53,13 @@ def rebuild_site():
     root.render()
 
 def verify_project():
-    """Verify existence of directories specified in configuration.
-    """
+    """Verify existence of directories specified in configuration."""
     if not (isdir(setting.input) and isdir(setting.output) and isdir(setting.layout)):
         logger.critical('Directories missing in project')
         sys.exit(1)
 
 def read_extension():
-    """Read extension(s) from package specified in configuration file.
-    """
+    """Read extension(s) from package specified in configuration file."""
     if setting.extension and isdir(join(setting.project, setting.extension)):
         try:
             logger.debug(f'Adding project directory {setting.project} to Python path')
@@ -75,8 +70,7 @@ def read_extension():
             logger.debug(f'Extension directory {setting.extension} is not a Python package')
 
 def prepare_output():
-    """Clean output directory before rendering site tree.
-    """
+    """Clean output directory before rendering site tree."""
     logger.debug(f'Clean output directory {setting.output}')
     for name in [n for n in scandir(setting.output) if n.name != '.']:
         path = join(setting.output, name)
@@ -100,8 +94,7 @@ def ignore_entry(name_rel: str, dirname: str) -> bool:
            not (setting.follow_links or not islink(join(dirname, name_rel)))
 
 def generate_tree():
-    """Generate site tree from files and directories in input directory.
-    """
+    """Generate site tree from files and directories in input directory."""
     logger.info('Ignore files/directories: {}'.format(' '.join(setting.ignore)))
     logger.info('Follow symbolic links: {}'.format(('no','yes')[setting.follow_links]))
     prefix = 'generate:post:page:extension:'

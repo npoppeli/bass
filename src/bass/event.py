@@ -79,13 +79,13 @@ class Processor:
     """
     Processor instances are page processors for a given type of markup.
     """
-    def __init__(self, converter=None):
+    def __init__(self, func=None):
         """Construct page processor for given markup converter.
 
         Arguments:
-            converter (callable): markup converter
+            func (callable): markup converter
         """
-        self.convert = converter
+        self.convert = func
 
     def __call__(self, node: Node):
         """Convert node.content, node.preview and node.meta, which are set by the

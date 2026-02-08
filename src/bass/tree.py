@@ -64,11 +64,11 @@ class Node:
     def __init__(self, name: str, path: str, parent=None):
         """Construct Node with given name, path and parent.
 
-    Arguments:
-        name (str):    name of node
-        path (str):    filesystem path of node contents
-        parent (Node): parent node (can be empty, i.e. None)
-    """
+        Arguments:
+            name (str):    name of node
+            path (str):    filesystem path of node contents
+            parent (Node): parent node (can be empty, i.e. None)
+        """
         self.kind = 'Node'
         self.id = ''
         self.name = name
