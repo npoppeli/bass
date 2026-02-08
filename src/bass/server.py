@@ -44,10 +44,6 @@ try:
                 self.timestamp = datetime.now()
                 self.callback()
             response = request.get_response(self.wrapped)
-            dt = datetime.strftime(datetime.now(), "%d/%b/%Y %H:%M:%S")
-            logger.info('{} - - [{}] "{} {}" {} {}'.\
-                        format(request.server_name, dt, request.method, request.path_info,
-                               response.status, response.content_length))
             return response(environ, start_response)
 
     try:
