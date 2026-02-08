@@ -24,10 +24,12 @@ classifiers = [
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10'
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12'
 ]
 
 [project.urls]
-Homepage   = "http://schier7.home.xs4all.nl/bass"
+Homepage   = "http://www.fransevoorouders.nl/bass"
 Repository = "https://github.com/npoppeli/bass"
 Issues     = "https://github.com/npoppeli/bass/issues"
