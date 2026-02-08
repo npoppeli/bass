@@ -7,7 +7,7 @@ Objects and functions related to the site tree.
 import shutil, sys
 from typing import Callable
 from copy import copy as shallow_copy
-from datetime import datetime, date
+from datetime import datetime, date, time
 from os.path import getctime, basename
 from os import makedirs
 from os.path import join, splitext
@@ -271,32 +271,50 @@ def complete_metadata(meta: dict, path: str) -> dict:
 
 def adjust_date_time(meta: dict, ctime: datetime):
     """Adjust metadata fields `date`, `time` and `datetime`.
-     The adjustments are based on the given metadata and the ctime of a node.
+    If present in the YAML file, the metadata fields `date`, `time` and `datetime` should have the
+    right data type.
 
     Arguments:
         meta: metadata dictionary
         ctime: ctime of a node
     """
-    date_part = meta.get('date')
-    time_part = meta.get('time')
+    date_value, time_value, datetime_value = None, None, None
+    if 'date' in meta:
+        if isinstance(meta['date'], datetime):
+            date_value = meta['date']
+        else:
+            logger.debug(f"Bad date value {date_value}, type {type(date_value)}")
+    if 'time' in meta:
+        if isinstance(meta['time'], time):
+            time_value = meta['time']
+        else:
+            logger.debug(f"Bad time value {time_value}, type {type(time_value)}")
     if 'datetime' in meta:
-        if date_part is None:
-            if isinstance(meta['datetime'], datetime):
-                date_part = meta['datetime'].date()
-            elif isinstance(meta['datetime'], date):
-                date_part = meta['datetime']
-        if time_part is None and isinstance(meta['datetime'], datetime):
-            time_part = meta['datetime'].time()
-    meta['date'] = date_part
-    meta['time'] = time_part
-    # date & time from datetime override date & time from metadata
-    if date_part is not None and time_part is not None:
-        meta['datetime'] = datetime(date_part.year, date_part.month,
-                date_part.day, time_part.hour, time_part.minute,
-                time_part.second, time_part.microsecond, time_part.tzinfo)
-    elif date_part is not None:
-        meta['datetime'] = datetime(date_part.year, date_part.month, date_part.day)
-    else:
+        if isinstance(meta['datetime'], datetime):
+            datetime_value = meta['datetime']
+        else:
+            logger.debug(f"Bad datetime value {datetime_value}, type {type(datetime_value)}")
+    # We now distinguish 3 cases:
+    # 1. if we have a valid datetime, we can set date and time based on datetime, if necessary
+    # 2. we do not have a valid datetime, but we have a valid date or date+time
+    # 3. we have neither a valid datetime nor a valid date
+    if date_value or time_value or datetime_value:
+        logger.debug(f"datetime={datetime_value} date={date_value} time={time_value}")
+    if datetime_value: # case 1
+        if date_value is None:
+            date_value = datetime_value.date()
+            meta['date'] = date_value
+        if time_value is None:
+            time_value = datetime_value.time()
+            meta['time'] = time_value
+    elif date_value: # case 2
+        if time_value:
+            meta['datetime'] = datetime(date_value.year, date_value.month,
+                date_value.day, time_value.hour, time_value.minute,
+                time_value.second, time_value.microsecond, time_value.tzinfo)
+        else:
+            meta['datetime'] = datetime(date_value.year, date_value.month, date_value.day)
+    else: # case 3
         meta['datetime'] = ctime
         meta['date']     = ctime.date()
         meta['time']     = ctime.time()
@@ -367,7 +385,13 @@ class Page(Node):
             logger.critical(f"Undefined template '{self.skin}' for page {self.path}")
             sys.exit(1)
         filepath = join(setting.output, self.url[1:])
-        write_file(template.render(this=self), filepath)
+        # logger.debug('Writing page {}'.format(filepath))
+        try:
+            write_file(template.render(this=self), filepath)
+        except NameError as e:
+            logger.debug(f"Error in template expression in page {self.path}\n{e}")
+        except AttributeError as e:
+            logger.debug(f"Missing attribute in page {self.path}\n{e}")
         for node in self.children: # (dynamically created) sub-pages
             node.render()
         self.event('render:post:page:any')
