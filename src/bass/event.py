@@ -162,7 +162,7 @@ def add_toc(page, nodelist, skin, sep='_', size=10):
         except AttributeError:
             logger.debug(f"add_toc: node {node.name} misses an attribute")
     parts = partition(results, size)
-    # create 'prev' and 'next' links
+    # create 'previous' and 'next' links
     page.prev, page.next = None, None
     previous = page
     logger.debug(f'add_toc: main page name={page.name} path={page.path}, {len(parts)} parts')
