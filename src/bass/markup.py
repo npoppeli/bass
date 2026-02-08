@@ -21,29 +21,30 @@ except:
 
 # Markdown
 try:
-    import markdown2
-    def convert_md2(text):
-        extensions = ['tables']
+    import markdown
+    def convert_mkd(text):
+        extras = ['markdown.extensions.tables', 'markdown.extensions.def_list']
         if have_pygments:
-            extensions.append('fenced-code-blocks')
-        return markdown2.markdown(text, extras=extensions)
-    converter['.mkd'] = convert_md2
-    have_markdown  = True
+            extras.extend(['markdown.extensions.codehilite', 'markdown.extensions.fenced_code'])
+        return markdown.markdown(text, extensions=extras)
+    converter['.mkd'] = convert_mkd
+    have_markdown = True
 except ImportError:
-    have_markdown  = False
+    have_markdown = False
 
+# Markdown 2
 if not have_markdown:
     try:
-        import markdown
-        def convert_mkd(text):
-            extras = ['markdown.extensions.tables']
+        import markdown2
+        def convert_md2(text):
+            extensions = ['tables']
             if have_pygments:
-                extras.extend(['markdown.extensions.codehilite', 'markdown.extensions.fenced_code'])
-            return markdown.markdown(text, extensions=extras)
-        converter['.mkd'] = convert_mkd
-        have_markdown = True
+                extensions.append('fenced-code-blocks')
+            return markdown2.markdown(text, extras=extensions)
+        converter['.mkd'] = convert_md2
+        have_markdown  = True
     except ImportError:
-        have_markdown = False
+        have_markdown  = False
 
 # RestructuredText
 try:
