@@ -42,7 +42,7 @@ def read_file(path: str) -> str:
     Returns:
         text (str): content of file
     """
-    with open(path, 'rU') as f:
+    with open(path, 'r') as f:
         try:
             text = ''.join(f.readlines())
         except UnicodeError:
