@@ -77,6 +77,9 @@ class Node:
         self.children = []
         self.tags = []
 
+    def __str__(self):
+        return f"{self.kind} '{self.path}'"
+
     def ready(self):
         """abstract `ready` method"""
         pass
@@ -88,7 +91,10 @@ class Node:
             descr (str): description of event
         """
         if descr in event_mod.event_handler:
-            event_mod.event_handler[descr](self)
+            try:
+                event_mod.event_handler[descr](self)
+            except Exception as e:
+                logger.error(f'Error handling event {descr} on {self}:\n{e}')
 
     def render(self):
         """abstract `render` method"""
