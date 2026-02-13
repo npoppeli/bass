@@ -8,6 +8,8 @@ converters, depending on which external packages are available.
 """
 
 import re
+from collections.abc import Callable
+from .common import logger
 
 # available page converters
 converter = {}
@@ -22,11 +24,11 @@ except:
 # Markdown
 try:
     import markdown
+    extensions = ['markdown.extensions.tables', 'markdown.extensions.def_list', 'markdown.extensions.fenced_code']
+    if have_pygments:
+        extensions.append('markdown.extensions.codehilite')
     def convert_mkd(text):
-        extras = ['markdown.extensions.tables', 'markdown.extensions.def_list']
-        if have_pygments:
-            extras.extend(['markdown.extensions.codehilite', 'markdown.extensions.fenced_code'])
-        return markdown.markdown(text, extensions=extras)
+        return markdown.markdown(text, extensions=extensions)
     converter['.mkd'] = convert_mkd
     have_markdown = True
 except ImportError:
@@ -36,10 +38,10 @@ except ImportError:
 if not have_markdown:
     try:
         import markdown2
+        extensions = ['tables']
+        if have_pygments:
+            extensions.append('fenced-code-blocks')
         def convert_md2(text):
-            extensions = ['tables']
-            if have_pygments:
-                extensions.append('fenced-code-blocks')
             return markdown2.markdown(text, extras=extensions)
         converter['.mkd'] = convert_md2
         have_markdown  = True
@@ -76,3 +78,20 @@ converter['.html'] = convert_html
 def convert_txt(text):
     return '<p>' + re.sub(r'\n{2,}', '</p><p>', text) + '</p>'
 converter['.txt'] = convert_txt
+
+# user-defined converters
+def add_converter(extension: str, conv: Callable) -> None:
+    """Add converter for `extension`.
+
+    Arguments:
+        extension (str): extension of filetype
+        conv (Callable): callable for this filetype
+    """
+    if callable(conv):
+        if extension in converter:
+            logger.debug(f'Converter for {extension} already exists')
+        else:
+            logger.debug(f'New converter for {extension}')
+            converter[extension] = conv
+    else:
+        logger.debug(f'Converter for {extension} is not a callable')
