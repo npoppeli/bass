@@ -1,3 +1,16 @@
+Version 1.4.0
+-------------
+
+### Features
+- API changes: added helper function for adding a converter
+- Updated README and manual.
+
+### Other
+- event exceptions are now caught and reported
+- added or improved doc strings
+- improved handling of metadata fields 'date', 'time' and 'datetime'
+- removed superfluous logging by the HTTP server
+
 Version 1.3.0
 -------------
 
