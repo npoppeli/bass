@@ -304,8 +304,6 @@ def adjust_date_time(meta: dict, ctime: datetime):
     # 1. if we have a valid datetime, we can set date and time based on datetime, if necessary
     # 2. we do not have a valid datetime, but we have a valid date or date+time
     # 3. we have neither a valid datetime nor a valid date
-    if date_value or time_value or datetime_value:
-        logger.debug(f"datetime={datetime_value} date={date_value} time={time_value}")
     if datetime_value: # case 1
         if date_value is None:
             date_value = datetime_value.date()
@@ -391,13 +389,15 @@ class Page(Node):
             logger.critical(f"Undefined template '{self.skin}' for page {self.path}")
             sys.exit(1)
         filepath = join(setting.output, self.url[1:])
-        # logger.debug('Writing page {}'.format(filepath))
+        # logger.debug(f"Page {self.path}: self.url={self.url}")
         try:
             write_file(template.render(this=self), filepath)
         except NameError as e:
-            logger.debug(f"Error in template expression in page {self.path}\n{e}")
+            logger.error(f"Page {self.path}: error in template expression\n{e}")
         except AttributeError as e:
-            logger.debug(f"Missing attribute in page {self.path}\n{e}")
+            logger.error(f"Page {self.path}: missing attribute in \n{e}")
+        except IsADirectoryError as e:
+            logger.error(f"Page {self.path}: path {filepath} is a directory\n{e}")
         for node in self.children: # (dynamically created) sub-pages
             node.render()
         self.event('render:post:page:any')
