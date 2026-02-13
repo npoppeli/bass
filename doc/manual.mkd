@@ -151,11 +151,13 @@ and [Tree model](#treemodel).
 
 After a node is created, one or more events are sent, depending on the node type:
 
+```
     generate:post:root
     generate:post:folder:name:<name>
     generate:post:page:name:<name>
     generate:post:page:extension:<extension>
     generate:post:asset:name:<name>
+```
 
 See the paragraph [Events](#events) for an explanation of these events. Because the site tree is
 generated in bottom-up fashion, the event handlers for *generate:post:root* and
@@ -210,7 +212,6 @@ an asset.
 The event handler for *generate:post:page:extension:abc* should perform the following tasks:
 
 - convert `node.content`, `node.preview` and `node.meta` (which are set by the node constructor) to HTML
-- set all elements of `node.meta` as attributes of the node
 - set `node.url`
 
 #### Pages
@@ -231,9 +232,11 @@ tags: each sequence of two or more line breaks is treated as end of paragraph.
 Each page may optionally can start with a metadata section in YAML form. Suppose there is a file
 named `index.mkd` in the input directory, with the following contents.
 
+``` yaml
     title: Home
     ---
     This is the home page. Add useful text here.
+```
 
 This is a minimal Markdown page. The part above the divider `---` contains the metadata for the
 page. Below the `---` is the content of the page.  The metadata section is not required.
@@ -257,7 +260,8 @@ The basic set of metadata is this.
   (default: `ctime` of the file)
 
 Other metadata fields can be defined in the header of the page. All metadata fields are added as
-attributes of the *Page* node, and can be used in templates or events.
+attributes of the *Page* node when the node is created (by the `__init__` method),
+and can be used in templates or events.
 
 #### Assets
 
@@ -403,7 +407,7 @@ Events for the root of the site tree are specified as *generate:post:root*,
 
 The post-generate event for the root node, *generate:post:root*, is called after generating the
 site tree, and can be used for global transformations of the tree. Please use your imagination,
-but don't break the site tree (well: it's your tree anyway).
+but don't break the site tree.
 
 The post-render event, *render:post:root*, is the last event to be sent, after the root node and
 all its children have been rendered (see the paragraph [Rendering phase](#rendering) for more
@@ -412,10 +416,12 @@ to another server, for example.
 
 #### Extensions
 
-Extensions, mostly in the form of event handlers, are put in a Python package that is defined in
+Extensions, mostly in the form of event handlers, are placed in a Python package that is defined in
 the configuration file:
 
-    extension: package_name
+``` yaml
+extension: package_name
+```
 
 Bass attempts to import the package `package_name`. This means that the project directory should
 contain a sub-directory `package_name`, which contain at least a file `__init__.py` and possibly
@@ -426,7 +432,7 @@ always any callable object is acceptable. An event handler is called with one pa
 the node that emitted the event. During the import of the package, the event handlers should be
 assigned to an event by calling the function `add_handler`:
 
-```python
+``` python
 def upload_site(root):
     ...
 add_handler('render:post:root', upload_site)
@@ -448,11 +454,31 @@ For the following events Bass has built-in event handlers:
 * *generate:post:page:extension:html*
 * *generate:post:page:extension:txt*
 
+#### Page processing
+The handler for the *generate:post:page:extension:xyz* is important, because it is responsible
+for handling the metadata of a Page node, and for converting the page preview and the page content
+into HTML. The built-in event handlers are instances of the Processor class. Each instance of this class
+is a callable object ('processor') that functions as a wrapper around a converter. Each processor
+also sets the `url` attribute of the node. A converter is a callable that converts a certain text format into HTML.
+We will give a short example of a user-defined processor below.
+
+``` python
+from bass import add_handler, add_converter, Processor
+# first the converter
+def tex_converter(text):
+    # convert `text` to HTML
+    ...
+add_converter('.tex', tex_converter)
+# then the processor
+tex_markup_processor = Processor(tex_converter)
+add_handler('generate:post:page:extension:tex', tex_markup_processor)
+```
+
 #### Pre-render events
 
 Table of contents (paginated).
 
-```python
+``` python
 from bass import add_toc, add_handler
 def photo_toc(this):
     add_toc(this, this.parent.folder('photo').children, skin='photo_entry', size=20)
@@ -461,20 +487,9 @@ add_handler('render:pre:page:name:photo.mkd', photo_toc)
 
 #### Post-generate events
 
-Define an extra page type (markup format):
-
-```python
-from bass import add_handler
-def page_with_tex_markup(node):
-    # convert node.content and node.preview to HTML
-    # use metadata to set node attributes
-    # set node.url
-add_handler('generate:post:page:extension:tex', page_with_tex_markup)
-```
-
 Remove an existing page type:
 
-```python
+``` python
 from bass import remove_handler
 remove_handler('generate:post:page:extension:txt')
 ```
@@ -483,7 +498,7 @@ If you do this, `.txt` files are treated as assets.
 
 Use existing page types with different file extensions:
 
-```python
+``` python
 from bass import copy_handler
 copy_handler('generate:post:page:extension:rst', 'generate:post:page:extension:rest')
 ```
@@ -493,7 +508,7 @@ If you do this, files with extension `.rest` are treated the same as files (page
 
 Define extra template type:
 
-```python
+``` python
 from bass import add_template_type
 from mako.template import Template
 add_template_type('mko', lambda name: Template(filename=name))
