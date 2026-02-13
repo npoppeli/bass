@@ -41,7 +41,7 @@ def add_handler(event: str, handler: Handler) -> None:
     """
     if callable(handler):
         if event in event_handler:
-            logger.debug(f'Event handler for {event} extended')
+            logger.debug(f'Extended event handler for {event}')
             event_handler[event] = combine(event_handler[event], handler)
         else:
             logger.debug(f'New event handler for {event}')
