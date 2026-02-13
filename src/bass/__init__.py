@@ -23,8 +23,9 @@ Functions:
 
 from .common  import logger
 from .config  import parse_cmdline
-from .event   import add_toc, add_handler, copy_handler, remove_handler, resolve_idref
+from .event   import add_toc, add_handler, copy_handler, remove_handler, resolve_idref, Processor
 from .layout  import add_template_type, copy_template_type
+from .markup  import add_converter
 from .server  import http_server
 from .site    import build_site, create_project
 from .tree    import add_transformer
